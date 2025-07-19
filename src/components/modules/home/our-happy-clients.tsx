@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { EmblaOptionsType } from "embla-carousel";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { FeedbackCarousel } from "./feedback-carousel";
-import Container from "@/components/shared/Container";
-import { SectionHeadWithBorder } from "@/components/common/section-head-with-border";
-import { usePrevNextButtons } from "@/components/common/embla-arrow-buttons";
+import { EmblaOptionsType } from 'embla-carousel';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { FeedbackCarousel } from './feedback-carousel';
+import Container from '@/components/shared/Container';
+import { SectionHeadWithBorder } from '@/components/common/section-head-with-border';
+import { usePrevNextButtons } from '@/components/common/embla-arrow-buttons';
 import backgroundImg from '@/assets/images/background-img.png';
-import useEmblaCarousel from "embla-carousel-react";
+import useEmblaCarousel from 'embla-carousel-react';
 
 export const OurHappyClients = () => {
   const OPTIONS: EmblaOptionsType = { loop: true };
@@ -27,9 +27,9 @@ export const OurHappyClients = () => {
       className="py-20"
       style={{
         backgroundImage: `url(${backgroundImg.src})`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
       }}
     >
       <Container>

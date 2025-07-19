@@ -14,13 +14,13 @@ interface IClientFeedbackCardProps {
 
 const clientsFeedback: IClinetContent[] = [
   {
-    title: "Amazing Fashion Wear",
+    title: 'Amazing Fashion Wear',
     detailsText: `“ Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer 
 took a galley of type and `,
     reviewedBy: {
-      name: "DR. Marina Califer",
+      name: 'DR. Marina Califer',
       profile:
-        "https://img.p.mapq.st/?url=https://s3-media0.fl.yelpcdn.com/photo/cEb4N-HF0OFnR9_qP1pOnw/l.jpg?w=96&q=75",
+        'https://img.p.mapq.st/?url=https://s3-media0.fl.yelpcdn.com/photo/cEb4N-HF0OFnR9_qP1pOnw/l.jpg?w=96&q=75',
     },
   },
 ];

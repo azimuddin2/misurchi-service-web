@@ -36,19 +36,22 @@ export default function Header() {
       <div className="bg-[#093954] text-white text-sm  py-2">
         <div className="container mx-auto px-5 lg:px-0 flex justify-between items-center">
           <div className="lg:flex gap-6">
-            <p className='flex items-center'>
-              <Phone size={16} /> <span className='ml-1'>+123 (456) 789-987</span>
+            <p className="flex items-center">
+              <Phone size={16} />{' '}
+              <span className="ml-1">+123 (456) 789-987</span>
             </p>
-            <p className='flex items-center'> <Mail size={16} /> <span className='ml-1'>contact@fashion.com</span> </p>
+            <p className="flex items-center">
+              {' '}
+              <Mail size={16} />{' '}
+              <span className="ml-1">contact@fashion.com</span>{' '}
+            </p>
           </div>
           <div className="flex justify-center items-center gap-4 ml-auto sm:ml-0">
             <Link href="/login" className="hover:underline">
               Sign In
             </Link>
             <Link href="/user-role">
-              <Button
-                className="text-[#fff] bg-[#0d3c59e9] px-3 py-5 text-sm"
-              >
+              <Button className="text-[#fff] bg-[#0d3c59e9] px-3 py-5 text-sm">
                 Sign Up
               </Button>
             </Link>
@@ -90,8 +93,9 @@ export default function Header() {
 
       {/* Mobile Dropdown */}
       <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-          }`}
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
       >
         <div className="flex flex-col gap-4 text-center text-sm font-medium px-4 py-4">
           {/* Top Nav */}

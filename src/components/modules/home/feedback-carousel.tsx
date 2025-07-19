@@ -1,15 +1,15 @@
-"use client";
-import  { useCallback, useEffect, useRef } from "react";
+'use client';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   EmblaCarouselType,
   EmblaEventType,
   EmblaOptionsType,
-} from "embla-carousel";
+} from 'embla-carousel';
 
 // import css here
-import "./styles/embla.css";
-import { EmblaViewportRefType } from "embla-carousel-react";
-import { ClientFeedbackCard } from "@/components/ui/core/client-feedback-card";
+import './styles/embla.css';
+import { EmblaViewportRefType } from 'embla-carousel-react';
+import { ClientFeedbackCard } from '@/components/ui/core/client-feedback-card';
 
 const TWEEN_FACTOR_BASE = 0.52;
 
@@ -31,7 +31,7 @@ export const FeedbackCarousel: React.FC<PropType> = (props) => {
 
   const setTweenNodes = useCallback((emblaApi: EmblaCarouselType): void => {
     tweenNodes.current = emblaApi.slideNodes().map((slideNode) => {
-      return slideNode.querySelector(".embla__slide__number") as HTMLElement;
+      return slideNode.querySelector('.embla__slide__number') as HTMLElement;
     });
   }, []);
 
@@ -44,7 +44,7 @@ export const FeedbackCarousel: React.FC<PropType> = (props) => {
       const engine = emblaApi.internalEngine();
       const scrollProgress = emblaApi.scrollProgress();
       const slidesInView = emblaApi.slidesInView();
-      const isScrollEvent = eventName === "scroll";
+      const isScrollEvent = eventName === 'scroll';
 
       emblaApi.scrollSnapList().forEach((scrollSnap, snapIndex) => {
         let diffToTarget = scrollSnap - scrollProgress;
@@ -80,7 +80,7 @@ export const FeedbackCarousel: React.FC<PropType> = (props) => {
         });
       });
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -91,11 +91,11 @@ export const FeedbackCarousel: React.FC<PropType> = (props) => {
     tweenScale(emblaApi);
 
     emblaApi
-      .on("reInit", setTweenNodes)
-      .on("reInit", setTweenFactor)
-      .on("reInit", tweenScale)
-      .on("scroll", tweenScale)
-      .on("slideFocus", tweenScale);
+      .on('reInit', setTweenNodes)
+      .on('reInit', setTweenFactor)
+      .on('reInit', tweenScale)
+      .on('scroll', tweenScale)
+      .on('slideFocus', tweenScale);
   }, [emblaApi, tweenScale]);
 
   return (
