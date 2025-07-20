@@ -31,11 +31,11 @@ const UserRole = () => {
     <div
       style={{
         backgroundImage: `url(${rectangleBgImg.src})`,
-        backgroundSize: 'cover',
+        backgroundSize: 'contain',
+        width: '100%',
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
       }}
-      className=" min-h-screen flex justify-center items-center"
+      className="flex justify-center items-center py-20"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 px-4 py-8 container mx-auto">
         {cards.map((card, index) => (

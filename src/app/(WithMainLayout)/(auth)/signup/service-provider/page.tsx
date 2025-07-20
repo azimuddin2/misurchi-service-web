@@ -2,7 +2,7 @@ import ProviderSignupForm from '@/components/modules/auth/signup/ProviderSignupF
 
 export default function ServiceProviderSignupPage() {
   return (
-    <div className="p-8 max-w-xl mx-auto">
+    <div>
       <ProviderSignupForm />
     </div>
   );
