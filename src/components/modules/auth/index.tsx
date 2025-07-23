@@ -16,7 +16,7 @@ const UserRole = () => {
       description:
         'Showcase your services & products, and connect with users in your area. Expand your reach today!',
       image: serviceProviderImg,
-      href: '/signup/service-provider',
+      href: '/signup/vendor',
     },
     {
       title: 'Sign Up as a User',

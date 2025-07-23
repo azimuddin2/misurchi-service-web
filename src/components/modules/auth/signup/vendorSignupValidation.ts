@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const providerSignupSchema = z
+export const vendorSignupSchema = z
   .object({
     businessName: z.string({ required_error: 'Business name is required' }),
     email: z
@@ -32,4 +32,4 @@ export const providerSignupSchema = z
     path: ['confirmPassword'],
   });
 
-export type RegisterSchema = z.infer<typeof providerSignupSchema>;
+export type RegisterSchema = z.infer<typeof vendorSignupSchema>;

@@ -23,7 +23,7 @@ import {
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { providerSignupSchema } from './providerSignupValidation';
+import { vendorSignupSchema } from './vendorSignupValidation';
 import CountryStateCitySelector from '@/components/ui/core/country-state-city-selector';
 import googleIcon from '@/assets/icons/google.png';
 import phoneIcon from '@/assets/icons/phone.png';
@@ -36,12 +36,12 @@ import Link from 'next/link';
 import { IoCheckbox } from 'react-icons/io5';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 
-const ProviderSignupForm = () => {
+const VendorSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const form = useForm({
-    resolver: zodResolver(providerSignupSchema),
+    resolver: zodResolver(vendorSignupSchema),
   });
 
   const { register, setValue, control } = form;
@@ -496,4 +496,4 @@ const ProviderSignupForm = () => {
   );
 };
 
-export default ProviderSignupForm;
+export default VendorSignupForm;
