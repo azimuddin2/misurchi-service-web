@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import {
   Form,
@@ -31,6 +31,10 @@ import Image from 'next/image';
 import { currencyOptions } from '@/constants/currency';
 import { timezonesOptions } from '@/constants/timezones';
 import { workHourOptions } from '@/constants/workHour';
+import { AppButton } from '@/components/shared/app-button';
+import Link from 'next/link';
+import { IoCheckbox } from 'react-icons/io5';
+import { PhoneInput } from '@/components/ui/core/phone-input';
 
 const ProviderSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -49,13 +53,6 @@ const ProviderSignupForm = () => {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       console.log(data);
-      // const res = await registerUser(data);
-      // if (res?.success) {
-      //     toast.success(res?.message);
-      //     form.reset();
-      // } else {
-      //     toast.error(res?.message);
-      // }
     } catch (error: any) {
       console.error(error);
     }
@@ -71,7 +68,7 @@ const ProviderSignupForm = () => {
       }}
       className="flex justify-center items-center py-20"
     >
-      <div className="bg-white p-5 lg:p-6 rounded-xl shadow-md lg:w-1/3">
+      <div className="bg-white p-4 lg:p-6 rounded-xl shadow-md lg:w-1/3">
         <h3 className="text-sm text-gray-700 uppercase font-medium">
           Let's get you started
         </h3>
@@ -117,8 +114,10 @@ const ProviderSignupForm = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
+                      type="text"
                       placeholder="Enter your business name"
                       {...field}
+                      value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
@@ -141,6 +140,7 @@ const ProviderSignupForm = () => {
                       type="email"
                       placeholder="Enter business email address"
                       {...field}
+                      value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
@@ -154,16 +154,17 @@ const ProviderSignupForm = () => {
               control={form.control}
               name="phone"
               render={({ field }) => (
-                <FormItem className="mb-5">
+                <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium">
                     Phone Number
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                      type="tel"
-                      placeholder="Enter business phone number"
-                      {...field}
+                    <PhoneInput
+                      // @ts-ignore
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      international
+                      defaultCountry="US"
                     />
                   </FormControl>
                   <FormMessage />
@@ -191,9 +192,11 @@ const ProviderSignupForm = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
+                      type="text"
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       placeholder="Enter your street address"
                       {...field}
+                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -202,12 +205,12 @@ const ProviderSignupForm = () => {
             />
 
             {/* State and Zip */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-5">
               <FormField
                 control={form.control}
                 name="zip"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="lg:mb-0 mb-5">
                     <FormLabel className="!text-gray-700 !text-base font-medium">
                       Zip Code
                     </FormLabel>
@@ -215,6 +218,7 @@ const ProviderSignupForm = () => {
                       type="text"
                       placeholder="Type Zip Code"
                       {...field}
+                      value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                     <FormMessage />
@@ -255,12 +259,12 @@ const ProviderSignupForm = () => {
             </div>
 
             {/* Time Zone & Work Hours */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-5">
               <FormField
                 control={form.control}
                 name="timezone"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="lg:mb-0 mb-5">
                     <FormLabel className="!text-gray-700 !text-base font-medium">
                       Time Zone
                     </FormLabel>
@@ -317,19 +321,21 @@ const ProviderSignupForm = () => {
             </div>
 
             {/* First and Last Name */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-5">
               <FormField
                 control={form.control}
                 name="firstName"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="lg:mb-0 mb-5">
                     <FormLabel className="!text-gray-700 !text-base font-medium">
                       First Name
                     </FormLabel>
                     <FormControl>
                       <Input
+                        type="text"
                         placeholder="First Name"
                         {...field}
+                        value={field.value || ''}
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
@@ -347,8 +353,10 @@ const ProviderSignupForm = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
+                        type="text"
                         placeholder="Last Name"
                         {...field}
+                        value={field.value || ''}
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
@@ -372,6 +380,7 @@ const ProviderSignupForm = () => {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
                       {...field}
+                      value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
@@ -407,6 +416,7 @@ const ProviderSignupForm = () => {
                       type={showConfirm ? 'text' : 'password'}
                       placeholder="Enter your confirm password"
                       {...field}
+                      value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
@@ -430,26 +440,54 @@ const ProviderSignupForm = () => {
 
             {/* Password Requirements */}
             <ul className="text-xs text-gray-500 space-y-1 pl-2 list-disc">
-              <li>Minimum of 8 characters</li>
-              <li>At least one uppercase letter</li>
-              <li>At least one lowercase letter</li>
-              <li>At least one number</li>
-              <li>At least one special character (e.g., !@#$%^&*)</li>
+              <li className="list-none flex items-center">
+                <IoCheckbox size={18} />
+                <span className="ml-1 text-sm font-medium">
+                  Minimum of 8 characters
+                </span>
+              </li>
+              <li className="list-none flex items-center">
+                <IoCheckbox size={18} />
+                <span className="ml-1 text-sm font-medium">
+                  At least one uppercase letter
+                </span>
+              </li>
+              <li className="list-none flex items-center">
+                <IoCheckbox size={18} />
+                <span className="ml-1 text-sm font-medium">
+                  At least one lowercase letter
+                </span>
+              </li>
+              <li className="list-none flex items-center">
+                <IoCheckbox size={18} />
+                <span className="ml-1 text-sm font-medium">
+                  At least one number
+                </span>
+              </li>
+              <li className="list-none flex items-center">
+                <IoCheckbox size={18} />
+                <span className="ml-1 text-sm font-medium">
+                  At least one special character (e.g., !@#$%^&*)
+                </span>
+              </li>
             </ul>
 
             {/* Submit Button */}
-            <Button
-              type="submit"
-              className="w-full mt-4 bg-gradient-to-r from-green-400 to-emerald-600"
-            >
-              SIGN UP →
-            </Button>
+            <AppButton
+              className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
+              content={
+                <div className="flex justify-center items-center space-x-2 font-semibold">
+                  <p className="uppercase">Sign Up</p>
+                  <ArrowRight />
+                </div>
+              }
+            />
 
-            <p className="text-center text-sm mt-4">
+            <p className="text-center text-base mt-2">
               Have an account?{' '}
-              <a href="/login" className="text-black font-medium underline">
+              <Link href="/login" className="text-black font-bold underline">
                 SIGN IN HERE
-              </a>
+              </Link>
             </p>
           </form>
         </Form>

@@ -35,25 +35,27 @@ export const Footer = () => {
 
         {/* Copyright & Links */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-y-4 text-sm">
-          <p>© 2025 AnyJob. All rights reserved.</p>
+          <p className="text-sm text-gray-400">
+            Copyright © 2025 AnyJob. All rights reserved.
+          </p>
           <ul className="flex flex-wrap justify-center gap-6">
             <li>
-              <Link href="#" className="hover:underline">
+              <Link href="#" className="hover:underline text-gray-400">
                 Home
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:underline">
+              <Link href="#" className="hover:underline text-gray-400">
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:underline">
+              <Link href="#" className="hover:underline text-gray-400">
                 Terms Of Use
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:underline">
+              <Link href="#" className="hover:underline text-gray-400">
                 Pricing
               </Link>
             </li>

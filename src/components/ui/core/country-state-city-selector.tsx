@@ -85,7 +85,7 @@ export default function CountryStateCitySelector({
         control={control}
         name="country"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="lg:mb-0 mb-5">
             <FormLabel className="!text-gray-700 !text-base font-medium">
               Country
             </FormLabel>

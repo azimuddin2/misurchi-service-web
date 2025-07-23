@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, MoveRight } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, ArrowRight } from 'lucide-react';
 import { AppButton } from '@/components/shared/app-button';
 
 export default function Contact() {
@@ -169,7 +169,7 @@ export default function Contact() {
             content={
               <div className="flex justify-center items-center space-x-2 font-semibold">
                 <p className="uppercase">Submit Feedback</p>
-                <MoveRight />
+                <ArrowRight />
               </div>
             }
           />
