@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Eye, EyeOff, Import, PhoneCall } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import {
   Form,
@@ -28,6 +28,9 @@ import CountryStateCitySelector from '@/components/ui/core/country-state-city-se
 import googleIcon from '@/assets/icons/google.png';
 import phoneIcon from '@/assets/icons/phone.png';
 import Image from 'next/image';
+import { currencyOptions } from '@/constants/currency';
+import { timezonesOptions } from '@/constants/timezones';
+import { workHourOptions } from '@/constants/workHour';
 
 const ProviderSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -68,7 +71,7 @@ const ProviderSignupForm = () => {
       }}
       className="flex justify-center items-center py-20"
     >
-      <div className="bg-white p-6 rounded-xl shadow-md lg:w-1/3">
+      <div className="bg-white p-5 lg:p-6 rounded-xl shadow-md lg:w-1/3">
         <h3 className="text-sm text-gray-700 uppercase font-medium">
           Let's get you started
         </h3>
@@ -108,15 +111,15 @@ const ProviderSignupForm = () => {
               control={form.control}
               name="businessName"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base font-medium">
+                <FormItem className="mb-5">
+                  <FormLabel className="!text-gray-700 !text-base font-medium">
                     Business Name
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter your business name"
                       {...field}
-                      className="bg-[#f5f5f5] py-6 border-none"
+                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
                   <FormMessage />
@@ -129,8 +132,8 @@ const ProviderSignupForm = () => {
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base font-medium">
+                <FormItem className="mb-5">
+                  <FormLabel className="!text-gray-700 !text-base font-medium">
                     Email Address
                   </FormLabel>
                   <FormControl>
@@ -138,7 +141,7 @@ const ProviderSignupForm = () => {
                       type="email"
                       placeholder="Enter business email address"
                       {...field}
-                      className="bg-[#f5f5f5] py-6 border-none"
+                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
                   <FormMessage />
@@ -151,13 +154,13 @@ const ProviderSignupForm = () => {
               control={form.control}
               name="phone"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base font-medium">
+                <FormItem className="mb-5">
+                  <FormLabel className="!text-gray-700 !text-base font-medium">
                     Phone Number
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-[#f5f5f5] py-6 border-none"
+                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       type="tel"
                       placeholder="Enter business phone number"
                       {...field}
@@ -168,18 +171,27 @@ const ProviderSignupForm = () => {
               )}
             />
 
+            {/* Country, State, City Selector */}
+            <div className="grid w-full  items-center mb-5">
+              <CountryStateCitySelector
+                control={control}
+                setValue={setValue}
+                register={register}
+              />
+            </div>
+
             {/* Street */}
             <FormField
               control={form.control}
               name="street"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base font-medium">
+                <FormItem className="mb-5">
+                  <FormLabel className="!text-gray-700 !text-base font-medium">
                     Street
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-[#f5f5f5] py-6 border-none"
+                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       placeholder="Enter your street address"
                       {...field}
                     />
@@ -190,49 +202,50 @@ const ProviderSignupForm = () => {
             />
 
             {/* State and Zip */}
-            <div className="flex gap-4">
-              <FormField
-                control={form.control}
-                name="state"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>State</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="State" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="dhaka">Dhaka</SelectItem>
-                        <SelectItem value="ny">New York</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
               <FormField
                 control={form.control}
                 name="zip"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Zip Code</FormLabel>
+                  <FormItem>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Zip Code
+                    </FormLabel>
+                    <Input
+                      type="text"
+                      placeholder="Type Zip Code"
+                      {...field}
+                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Currency */}
+              <FormField
+                control={form.control}
+                name="currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Currency
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Zip Code" />
+                        <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
+                          <SelectValue placeholder="Select Currency" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="12345">12345</SelectItem>
-                        <SelectItem value="54321">54321</SelectItem>
+                      <SelectContent className="max-h-60 overflow-y-auto">
+                        {currencyOptions.map((currency) => (
+                          <SelectItem key={currency.code} value={currency.code}>
+                            {currency.name} ({currency.code})
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -241,52 +254,31 @@ const ProviderSignupForm = () => {
               />
             </div>
 
-            {/* Currency */}
-            <FormField
-              control={form.control}
-              name="currency"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Currency</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Currency" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="usd">USD</SelectItem>
-                      <SelectItem value="bdt">BDT</SelectItem>
-                      <SelectItem value="eur">EUR</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Time Zone & Work Hours */}
-            <div className="flex gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <FormField
                 control={form.control}
                 name="timezone"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Time Zone</FormLabel>
+                  <FormItem>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Time Zone
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
                           <SelectValue placeholder="Time Zone" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="utc+6">UTC+6</SelectItem>
+                      <SelectContent className="max-h-60 overflow-y-auto">
+                        {timezonesOptions.map((tz) => (
+                          <SelectItem key={tz.value} value={tz.value}>
+                            {tz.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -297,19 +289,25 @@ const ProviderSignupForm = () => {
                 control={form.control}
                 name="workHours"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Work Hours</FormLabel>
+                  <FormItem>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Work Hours
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
                           <SelectValue placeholder="Work Hours" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="9-5">9AM - 5PM</SelectItem>
+                        {workHourOptions.map((wh) => (
+                          <SelectItem key={wh.value} value={wh.value}>
+                            {wh.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -319,20 +317,20 @@ const ProviderSignupForm = () => {
             </div>
 
             {/* First and Last Name */}
-            <div className="flex gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <FormField
                 control={form.control}
                 name="firstName"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="text-base font-medium">
+                  <FormItem>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
                       First Name
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="First Name"
                         {...field}
-                        className="bg-[#f5f5f5] py-6 border-none"
+                        className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
                     <FormMessage />
@@ -343,15 +341,15 @@ const ProviderSignupForm = () => {
                 control={form.control}
                 name="lastName"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="text-base font-medium">
+                  <FormItem>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
                       Last Name
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Last Name"
                         {...field}
-                        className="bg-[#f5f5f5] py-6 border-none"
+                        className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
                     <FormMessage />
@@ -365,8 +363,8 @@ const ProviderSignupForm = () => {
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem className="relative">
-                  <FormLabel className="text-base font-medium">
+                <FormItem className="relative mb-5">
+                  <FormLabel className="!text-gray-700 !text-base font-medium">
                     Password
                   </FormLabel>
                   <FormControl>
@@ -374,20 +372,20 @@ const ProviderSignupForm = () => {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
                       {...field}
-                      className="bg-[#f5f5f5] py-6 border-none"
+                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-2 top-8 mt-2"
+                    className="absolute right-2 top-8"
                     onClick={() => setShowPassword((prev) => !prev)}
                   >
                     {showPassword ? (
-                      <EyeOff className="w-6 h-6 mt-1" />
+                      <EyeOff className="w-6 h-6" />
                     ) : (
-                      <Eye className="w-6 h-6 mt-1" />
+                      <Eye className="w-6 h-6" />
                     )}
                   </Button>
                   <FormMessage />
@@ -400,8 +398,8 @@ const ProviderSignupForm = () => {
               control={form.control}
               name="confirmPassword"
               render={({ field }) => (
-                <FormItem className="relative">
-                  <FormLabel className="text-base font-medium">
+                <FormItem className="relative mb-5">
+                  <FormLabel className="!text-gray-700 !text-base font-medium">
                     Confirm Password
                   </FormLabel>
                   <FormControl>
@@ -409,7 +407,7 @@ const ProviderSignupForm = () => {
                       type={showConfirm ? 'text' : 'password'}
                       placeholder="Enter your confirm password"
                       {...field}
-                      className="bg-[#f5f5f5] py-6 border-none"
+                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
                   <Button
@@ -420,9 +418,9 @@ const ProviderSignupForm = () => {
                     onClick={() => setShowConfirm((prev) => !prev)}
                   >
                     {showConfirm ? (
-                      <EyeOff className="w-6 h-6 mt-2" />
+                      <EyeOff className="w-6 h-6" />
                     ) : (
-                      <Eye className="w-6 h-6 mt-2" />
+                      <Eye className="w-6 h-6" />
                     )}
                   </Button>
                   <FormMessage />

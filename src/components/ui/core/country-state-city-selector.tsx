@@ -6,13 +6,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Controller } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+// import { Input } from '@/components/ui/input';
 
 export default function CountryStateCitySelector({
   control,
   userAddress,
-  register,
   setValue,
 }: any) {
   const [allData, setAllData] = useState([]);
@@ -74,193 +79,126 @@ export default function CountryStateCitySelector({
   }, [userAddress?.country]);
 
   return (
-    <div className="space-y-3">
-      <div className="grid w-full grid-cols-2 gap-x-3 gap-y-3 lg:grid-cols-3">
-        <div>
-          <Controller
-            name="country"
-            control={control}
-            defaultValue={selectedCountry}
-            render={({ field }) => (
+    <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-2">
+      {/* Country */}
+      <FormField
+        control={control}
+        name="country"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="!text-gray-700 !text-base font-medium">
+              Country
+            </FormLabel>
+            <FormControl>
               <Select
-                onValueChange={(countryName) => {
-                  field.onChange(countryName);
-                  setSelectedCountry(countryName);
+                onValueChange={(val) => {
+                  field.onChange(val);
+                  setSelectedCountry(val);
+                  setSelectedState('');
+                  setSelectedCity('');
+                  setValue('state', '');
+                  setValue('city', '');
                 }}
-                value={selectedCountry || ''}
+                value={selectedCountry}
               >
-                <SelectTrigger className="  py-5 bg-primary-light-gray w-full">
-                  <SelectValue placeholder="Select country" />
+                <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
+                  <SelectValue placeholder="Select Country" />
                 </SelectTrigger>
                 <SelectContent>
-                  {memoizedAllCountries?.map((country: any) => (
+                  {memoizedAllCountries.map((country: any) => (
                     <SelectItem key={country.name} value={country.name}>
                       {country.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            )}
-          />
-        </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <div>
-          {selectedCountry ? (
-            <>
-              {statesOfCountry?.length ? (
-                <Controller
-                  name="state"
-                  control={control}
-                  defaultValue={selectedState}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={(stateName) => {
-                        field.onChange(stateName);
-                        setSelectedState(stateName);
-                      }}
-                      value={selectedState || ''}
-                    >
-                      <SelectTrigger className="py-5 bg-primary-light-gray w-full">
-                        <SelectValue placeholder="Select state" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {statesOfCountry?.map((state: any) => (
-                          <SelectItem key={state.name} value={state.name}>
-                            {state.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              ) : (
-                <Select>
-                  <SelectTrigger className="py-5 bg-primary-light-gray w-full">
-                    <SelectValue placeholder="Select State" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="no state found">
-                      No state found!
+      {/* State */}
+      <FormField
+        control={control}
+        name="state"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="!text-gray-700 !text-base font-medium">
+              State
+            </FormLabel>
+            <FormControl>
+              <Select
+                onValueChange={(val) => {
+                  field.onChange(val);
+                  setSelectedState(val);
+                  setSelectedCity('');
+                  setValue('city', '');
+                }}
+                value={selectedState}
+                disabled={!selectedCountry || statesOfCountry.length === 0}
+              >
+                <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
+                  <SelectValue placeholder="Select State" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statesOfCountry.length > 0 ? (
+                    statesOfCountry.map((state: any) => (
+                      <SelectItem key={state.name} value={state.name}>
+                        {state.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-states-found" disabled>
+                      No states found
                     </SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            </>
-          ) : (
-            <Select>
-              <SelectTrigger
-                disabled
-                className="py-5 bg-primary-light-gray w-full"
+                  )}
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* City */}
+      {/* <FormField
+        control={control}
+        name="city"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>City</FormLabel>
+            <FormControl>
+              <Select
+                onValueChange={(val) => {
+                  field.onChange(val);
+                  setSelectedCity(val);
+                }}
+                value={selectedCity}
+                disabled={!selectedState || citiesOfState.length === 0}
               >
-                <SelectValue placeholder="Select a country first" />
-              </SelectTrigger>
-              <SelectContent></SelectContent>
-            </Select>
-          )}
-        </div>
-
-        <div>
-          {selectedState ? (
-            <>
-              <Controller
-                name="city"
-                control={control}
-                defaultValue={selectedCity}
-                render={({ field }) => (
-                  <>
-                    {citiesOfState?.length ? (
-                      <Select
-                        onValueChange={(cityName) => {
-                          field.onChange(cityName);
-                          setSelectedCity(cityName);
-                        }}
-                        value={selectedCity || ''}
-                      >
-                        <SelectTrigger className="py-5 bg-primary-light-gray w-full">
-                          <SelectValue placeholder="Select city" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {citiesOfState?.map((city: any) => (
-                            <SelectItem key={city.name} value={city.name}>
-                              {city.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <Select onValueChange={field.onChange}>
-                        <SelectTrigger className="py-5 bg-primary-light-gray w-full">
-                          <SelectValue placeholder="Select City" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="No city found">
-                            No city found
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </>
-                )}
-              />
-            </>
-          ) : (
-            <Select>
-              <SelectTrigger
-                disabled
-                className="py-5 bg-primary-light-gray w-full"
-              >
-                <SelectValue placeholder="Select a state first" />
-              </SelectTrigger>
-              <SelectContent></SelectContent>
-            </Select>
-          )}
-        </div>
-      </div>
-
-      <div className="grid w-full grid-cols-2 gap-x-3 gap-y-3 lg:grid-cols-3">
-        {/* <div>
-          <Input
-            type="text"
-            defaultValue={userAddress?.area}
-            id="area"
-            placeholder="Type Area"
-            className="outline-none focus:outline-none py-5 bg-primary-light-gray"
-            {...register("area")}
-          />
-        </div>
-
-        <div>
-          <Input
-            defaultValue={userAddress?.house}
-            type="text"
-            id="house"
-            placeholder="Type House No"
-            className="outline-none focus:outline-none py-5 bg-primary-light-gray"
-            {...register("house")}
-          />
-        </div> */}
-        <div className="col-span-2">
-          <Input
-            defaultValue={userAddress?.streetAddress}
-            type="text"
-            id="streetAddress"
-            placeholder="Street Address"
-            className="outline-none focus:outline-none py-5 bg-primary-light-gray bg-transparent"
-            {...register('streetAddress')}
-          />
-        </div>
-
-        <div>
-          <Input
-            defaultValue={userAddress?.zipCode}
-            type="number"
-            id="zipCode"
-            placeholder="Type Zip Code"
-            className="outline-none focus:outline-none py-5 bg-primary-light-gray bg-transparent"
-            {...register('zipCode')}
-          />
-        </div>
-      </div>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {citiesOfState.length > 0 ? (
+                    citiesOfState.map((city: any) => (
+                      <SelectItem key={city.name} value={city.name}>
+                        {city.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-cities-found" disabled>
+                      No cities found
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      /> */}
     </div>
   );
 }

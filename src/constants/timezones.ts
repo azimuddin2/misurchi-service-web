@@ -1,0 +1,32 @@
+const timezones = [
+  { label: 'UTC−12:00', value: 'UTC-12' },
+  { label: 'UTC−11:00', value: 'UTC-11' },
+  { label: 'UTC−10:00', value: 'UTC-10' },
+  { label: 'UTC−09:00', value: 'UTC-9' },
+  { label: 'UTC−08:00', value: 'UTC-8' },
+  { label: 'UTC−07:00', value: 'UTC-7' },
+  { label: 'UTC−06:00', value: 'UTC-6' },
+  { label: 'UTC−05:00', value: 'UTC-5' },
+  { label: 'UTC−04:00', value: 'UTC-4' },
+  { label: 'UTC−03:00', value: 'UTC-3' },
+  { label: 'UTC−02:00', value: 'UTC-2' },
+  { label: 'UTC−01:00', value: 'UTC-1' },
+  { label: 'UTC±00:00', value: 'UTC+0' },
+  { label: 'UTC+01:00', value: 'UTC+1' },
+  { label: 'UTC+02:00', value: 'UTC+2' },
+  { label: 'UTC+03:00', value: 'UTC+3' },
+  { label: 'UTC+04:00', value: 'UTC+4' },
+  { label: 'UTC+05:00', value: 'UTC+5' },
+  { label: 'UTC+06:00 (Bangladesh)', value: 'UTC+6' },
+  { label: 'UTC+07:00', value: 'UTC+7' },
+  { label: 'UTC+08:00', value: 'UTC+8' },
+  { label: 'UTC+09:00', value: 'UTC+9' },
+  { label: 'UTC+10:00', value: 'UTC+10' },
+  { label: 'UTC+11:00', value: 'UTC+11' },
+  { label: 'UTC+12:00', value: 'UTC+12' },
+];
+
+export const timezonesOptions = timezones.map((item) => ({
+  label: item.label,
+  value: item.value,
+}));
