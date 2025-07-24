@@ -53,7 +53,7 @@ const LoginForm = () => {
       }}
       className="flex justify-center items-center min-h-screen py-20"
     >
-      <div className="bg-white p-4 lg:p-6 rounded-xl shadow-md lg:w-1/3">
+      <div className="bg-white p-4 lg:p-6 rounded-xl border shadow-md lg:w-1/3">
         <h3 className="text-sm text-gray-700 uppercase font-medium">
           Welcome Back
         </h3>
@@ -100,7 +100,7 @@ const LoginForm = () => {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="Enter business email address"
+                      placeholder="Enter your email address"
                       {...field}
                       value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
