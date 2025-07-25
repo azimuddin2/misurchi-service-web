@@ -27,6 +27,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { useLoginMutation } from '@/redux/features/auth/authApi';
 import { setUser, TUser } from '@/redux/features/auth/authSlice';
 import { verifyToken } from '@/utils/verifyToken';
+import { toast } from 'sonner';
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -49,28 +50,31 @@ const LoginForm = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      const res = await login(data).unwrap();
-      console.log(res.data.accessToken);
+      const response = await login(data).unwrap();
 
-      const user = verifyToken(res.data.accessToken) as TUser;
-      console.log(user);
+      const accessToken = response?.data?.accessToken;
+      if (!accessToken) {
+        toast.error('Access token missing from server response.');
+        return;
+      }
 
-      dispatch(setUser({ user: user, token: res.data.accessToken }));
+      const user = verifyToken(accessToken) as TUser;
+      if (!user) {
+        toast.error('Invalid access token.');
+        return;
+      }
 
-      // if (res?.success) {
-      //   toast.success(res?.message);
-      //   form.reset();
+      dispatch(setUser({ user, token: accessToken }));
+      toast.success(response.message || 'Login successful');
+      form.reset();
 
-      //   if (redirect) {
-      //     router.push(redirect);
-      //   } else {
-      //     router.push('/');
-      //   }
-      // } else {
-      //   toast.error(res?.message);
-      // }
+      router.push(redirect || '/');
     } catch (error: any) {
-      console.error(error);
+      const message =
+        error?.data?.message ||
+        error?.message ||
+        'An unexpected error occurred during login.';
+      toast.error(message);
     }
   };
 
@@ -201,7 +205,9 @@ const LoginForm = () => {
               className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
               content={
                 <div className="flex justify-center items-center space-x-2 font-semibold">
-                  <p className="uppercase">Sign In</p>
+                  <p className="uppercase">
+                    {isSubmitting ? 'Signing In...' : 'Sign In'}
+                  </p>
                   <ArrowRight />
                 </div>
               }

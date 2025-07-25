@@ -7,6 +7,8 @@ import { Bell, ShoppingBag, User, Menu, X, Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/icons/Logo.png';
 import { NavLink } from '../common/NavLink';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { logout, selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 const TOP_NAV_LINKS = [
   { label: 'Services', href: '/services' },
@@ -30,6 +32,13 @@ const ICONS = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectCurrentUser);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <header className="w-full shadow border-b">
       {/* Top Bar */}
@@ -46,16 +55,27 @@ export default function Header() {
               <span className="ml-1">contact@fashion.com</span>{' '}
             </p>
           </div>
-          <div className="flex justify-center items-center gap-4 ml-auto sm:ml-0">
-            <Link href="/login" className="hover:underline">
-              Sign In
-            </Link>
-            <Link href="/user-role">
-              <Button className="text-[#fff] bg-[#0d3c59e9] px-3 py-5 text-sm">
-                Sign Up
+          {user?.email ? (
+            <div>
+              <Button
+                onClick={handleLogout}
+                className="text-[#fff] bg-[#0d3c59e9] px-3 py-5 text-sm cursor-pointer"
+              >
+                Sign Out
               </Button>
-            </Link>
-          </div>
+            </div>
+          ) : (
+            <div className="flex justify-center items-center gap-4 ml-auto sm:ml-0">
+              <Link href="/login" className="hover:underline">
+                Sign In
+              </Link>
+              <Link href="/user-role">
+                <Button className="text-[#fff] bg-[#0d3c59e9] px-3 py-5 text-sm cursor-pointer">
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 

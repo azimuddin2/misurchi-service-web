@@ -35,6 +35,11 @@ import { AppButton } from '@/components/shared/app-button';
 import Link from 'next/link';
 import { IoCheckbox } from 'react-icons/io5';
 import { PhoneInput } from '@/components/ui/core/phone-input';
+import { useAppDispatch } from '@/redux/hooks';
+import { useVendorSignupMutation } from '@/redux/features/auth/authApi';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { verifyToken } from '@/utils/verifyToken';
+import { setUser, TUser } from '@/redux/features/auth/authSlice';
 
 const VendorSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,11 +55,41 @@ const VendorSignupForm = () => {
     formState: { isSubmitting },
   } = form;
 
+  const dispatch = useAppDispatch();
+  const [vendorSignup] = useVendorSignupMutation();
+
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirectPath');
+  const router = useRouter();
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    console.log(data);
     try {
-      console.log(data);
+      const response = await vendorSignup(data).unwrap();
+
+      const accessToken = response?.data?.accessToken;
+      if (!accessToken) {
+        toast.error('Access token missing from server response.');
+        return;
+      }
+
+      const user = verifyToken(accessToken) as TUser;
+      if (!user) {
+        toast.error('Invalid access token.');
+        return;
+      }
+
+      dispatch(setUser({ user, token: accessToken }));
+      toast.success(response.message || 'Vendor registered successfully');
+      form.reset();
+
+      router.push(redirect || '/verify-otp');
     } catch (error: any) {
-      console.error(error);
+      const message =
+        error?.data?.message ||
+        error?.message ||
+        'An unexpected error occurred during signup.';
+      toast.error(message);
     }
   };
 
@@ -477,7 +512,9 @@ const VendorSignupForm = () => {
               className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
               content={
                 <div className="flex justify-center items-center space-x-2 font-semibold">
-                  <p className="uppercase">Sign Up</p>
+                  <p className="uppercase">
+                    {isSubmitting ? 'Signing Up...' : 'Sign Up'}
+                  </p>
                   <ArrowRight />
                 </div>
               }

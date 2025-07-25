@@ -66,7 +66,7 @@ const VerifyOtpForm = () => {
             Enter Verification Code
           </h3>
           <h2 className="text-xl lg:text-2xl font-medium mt-1 mb-6">
-            Verify Your Password
+            Verify Your Account
           </h2>
         </div>
 

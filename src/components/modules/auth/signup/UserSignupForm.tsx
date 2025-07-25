@@ -24,6 +24,11 @@ import Link from 'next/link';
 import { IoCheckbox } from 'react-icons/io5';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import { userSignupSchema } from './userSignupValidation';
+import { useAppDispatch } from '@/redux/hooks';
+import { useUserSignupMutation } from '@/redux/features/auth/authApi';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { verifyToken } from '@/utils/verifyToken';
+import { setUser, TUser } from '@/redux/features/auth/authSlice';
 
 const UserSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -37,11 +42,40 @@ const UserSignupForm = () => {
     formState: { isSubmitting },
   } = form;
 
+  const dispatch = useAppDispatch();
+  const [signup] = useUserSignupMutation();
+
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirectPath');
+  const router = useRouter();
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      console.log(data);
+      const response = await signup(data).unwrap();
+
+      const accessToken = response?.data?.accessToken;
+      if (!accessToken) {
+        toast.error('Access token missing from server response.');
+        return;
+      }
+
+      const user = verifyToken(accessToken) as TUser;
+      if (!user) {
+        toast.error('Invalid access token.');
+        return;
+      }
+
+      dispatch(setUser({ user, token: accessToken }));
+      toast.success(response.message || 'User registered successfully');
+      form.reset();
+
+      router.push(redirect || '/verify-otp');
     } catch (error: any) {
-      console.error(error);
+      const message =
+        error?.data?.message ||
+        error?.message ||
+        'An unexpected error occurred during signup.';
+      toast.error(message);
     }
   };
 
