@@ -30,6 +30,7 @@ export const loginUser = async (userData: FieldValues) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify(userData),
     });
 

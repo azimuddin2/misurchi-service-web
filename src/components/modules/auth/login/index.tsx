@@ -22,6 +22,11 @@ import { AppButton } from '@/components/shared/app-button';
 import Link from 'next/link';
 import { loginSchema } from './loginValidation';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAppDispatch } from '@/redux/hooks';
+import { useLoginMutation } from '@/redux/features/auth/authApi';
+import { setUser, TUser } from '@/redux/features/auth/authSlice';
+import { verifyToken } from '@/utils/verifyToken';
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -35,9 +40,35 @@ const LoginForm = () => {
     formState: { isSubmitting },
   } = form;
 
+  const dispatch = useAppDispatch();
+  const [login] = useLoginMutation();
+
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirectPath');
+  const router = useRouter();
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      console.log(data);
+      const res = await login(data).unwrap();
+      console.log(res.data.accessToken);
+
+      const user = verifyToken(res.data.accessToken) as TUser;
+      console.log(user);
+
+      dispatch(setUser({ user: user, token: res.data.accessToken }));
+
+      // if (res?.success) {
+      //   toast.success(res?.message);
+      //   form.reset();
+
+      //   if (redirect) {
+      //     router.push(redirect);
+      //   } else {
+      //     router.push('/');
+      //   }
+      // } else {
+      //   toast.error(res?.message);
+      // }
     } catch (error: any) {
       console.error(error);
     }
