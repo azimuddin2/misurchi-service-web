@@ -37,13 +37,10 @@ const baseQueryWithRefreshToken: BaseQueryFn<
   }
 
   if (result.error?.status === 401) {
-    const res = await fetch(
-      'https://stationery-shop-backend-rose.vercel.app/api/auth/refresh-token',
-      {
-        method: 'POST',
-        credentials: 'include',
-      },
-    );
+    const res = await fetch('http://localhost:5000/api/auth/refresh-token', {
+      method: 'POST',
+      credentials: 'include',
+    });
 
     const data = await res.json();
 
