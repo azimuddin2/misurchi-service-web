@@ -3,12 +3,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Bell, ShoppingBag, User, Menu, X, Phone, Mail } from 'lucide-react';
+import {
+  Bell,
+  ShoppingBag,
+  User,
+  Menu,
+  X,
+  Phone,
+  Mail,
+  LogOut,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/icons/Logo.png';
 import { NavLink } from '../common/NavLink';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout, selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const TOP_NAV_LINKS = [
   { label: 'Services', href: '/services' },
@@ -23,12 +33,6 @@ const MAIN_NAV_LINKS = [
   { label: 'PROVIDERS', href: '/providers' },
 ];
 
-const ICONS = [
-  { icon: <Bell size={20} />, label: 'Notifications', href: '/notifications' },
-  { icon: <ShoppingBag size={20} />, label: 'Cart', href: '/cart' },
-  { icon: <User size={20} />, label: 'Account', href: '/account' },
-];
-
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -38,6 +42,27 @@ export default function Header() {
   const handleLogout = () => {
     dispatch(logout());
   };
+
+  const ICONS_LINKS = (
+    <>
+      <Link href="/notifications">
+        <Bell size={20} />
+      </Link>
+      <Link href="/cart">
+        <ShoppingBag size={20} />
+      </Link>
+      <Link href="/profile">
+        {user?.userId ? (
+          <Avatar>
+            <AvatarImage src={user?.image} />
+            <AvatarFallback>{user.name?.slice(0, 1)}</AvatarFallback>
+          </Avatar>
+        ) : (
+          <User size={20} />
+        )}
+      </Link>
+    </>
+  );
 
   return (
     <header className="w-full shadow border-b">
@@ -61,7 +86,8 @@ export default function Header() {
                 onClick={handleLogout}
                 className="text-[#fff] bg-[#0d3c59e9] px-3 py-5 text-sm cursor-pointer"
               >
-                Sign Out
+                <LogOut />
+                <span>Sign Out</span>
               </Button>
             </div>
           ) : (
@@ -94,10 +120,8 @@ export default function Header() {
         </Link>
 
         {/* Right Icons (Desktop) */}
-        <div className="hidden md:flex gap-6 text-gray-600">
-          {ICONS.map(({ icon, label, href }) => (
-            <IconLink key={label} icon={icon} label={label} href={href} />
-          ))}
+        <div className="hidden md:flex items-center gap-6 text-gray-600">
+          {ICONS_LINKS}
         </div>
 
         {/* Mobile Menu Button */}
@@ -137,10 +161,8 @@ export default function Header() {
           <hr />
 
           {/* Icons */}
-          <div className="flex justify-center gap-6 text-gray-600 mt-2">
-            {ICONS.map(({ icon, label, href }) => (
-              <IconLink key={label} icon={icon} label={label} href={href} />
-            ))}
+          <div className="flex justify-center items-center gap-6 text-gray-600 mt-2">
+            {ICONS_LINKS}
           </div>
         </div>
       </div>

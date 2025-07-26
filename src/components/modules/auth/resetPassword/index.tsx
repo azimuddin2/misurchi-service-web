@@ -17,6 +17,10 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AppButton } from '@/components/shared/app-button';
 import { resetPasswordSchema } from './resetPasswordValidation';
+import { useResetPasswordMutation } from '@/redux/features/auth/authApi';
+import { IUser, TResponse } from '@/types';
+import { toast } from 'sonner';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const ResetPasswordForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,11 +34,25 @@ const ResetPasswordForm = () => {
     formState: { isSubmitting },
   } = form;
 
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirectPath');
+  const router = useRouter();
+
+  const [resetPassword] = useResetPasswordMutation();
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      console.log(data);
+      const res = (await resetPassword(data)) as TResponse<IUser | any>;
+
+      if (res.error) {
+        toast.error(res?.error?.data?.message);
+      } else {
+        toast.success(res?.data?.message);
+        router.push(redirect || '/');
+      }
     } catch (error: any) {
-      console.error(error);
+      const message = error?.data?.message || error?.message;
+      toast.error(message);
     }
   };
 
@@ -134,7 +152,7 @@ const ResetPasswordForm = () => {
               className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
               content={
                 <div className="flex justify-center items-center space-x-2 font-semibold">
-                  <p className="uppercase">Update Password</p>
+                  {isSubmitting ? 'Updating Password...' : 'Update Password'}
                   <ArrowRight />
                 </div>
               }
