@@ -63,7 +63,6 @@ const VendorSignupForm = () => {
   const router = useRouter();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data);
     try {
       const response = await vendorSignup(data).unwrap();
 
@@ -243,7 +242,7 @@ const VendorSignupForm = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-5">
               <FormField
                 control={form.control}
-                name="zip"
+                name="zipCode"
                 render={({ field }) => (
                   <FormItem className="lg:mb-0 mb-5">
                     <FormLabel className="!text-gray-700 !text-base font-medium">
@@ -297,7 +296,7 @@ const VendorSignupForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-5">
               <FormField
                 control={form.control}
-                name="timezone"
+                name="timeZone"
                 render={({ field }) => (
                   <FormItem className="lg:mb-0 mb-5">
                     <FormLabel className="!text-gray-700 !text-base font-medium">

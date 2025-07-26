@@ -7,6 +7,10 @@ import { Input } from '@/components/ui/input';
 import { AppButton } from '@/components/shared/app-button';
 import rectangleBgImg from '@/assets/images/rectangle.png';
 import { Form } from '@/components/ui/form';
+import { useRouter } from 'next/navigation';
+import { useVerifyOtpMutation } from '@/redux/features/otp/otpApi';
+import { toast } from 'sonner';
+import { TResponse } from '@/types';
 
 const OTP_LENGTH = 4;
 
@@ -39,15 +43,28 @@ const VerifyOtpForm = () => {
 
   const isOtpComplete = otp.every((digit) => digit !== '');
 
+  const router = useRouter();
+
+  const [verifyOtp] = useVerifyOtpMutation();
+
   const onSubmit: SubmitHandler<FieldValues> = async () => {
     const otpCode = otp.join('');
     if (!isOtpComplete) return;
 
     try {
-      console.log('Submitted OTP:', otpCode);
-      // Submit OTP logic here
-    } catch (error) {
-      console.error('OTP Submission Error:', error);
+      const res = (await verifyOtp({ otp: otpCode })) as TResponse<
+        string | Number | any
+      >;
+
+      if (res.error) {
+        toast.error(res.error.data.message);
+      } else {
+        toast.success('OTP verified. Please reset your password.');
+        router.push('/reset-password');
+      }
+    } catch (error: any) {
+      const message = error?.data?.message || error?.message;
+      toast.error(message);
     }
   };
 

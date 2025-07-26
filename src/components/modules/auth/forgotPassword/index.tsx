@@ -15,6 +15,13 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AppButton } from '@/components/shared/app-button';
 import { forgotPasswordSchema } from './forgotPasswordValidation';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { useForgotPasswordMutation } from '@/redux/features/auth/authApi';
+import { TResponse } from '@/types';
+import { verifyToken } from '@/utils/verifyToken';
+import { setUser, TUser } from '@/redux/features/auth/authSlice';
+import { useAppDispatch } from '@/redux/hooks';
 
 const ForgotPasswordForm = () => {
   const form = useForm({
@@ -25,11 +32,38 @@ const ForgotPasswordForm = () => {
     formState: { isSubmitting },
   } = form;
 
+  const router = useRouter();
+
+  const dispatch = useAppDispatch();
+  const [forgotPassword] = useForgotPasswordMutation();
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      console.log(data);
+      const res = (await forgotPassword(data)) as TResponse<string | any>;
+
+      const accessToken = res?.data?.data?.accessToken;
+      if (!accessToken) {
+        toast.error('User not found.');
+        return;
+      }
+
+      const user = verifyToken(accessToken) as TUser;
+      if (!user) {
+        toast.error('Invalid access token.');
+        return;
+      }
+
+      dispatch(setUser({ user, token: accessToken }));
+
+      if (res.error) {
+        toast.error(res.error.data.message);
+      } else {
+        toast.success(res.data.message);
+        router.push('/verify-otp');
+      }
     } catch (error: any) {
-      console.error(error);
+      const message = error?.data?.message || error?.message;
+      toast.error(message);
     }
   };
 
