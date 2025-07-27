@@ -12,7 +12,17 @@ import {
   Phone,
   Mail,
   LogOut,
+  LayoutDashboard,
+  SendToBack,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/icons/Logo.png';
 import { NavLink } from '../common/NavLink';
@@ -51,16 +61,74 @@ export default function Header() {
       <Link href="/cart">
         <ShoppingBag size={20} />
       </Link>
-      <Link href="/profile">
+      <div>
         {user?.userId ? (
-          <Avatar>
-            <AvatarImage src={user?.image} />
-            <AvatarFallback>{user.name?.slice(0, 1)}</AvatarFallback>
-          </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar className="cursor-pointer">
+                <AvatarImage src={user?.image} />
+                <AvatarFallback>{user.name?.slice(0, 1)}</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="rounded-[10px] mt-2 w-80 mr-3 p-3">
+              <div>
+                <Avatar className="mx-auto w-12 h-12">
+                  <AvatarFallback className="bg-[#093954] text-white text-2xl">
+                    {user?.name?.slice(0, 1)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-center my-2">
+                  <h2 className="text-lg">{user?.name}</h2>
+                  <p className="text-sm text-gray-500">{user?.email}</p>
+                </div>
+              </div>
+              <DropdownMenuSeparator />
+              <Link href={`/${user?.role}/view-profile`}>
+                <DropdownMenuItem className="rounded-[5px] cursor-pointer">
+                  <User />
+                  <span>View Profile</span>
+                </DropdownMenuItem>
+              </Link>
+
+              {user?.role === 'admin' ? (
+                <>
+                  <Link href={`${user?.role}/dashboard`}>
+                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
+                      <LayoutDashboard />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href={`${user?.role}/my-order`}>
+                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
+                      <LayoutDashboard />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href={`${user?.role}/my-order`}>
+                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
+                      <SendToBack />
+                      <span>My Order</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="rounded-[5px] text-white bg-[#FF4D4F] cursor-pointer mt-2"
+              >
+                <LogOut />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
-          <User size={20} />
+          <User className="cursor-pointer" size={20} />
         )}
-      </Link>
+      </div>
     </>
   );
 

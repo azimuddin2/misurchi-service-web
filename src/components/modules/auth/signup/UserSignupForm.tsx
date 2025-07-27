@@ -69,7 +69,7 @@ const UserSignupForm = () => {
       toast.success(response.message || 'User registered successfully');
       form.reset();
 
-      router.push(redirect || '/verify-otp');
+      router.push(redirect || '/verify-account-otp');
     } catch (error: any) {
       const message =
         error?.data?.message ||
