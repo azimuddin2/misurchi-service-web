@@ -1,4 +1,4 @@
-export type TRole = 'service_provider' | 'user' | 'admin';
+export type TRole = 'vendor' | 'user' | 'admin';
 
 export type TStatus = 'ongoing' | 'confirmed' | 'blocked';
 

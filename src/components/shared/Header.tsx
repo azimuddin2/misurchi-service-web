@@ -14,12 +14,12 @@ import {
   LogOut,
   LayoutDashboard,
   SendToBack,
+  Store,
 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -90,24 +90,49 @@ export default function Header() {
                 </DropdownMenuItem>
               </Link>
 
-              {user?.role === 'admin' ? (
+              {user?.role === 'admin' && (
                 <>
-                  <Link href={`${user?.role}/dashboard`}>
+                  <Link href="/admin/dashboard">
                     <DropdownMenuItem className="rounded-[5px] cursor-pointer">
                       <LayoutDashboard />
                       <span>Dashboard</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/admin/users-management">
+                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
+                      <SendToBack />
+                      <span>Manage Users</span>
                     </DropdownMenuItem>
                   </Link>
                 </>
-              ) : (
+              )}
+
+              {user?.role === 'vendor' && (
                 <>
-                  <Link href={`${user?.role}/my-order`}>
+                  <Link href="/vendor/dashboard">
                     <DropdownMenuItem className="rounded-[5px] cursor-pointer">
                       <LayoutDashboard />
                       <span>Dashboard</span>
                     </DropdownMenuItem>
                   </Link>
-                  <Link href={`${user?.role}/my-order`}>
+                  <Link href="/vendor/manage-offering">
+                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
+                      <Store />
+                      <span>Manage Offerings</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </>
+              )}
+
+              {user?.role === 'user' && (
+                <>
+                  <Link href="/user/my-order">
+                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
+                      <LayoutDashboard />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/user/my-order">
                     <DropdownMenuItem className="rounded-[5px] cursor-pointer">
                       <SendToBack />
                       <span>My Order</span>
@@ -115,6 +140,7 @@ export default function Header() {
                   </Link>
                 </>
               )}
+
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleLogout}
