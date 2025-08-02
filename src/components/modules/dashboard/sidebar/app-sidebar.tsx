@@ -9,7 +9,6 @@ import {
   Store,
   Settings,
   LayoutDashboard,
-  Shield,
   SendToBack,
   StoreIcon,
   UserRound,
@@ -110,54 +109,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     );
   }
 
-  // Admin-only routes
-  if (user?.role === 'admin') {
-    navMain.push(
-      {
-        title: 'Dashboard',
-        url: `/admin/dashboard`,
-        icon: LayoutDashboard,
-      },
-      {
-        title: 'Admin Panel',
-        url: '/admin/users-management',
-        icon: Shield,
-        items: [
-          {
-            title: 'Manage Users',
-            url: '/admin/users-management',
-          },
-          {
-            title: 'Manage Listings',
-            url: '/admin/listings',
-          },
-          {
-            title: 'Manage Orders',
-            url: '/admin/manage-orders',
-          },
-        ],
-      },
-      {
-        title: 'Settings',
-        url: '/admin/edit-profile',
-        icon: Settings,
-        items: [
-          {
-            title: 'Edit Profile',
-            url: '/admin/edit-profile',
-          },
-          {
-            title: 'View Profile',
-            url: '/admin/view-profile',
-          },
-        ],
-      },
-    );
-  }
-
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      {/* <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
@@ -167,9 +121,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarHeader>
+      </SidebarHeader> */}
 
-      <SidebarContent>
+      <SidebarContent className="mt-5">
         <NavMain items={navMain} currentPath={pathname} />
       </SidebarContent>
 

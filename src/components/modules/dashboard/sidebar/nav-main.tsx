@@ -21,10 +21,10 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils'; // Your class merging utility
+import { Badge } from '@/components/ui/badge';
 
 export function NavMain({
   items,
-  currentPath,
 }: {
   items: {
     title: string;
@@ -42,7 +42,14 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Menu</SidebarGroupLabel>
+      <SidebarGroupLabel className="mb-8">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">Fashion_Makeup</h2>
+          <Badge className="capitalize rounded-full text-blue-500 border border-blue-300 bg-blue-100 hover:bg-blue-100">
+            Advance Plan
+          </Badge>
+        </div>
+      </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const isParentActive =
@@ -58,8 +65,8 @@ export function NavMain({
                   className={cn(
                     'py-5 rounded-sm w-full text-left transition-colors',
                     isParentActive
-                      ? 'bg-green-600 text-white font-medium'
-                      : 'hover:bg-muted text-muted-foreground',
+                      ? 'bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white font-medium'
+                      : 'hover:bg-muted text-[#165940]',
                   )}
                 >
                   <Link href={item.url}>

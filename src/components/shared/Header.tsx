@@ -159,7 +159,7 @@ export default function Header() {
   );
 
   return (
-    <header className="w-full shadow border-b">
+    <header className="w-full shadow border-b z-auto">
       {/* Top Bar */}
       <div className="bg-[#093954] text-white text-sm  py-2">
         <div className="container mx-auto px-5 lg:px-0 flex justify-between items-center">
