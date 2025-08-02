@@ -83,29 +83,12 @@ export default function Header() {
                 </div>
               </div>
               <DropdownMenuSeparator />
-              <Link href={`/${user?.role}/view-profile`}>
+              <Link href={`/${user?.role}/profile`}>
                 <DropdownMenuItem className="rounded-[5px] cursor-pointer">
                   <User />
                   <span>View Profile</span>
                 </DropdownMenuItem>
               </Link>
-
-              {user?.role === 'admin' && (
-                <>
-                  <Link href="/admin/dashboard">
-                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
-                      <LayoutDashboard />
-                      <span>Dashboard</span>
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link href="/admin/users-management">
-                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
-                      <SendToBack />
-                      <span>Manage Users</span>
-                    </DropdownMenuItem>
-                  </Link>
-                </>
-              )}
 
               {user?.role === 'vendor' && (
                 <>
@@ -231,9 +214,8 @@ export default function Header() {
 
       {/* Mobile Dropdown */}
       <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          mobileOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <div className="flex flex-col gap-4 text-center text-sm font-medium px-4 py-4">
           {/* Top Nav */}

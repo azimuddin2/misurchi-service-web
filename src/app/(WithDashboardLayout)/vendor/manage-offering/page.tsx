@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 const ManageOfferingPage = () => {
   return (
     <div>
-      <Tabs defaultValue="products" className="w-full max-w-5xl mx-auto mt-6">
+      <Tabs defaultValue="products" className="w-full max-w-6xl mx-auto mt-5">
         <TabsList className="flex rounded-md shadow-md w-full">
           {/* Products Tab */}
           <TabsTrigger

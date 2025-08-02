@@ -65,7 +65,7 @@ export function NavMain({
                   className={cn(
                     'py-5 rounded-sm w-full text-left transition-colors',
                     isParentActive
-                      ? 'bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white font-medium'
+                      ? 'hover:text-white bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white font-medium'
                       : 'hover:bg-muted text-[#165940]',
                   )}
                 >

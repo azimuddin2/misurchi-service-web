@@ -1,10 +1,6 @@
 'use client';
 
-import * as React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-
 import {
   Store,
   Settings,
@@ -12,19 +8,14 @@ import {
   SendToBack,
   StoreIcon,
   UserRound,
+  ListTodo,
+  UsersRound,
 } from 'lucide-react';
-
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
 } from '@/components/ui/sidebar';
-
-import Logo from '@/assets/icons/Logo.png';
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
 import { useAppSelector } from '@/redux/hooks';
@@ -90,6 +81,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Manage Offering',
         url: `/vendor/manage-offering`,
         icon: StoreIcon,
+      },
+      {
+        title: 'Task Hub',
+        url: `/vendor/task-hub`,
+        icon: ListTodo,
+      },
+      {
+        title: 'Team Members',
+        url: `/vendor/team-members`,
+        icon: UsersRound,
       },
       {
         title: 'Settings',
