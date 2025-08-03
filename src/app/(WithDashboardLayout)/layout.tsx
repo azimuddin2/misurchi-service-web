@@ -11,7 +11,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <Header />
-      <div className='container mx-auto'>
+      <div className="container mx-auto">
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset>

@@ -1,8 +1,20 @@
 import ManageProducts from '@/components/modules/dashboard/vendor/manage-offering/products';
 import ManageServices from '@/components/modules/dashboard/vendor/manage-offering/services';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getAllProducts } from '@/services/Product';
 
-const ManageOfferingPage = () => {
+const ManageOfferingPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ page: string }>;
+}) => {
+  const { page } = await searchParams;
+  const limit = 10;
+
+  const { data, meta } = await getAllProducts(page, limit);
+
+  console.log(data);
+
   return (
     <div>
       <Tabs defaultValue="products" className="w-full max-w-6xl mx-auto mt-5">
@@ -36,7 +48,7 @@ const ManageOfferingPage = () => {
 
         {/* Content Panels */}
         <TabsContent value="products" className="mt-4">
-          <ManageProducts />
+          <ManageProducts products={data} meta={meta} />
         </TabsContent>
 
         <TabsContent value="services" className="mt-4">
