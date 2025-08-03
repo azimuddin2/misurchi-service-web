@@ -20,7 +20,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <SidebarTrigger className="-ml-1" />
               </div>
             </header>
-            <div className="min-h-[100vh] flex-1 rounded bg-muted/50 md:min-h-min p-4 lg:m-2 mt-0">
+            <div className="min-h-[100vh] bg-white flex-1 rounded md:min-h-min p-4 lg:m-2 mt-0">
               {children}
             </div>
           </SidebarInset>

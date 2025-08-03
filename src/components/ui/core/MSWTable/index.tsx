@@ -33,16 +33,16 @@ export function MSWTable<TData, TValue>({
   });
 
   return (
-    <div className="rounded-md border-0 bg-[#FAFAFA]">
+    <div className="rounded-md border-0 bg-white">
       <Table>
-        <TableHeader className="bg-gray-100">
+        <TableHeader className="bg-gray-50">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead
                     key={header.id}
-                    className="font-bold text-gray-600"
+                    className="font-bold text-gray-800 text-base"
                   >
                     {header.isPlaceholder
                       ? null
@@ -60,6 +60,7 @@ export function MSWTable<TData, TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
+                className="h-20 text-[#212529] font-medium text-base"
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
               >
@@ -72,7 +73,7 @@ export function MSWTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-60 text-center">
+              <TableCell colSpan={columns.length} className="h-80 text-center">
                 <Image
                   src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
                   alt="No results"

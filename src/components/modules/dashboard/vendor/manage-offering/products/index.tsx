@@ -11,13 +11,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Edit, Eye, Plus, Trash2 } from 'lucide-react';
+import { Edit, Eye, PlusCircle, Trash2 } from 'lucide-react';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import Image from 'next/image';
 import { format } from 'date-fns';
+import { AppButton } from '@/components/shared/app-button';
+import { Checkbox } from '@/components/ui/checkbox';
+import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirmationModal';
 
 type TProductsProps = {
   products: TProduct[];
@@ -31,29 +34,63 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
+  const [selectedIds, setSelectedIds] = useState<string[] | []>([]);
+
   const handleDelete = (data: TProduct) => {
     setSelectedId(data?._id);
     setSelectedItem(data?.name);
     setModalOpen(true);
   };
 
-  // const handleDeleteConfirm = async () => {
-  //   try {
-  //     if (selectedId) {
-  //       const res = await deleteListing(selectedId);
-  //       if (res.success) {
-  //         toast.success(res.message);
-  //         setModalOpen(false);
-  //       } else {
-  //         toast.error(res.message);
-  //       }
-  //     }
-  //   } catch (err: any) {
-  //     console.error(err?.message);
-  //   }
-  // };
+  const handleDeleteConfirm = async () => {
+    try {
+      // if (selectedId) {
+      //   const res = await deleteListing(selectedId);
+      //   if (res.success) {
+      //     toast.success(res.message);
+      //     setModalOpen(false);
+      //   } else {
+      //     toast.error(res.message);
+      //   }
+      // }
+    } catch (err: any) {
+      console.error(err?.message);
+    }
+  };
 
   const columns: ColumnDef<TProduct>[] = [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            if (value) {
+              setSelectedIds((prev) => [...prev, row.original._id]);
+            } else {
+              setSelectedIds(
+                selectedIds.filter((id) => id !== row.original._id),
+              );
+            }
+
+            row.toggleSelected(!!value);
+          }}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: 'name',
       header: 'Product Name',
@@ -68,7 +105,7 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
               alt={name}
               width={100}
               height={100}
-              className="w-10 h-10 rounded object-cover border"
+              className="w-14 h-14 rounded-sm object-cover border"
             />
             <span className="truncate">{name}</span>
           </div>
@@ -76,14 +113,9 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
       },
     },
     {
-      accessorKey: 'name',
-      header: 'Product Name',
-      cell: ({ row }) => <span>{row.original.name}</span>,
-    },
-    {
       accessorKey: 'price',
       header: 'Price',
-      cell: ({ row }) => <span>$ {row.original.price.toFixed(2)}</span>,
+      cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
     },
     {
       accessorKey: 'status',
@@ -103,7 +135,7 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }) => (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -114,7 +146,7 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
                     )
                   }
                   size={20}
-                  className="text-blue-500 cursor-pointer"
+                  className="text-blue-400 cursor-pointer"
                 />
               </TooltipTrigger>
               <TooltipContent>View</TooltipContent>
@@ -157,25 +189,28 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-3">
-        <h2 className="text-xl font-medium">Manage Products</h2>
+      <AppButton
+        className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
+        content={
+          <div className="flex justify-center items-center space-x-1 font-semibold">
+            <PlusCircle size={24} />
+            <span className="uppercase text-sm font-semibold">Add Product</span>
+          </div>
+        }
+      />
 
-        <button
-          onClick={() => router.push(`/user/listings/add-listing`)}
-          className="cursor-pointer"
-        >
-          <Plus /> Add Product
-        </button>
+      <div className="flex justify-between items-center mt-10 mb-2">
+        <h2 className="text-xl font-medium">Manage Products</h2>
       </div>
 
       <MSWTable columns={columns} data={products || []} />
       <MSWPagination totalPage={meta?.totalPage} />
-      {/* <DeleteConfirmationModal
+      <DeleteConfirmationModal
         name={selectedItem}
         isOpen={isModalOpen}
         onOpenChange={setModalOpen}
         onConfirm={handleDeleteConfirm}
-      /> */}
+      />
     </div>
   );
 };

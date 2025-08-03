@@ -17,16 +17,16 @@ const ManageOfferingPage = async ({
 
   return (
     <div>
-      <Tabs defaultValue="products" className="w-full max-w-6xl mx-auto mt-5">
-        <TabsList className="flex rounded-md shadow-md w-full">
+      <Tabs defaultValue="products" className="w-full max-w-6xl mx-auto">
+        <TabsList className="flex rounded-md shadow-md w-full py-6">
           {/* Products Tab */}
           <TabsTrigger
             value="products"
-            className="w-full text-[#165940] text-lg rounded-md font-medium py-5 transition 
+            className="w-full cursor-pointer text-[#165940] text-lg rounded-md font-medium py-6 transition 
             data-[state=active]:bg-gradient-to-t 
-            data-[state=active]:from-green-500/70 
-            data-[state=active]:to-green-800 
-            data-[state=active]:text-white 
+            data-[state=active]:from-[#cadfe7] 
+            data-[state=active]:to-[#d9ebe8] 
+            data-[state=active]:text-[#165940] 
             data-[state=active]:shadow"
           >
             Products
@@ -35,11 +35,11 @@ const ManageOfferingPage = async ({
           {/* Services Tab */}
           <TabsTrigger
             value="services"
-            className="w-full cursor-pointer text-[#165940] text-lg rounded-md font-medium py-5 transition 
+            className="w-full cursor-pointer text-[#165940] text-lg rounded-md font-medium py-6 transition 
             data-[state=active]:bg-gradient-to-t 
-            data-[state=active]:from-green-500/70 
-            data-[state=active]:to-green-800 
-            data-[state=active]:text-white 
+            data-[state=active]:from-[#cadfe7] 
+            data-[state=active]:to-[#d9ebe8] 
+            data-[state=active]:text-[#165940] 
             data-[state=active]:shadow"
           >
             Services
@@ -47,7 +47,7 @@ const ManageOfferingPage = async ({
         </TabsList>
 
         {/* Content Panels */}
-        <TabsContent value="products" className="mt-4">
+        <TabsContent value="products" className="mt-3">
           <ManageProducts products={data} meta={meta} />
         </TabsContent>
 

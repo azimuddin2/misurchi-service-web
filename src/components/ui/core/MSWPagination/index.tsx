@@ -24,7 +24,7 @@ const MSWPagination = ({ totalPage }: { totalPage: number }) => {
   };
 
   return (
-    <div className="flex justify-center items-center my-10 gap-2">
+    <div className="flex justify-end items-center my-10 gap-2">
       <Button
         onClick={handlePrev}
         disabled={currentPage === 1}
