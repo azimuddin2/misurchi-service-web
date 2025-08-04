@@ -10,6 +10,7 @@ export type TProduct = {
   colors: string[];
   size: string;
   status: string;
+  highlightStatus: string;
   description: string;
   isDeleted: boolean;
   createdAt: string;

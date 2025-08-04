@@ -127,7 +127,7 @@ export default function Header() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleLogout}
-                className="rounded-[5px] text-white bg-[#FF4D4F] cursor-pointer mt-2"
+                className="rounded-[5px] text-white bg-red-400 cursor-pointer mt-2"
               >
                 <LogOut />
                 <span>Logout</span>

@@ -24,7 +24,7 @@ export const addProduct = async (data: FieldValues) => {
 };
 
 export const getAllProducts = async (
-  page?: string,
+  page?: string | number,
   limit?: string | number,
   query?: { [key: string]: string | string[] | undefined },
 ) => {
@@ -32,15 +32,20 @@ export const getAllProducts = async (
 
   if (query?.price) {
     params.append('minPrice', '0');
-    params.append('maxPrice', query?.price.toString());
+    params.append('maxPrice', query.price.toString());
   }
 
   if (query?.category) {
-    params.append('category', query?.category.toString());
+    params.append('category', query.category.toString());
   }
 
   if (query?.searchTerm) {
-    params.append('searchTerm', query?.searchTerm.toString());
+    params.append('searchTerm', query.searchTerm.toString());
+  }
+
+  if (query?.createdAt) {
+    // Only send plain date, not full ISO timestamp
+    params.append('createdAt', query.createdAt.toString().slice(0, 10));
   }
 
   try {

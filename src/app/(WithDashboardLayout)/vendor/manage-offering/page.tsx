@@ -6,14 +6,22 @@ import { getAllProducts } from '@/services/Product';
 const ManageOfferingPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ page: string }>;
+  searchParams: { page?: string; searchTerm?: string; selectedDate?: string };
 }) => {
-  const { page } = await searchParams;
-  const limit = 10;
+  const page = Number(searchParams.page || '1');
+  const limit = 4;
 
-  const { data, meta } = await getAllProducts(page, limit);
+  // Build query object for API
+  const query: Record<string, string> = {};
+  if (searchParams.searchTerm) query.searchTerm = searchParams.searchTerm;
+  if (searchParams.selectedDate) query.selectedDate = searchParams.selectedDate;
 
-  console.log(data);
+  // Fetch filtered and paginated products server side
+  const { data, meta } = await getAllProducts(
+    page.toString(),
+    limit.toString(),
+    query,
+  );
 
   return (
     <div>
