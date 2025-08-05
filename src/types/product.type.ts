@@ -9,7 +9,7 @@ export type TProduct = {
   discountPrice: number;
   colors: string[];
   size: string;
-  status: string;
+  status: 'Available' | 'Out of Stock' | 'TBC' | 'Discontinued';
   highlightStatus: string;
   description: string;
   isDeleted: boolean;

@@ -1,6 +1,5 @@
 'use client';
 
-import { TMeta } from '@/types';
 import { TProduct } from '@/types/product.type';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -30,6 +29,11 @@ import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirm
 import { RxUpdate } from 'react-icons/rx';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
+import { updateProductStatus } from '@/services/Product';
+import {
+  useGetAllProductsQuery,
+  useUpdateProductStatusMutation,
+} from '@/redux/features/product/productApi';
 
 const statusOptions = [
   { label: 'Available', key: 'Available' },
@@ -43,12 +47,7 @@ const highlightstatusOptions = [
   { label: 'Highlighted', key: 'Highlighted' },
 ];
 
-type TProductsProps = {
-  products: TProduct[];
-  meta: TMeta;
-};
-
-const ManageProducts = ({ products, meta }: TProductsProps) => {
+const ManageProducts = () => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -58,17 +57,35 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // searchTeam & createdAt date filtering
   const [search, setSearch] = useState<string>(
     searchParams.get('searchTerm') || '',
   );
-
   const initialDateParam = searchParams.get('createdAt');
   const initialDate = initialDateParam ? parseISO(initialDateParam) : undefined;
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     initialDate,
   );
 
+  const page = searchParams.get('page') || 1;
+  const limit = searchParams.get('limit') || 10;
+  const searchTerm = searchParams.get('searchTerm') || '';
+  const createdAt = searchParams.get('createdAt') || '';
+
+  const { data, isLoading, isError, refetch } = useGetAllProductsQuery({
+    page,
+    limit,
+    query: {
+      searchTerm,
+      createdAt,
+    },
+  });
+
+  const products = data?.data || [];
+  const meta = data?.meta || { totalPage: 1 };
+
+  const [updateProductStatus] = useUpdateProductStatusMutation();
+
+  // search & createdAt date filtering part
   const updateSearchParams = useCallback(
     (newParams: Record<string, string | null | undefined>) => {
       const currentParams = new URLSearchParams(searchParams.toString());
@@ -115,12 +132,20 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
   };
 
   const handleStatusUpdate = async (productId: string, status: string) => {
-    const toastId = toast.loading('Updating Status...');
+    const toastId = toast.loading('Updating status...');
+
+    const updateStatus = { status };
+
     try {
-      // TODO: API call here
-      toast.success('Status updated successfully');
+      const res = await updateProductStatus({
+        id: productId,
+        status: updateStatus,
+      }).unwrap();
+
+      toast.success(res.message || 'Status updated');
+      refetch();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update status');
+      toast.error(error?.data?.message || 'Status update failed');
     } finally {
       toast.dismiss(toastId);
     }

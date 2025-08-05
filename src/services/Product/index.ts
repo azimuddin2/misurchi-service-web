@@ -64,3 +64,51 @@ export const getAllProducts = async (
     return Error(error);
   }
 };
+
+export const updateProductStatus = async (id: string, status: FieldValues) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/products/update-status/${id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization: (await cookies()).get('accessToken')!.value,
+        },
+        body: JSON.stringify(status),
+      },
+    );
+    console.log(res);
+
+    revalidateTag('PRODUCT');
+
+    return res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+export const updateProductHighlightStatus = async (
+  id: string,
+  highlightStatus: FieldValues,
+) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/products/highlight-status/${id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: (await cookies()).get('accessToken')!.value,
+        },
+        body: JSON.stringify(highlightStatus),
+      },
+    );
+
+    revalidateTag('PRODUCT');
+
+    return res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
