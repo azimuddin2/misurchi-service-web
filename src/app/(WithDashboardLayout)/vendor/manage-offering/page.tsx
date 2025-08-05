@@ -6,22 +6,20 @@ import { getAllProducts } from '@/services/Product';
 const ManageOfferingPage = async ({
   searchParams,
 }: {
-  searchParams: { page?: string; searchTerm?: string; selectedDate?: string };
+  searchParams: Promise<{
+    page?: string;
+    searchTerm?: string;
+    category?: string;
+    createdAt?: string;
+  }>;
 }) => {
-  const page = Number(searchParams.page || '1');
+  const query = await searchParams;
+  const { page } = query;
   const limit = 4;
 
-  // Build query object for API
-  const query: Record<string, string> = {};
-  if (searchParams.searchTerm) query.searchTerm = searchParams.searchTerm;
-  if (searchParams.selectedDate) query.selectedDate = searchParams.selectedDate;
+  const { data, meta } = await getAllProducts(page, limit, query);
 
   // Fetch filtered and paginated products server side
-  const { data, meta } = await getAllProducts(
-    page.toString(),
-    limit.toString(),
-    query,
-  );
 
   return (
     <div>
@@ -55,7 +53,7 @@ const ManageOfferingPage = async ({
         </TabsList>
 
         {/* Content Panels */}
-        <TabsContent value="products" className="mt-3">
+        <TabsContent value="products" className="mt-2">
           <ManageProducts products={data} meta={meta} />
         </TabsContent>
 

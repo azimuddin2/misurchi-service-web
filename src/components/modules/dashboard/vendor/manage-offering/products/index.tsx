@@ -17,34 +17,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Edit,
-  Eye,
-  PlusCircle,
-  Trash2,
-  CalendarIcon,
-  CircleX,
-  Delete,
-} from 'lucide-react';
+import { Edit, Eye, PlusCircle, Search, Trash2 } from 'lucide-react';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import Image from 'next/image';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isSameDay } from 'date-fns';
 import { AppButton } from '@/components/shared/app-button';
 import { Checkbox } from '@/components/ui/checkbox';
 import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirmationModal';
 import { RxUpdate } from 'react-icons/rx';
 import { toast } from 'sonner';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 
 const statusOptions = [
   { label: 'Available', key: 'Available' },
@@ -53,7 +38,7 @@ const statusOptions = [
   { label: 'Discontinued', key: 'Discontinued' },
 ];
 
-const highlightStatusOptions = [
+const highlightstatusOptions = [
   { label: 'Highlight', key: 'Highlight' },
   { label: 'Highlighted', key: 'Highlighted' },
 ];
@@ -73,25 +58,26 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const [searchInputValue, setSearchInputValue] = useState<string>('');
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  // searchTeam & createdAt date filtering
+  const [search, setSearch] = useState<string>(
+    searchParams.get('searchTerm') || '',
+  );
 
-  // Sync state with URL
-  useEffect(() => {
-    const searchTerm = searchParams.get('searchTerm') || '';
-    const selectedDateStr = searchParams.get('createdAt');
-    const parsedDate = selectedDateStr ? new Date(selectedDateStr) : undefined;
-
-    setSearchInputValue(searchTerm);
-    setSelectedDate(parsedDate);
-  }, [searchParams]);
+  const initialDateParam = searchParams.get('createdAt');
+  const initialDate = initialDateParam ? parseISO(initialDateParam) : undefined;
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    initialDate,
+  );
 
   const updateSearchParams = useCallback(
     (newParams: Record<string, string | null | undefined>) => {
       const currentParams = new URLSearchParams(searchParams.toString());
       Object.entries(newParams).forEach(([key, value]) => {
-        if (!value) currentParams.delete(key);
-        else currentParams.set(key, value);
+        if (!value) {
+          currentParams.delete(key);
+        } else {
+          currentParams.set(key, value);
+        }
       });
       router.push(`?${currentParams.toString()}`);
     },
@@ -99,30 +85,42 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
   );
 
   const handleSearch = () => {
-    updateSearchParams({ searchTerm: searchInputValue, page: '1' });
+    updateSearchParams({ searchTerm: search, page: '1' });
   };
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
     updateSearchParams({
-      createdAt: date ? date.toISOString() : null,
+      createdAt: date ? format(date, 'yyyy-MM-dd') : null, // Only send 'YYYY-MM-DD'
       page: '1',
     });
   };
 
+  useEffect(() => {
+    setSearch(searchParams.get('searchTerm') || '');
+
+    const dateParam = searchParams.get('createdAt');
+    if (dateParam) {
+      setSelectedDate(parseISO(dateParam));
+    } else {
+      setSelectedDate(undefined);
+    }
+  }, [searchParams]);
+
+  // API call here backend
   const handleDelete = (data: TProduct) => {
-    setSelectedId(data._id);
-    setSelectedItem(data.name);
+    setSelectedId(data?._id);
+    setSelectedItem(data?.name);
     setModalOpen(true);
   };
 
   const handleStatusUpdate = async (productId: string, status: string) => {
     const toastId = toast.loading('Updating Status...');
     try {
-      // TODO: API call
-      toast.success('Status updated');
+      // TODO: API call here
+      toast.success('Status updated successfully');
     } catch (error: any) {
-      toast.error(error.message || 'Update failed');
+      toast.error(error.message || 'Failed to update status');
     } finally {
       toast.dismiss(toastId);
     }
@@ -134,10 +132,10 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
   ) => {
     const toastId = toast.loading('Updating Highlight Status...');
     try {
-      // TODO: API call
-      toast.success('Highlight status updated');
+      // TODO: API call here
+      toast.success('Highlight status updated successfully');
     } catch (error: any) {
-      toast.error(error.message || 'Update failed');
+      toast.error(error.message || 'Failed to update highlight status');
     } finally {
       toast.dismiss(toastId);
     }
@@ -146,10 +144,10 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
   const handleDeleteConfirm = async () => {
     try {
       // TODO: API call to delete
-      toast.success('Deleted successfully');
+      toast.success('Product deleted successfully');
       setModalOpen(false);
     } catch (err: any) {
-      toast.error(err.message || 'Delete failed');
+      toast.error(err.message || 'Failed to delete product');
     }
   };
 
@@ -158,8 +156,12 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
       id: 'select',
       header: ({ table }) => (
         <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
         />
       ),
       cell: ({ row }) => (
@@ -173,6 +175,7 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
             );
             row.toggleSelected(!!value);
           }}
+          aria-label="Select row"
         />
       ),
     },
@@ -183,13 +186,13 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
         const { images, name } = row.original;
         const imageUrl = images?.[0]?.url || '/placeholder.png';
         return (
-          <div className="flex items-center space-x-3">
+          <div className="flex items-start space-x-3">
             <Image
               src={imageUrl}
               alt={name}
-              width={60}
-              height={60}
-              className="rounded object-cover border"
+              width={100}
+              height={100}
+              className="w-14 h-14 rounded-sm object-cover border"
             />
             <span className="truncate">{name}</span>
           </div>
@@ -206,19 +209,31 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
       header: 'Status',
       cell: ({ row }) => {
         const status = row.original.status;
+        const statusTextColorMap: Record<string, string> = {
+          Available: 'text-[#165940]',
+          'Out of Stock': 'text-[#E12728]',
+          TBC: 'text-[#0078BF]',
+          Discontinued: 'text-[#6B5103]',
+        };
+        const statusColor = statusTextColorMap[status] || 'text-gray-700';
         return (
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 capitalize border px-3 py-1 rounded-sm bg-white">
+            <DropdownMenuTrigger
+              className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
+            >
               <RxUpdate className="w-4 h-4" />
               {status}
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {statusOptions.map((opt) => (
+            <DropdownMenuContent className="w-44">
+              {statusOptions.map((option) => (
                 <DropdownMenuItem
-                  key={opt.key}
-                  onClick={() => handleStatusUpdate(row.original._id, opt.key)}
+                  key={option.key}
+                  onClick={() =>
+                    handleStatusUpdate(row.original._id, option.key)
+                  }
+                  className="capitalize px-3 py-2 hover:bg-gray-100"
                 >
-                  {opt.label}
+                  {option.label}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -234,24 +249,32 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
     },
     {
       accessorKey: 'highlightStatus',
-      header: 'Highlight',
+      header: 'Highlight Status',
       cell: ({ row }) => {
         const status = row.original.highlightStatus;
+        const statusTextColorMap: Record<string, string> = {
+          Highlight: 'text-[#1D4ED8]',
+          Highlighted: 'text-[#165940]',
+        };
+        const statusColor = statusTextColorMap[status] || 'text-gray-700';
         return (
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 capitalize border px-3 py-1 rounded-sm bg-white">
+            <DropdownMenuTrigger
+              className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
+            >
               <RxUpdate className="w-4 h-4" />
               {status}
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {highlightStatusOptions.map((opt) => (
+            <DropdownMenuContent className="w-44">
+              {highlightstatusOptions.map((option) => (
                 <DropdownMenuItem
-                  key={opt.key}
+                  key={option.key}
                   onClick={() =>
-                    handleHighlightStatusUpdate(row.original._id, opt.key)
+                    handleHighlightStatusUpdate(row.original._id, option.key)
                   }
+                  className="capitalize px-3 py-2 hover:bg-gray-100"
                 >
-                  {opt.label}
+                  {option.label}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -263,7 +286,7 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center space-x-3">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -273,13 +296,13 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
                       `/${user?.role}/listings/view-listing/${row.original._id}`,
                     )
                   }
-                  className="text-blue-500 cursor-pointer"
+                  size={20}
+                  className="text-blue-400 cursor-pointer"
                 />
               </TooltipTrigger>
               <TooltipContent>View</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -289,18 +312,19 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
                       `/${user?.role}/listings/update-listing/${row.original._id}`,
                     )
                   }
+                  size={20}
                   className="text-green-500 cursor-pointer"
                 />
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
                 <Trash2
                   onClick={() => handleDelete(row.original)}
+                  size={20}
                   className="text-red-500 cursor-pointer"
                 />
               </TooltipTrigger>
@@ -314,73 +338,58 @@ const ManageProducts = ({ products, meta }: TProductsProps) => {
 
   return (
     <div>
+      {/* Add Product Button */}
       <AppButton
-        className="w-full bg-white text-black border"
+        className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
-          <div className="flex items-center justify-center gap-2 font-semibold">
-            <PlusCircle size={20} />
-            <span>Add Product</span>
+          <div className="flex justify-center items-center space-x-1 font-semibold">
+            <PlusCircle size={24} />
+            <span className="uppercase text-sm font-semibold">Add Product</span>
           </div>
         }
       />
 
-      <div className="flex flex-col md:flex-row justify-between gap-4 mt-6">
-        <div className="relative w-full">
+      {/* Search + Date Filter Section */}
+      <div className="flex flex-col lg:justify-between lg:flex-row gap-4 mt-5">
+        <div className="relative w-full lg:w-3/5">
           <Input
-            placeholder="Search here"
-            value={searchInputValue}
-            onChange={(e) => setSearchInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search products..."
+            className="border px-4 py-5 pr-12 rounded w-full"
           />
-          {searchInputValue && (
-            <button
-              onClick={() => {
-                setSearchInputValue('');
-                updateSearchParams({ searchTerm: null, page: '1' });
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500"
-            >
-              <CircleX />
-            </button>
-          )}
+          <button
+            onClick={handleSearch}
+            className="absolute top-1/2 right-0 -translate-y-1/2 px-3 py-2 bg-[#003250] text-white rounded cursor-pointer"
+          >
+            <Search />
+          </button>
         </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full md:w-auto">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {selectedDate
-                ? format(selectedDate, 'MMMM dd, yyyy')
-                : 'Select Date'}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="start" className="p-4">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={handleDateSelect}
-              captionLayout="dropdown"
-              fromYear={2020}
-              toYear={2030}
-            />
-            {selectedDate && (
-              <Button
-                variant="ghost"
-                className="w-full mt-2"
-                onClick={() => handleDateSelect(undefined)}
-              >
-                Clear Date <Delete className="ml-1" />
-              </Button>
-            )}
-          </PopoverContent>
-        </Popover>
+        {/* Date Picker */}
+        <input
+          type="date"
+          value={selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''}
+          onChange={(e) =>
+            handleDateSelect(
+              e.target.value ? new Date(e.target.value) : undefined,
+            )
+          }
+          className="px-4 py-2 border rounded lg:w-2/5"
+        />
       </div>
 
-      <div className="mt-6">
-        <MSWTable columns={columns} data={products || []} />
-        <MSWPagination totalPage={meta?.totalPage} />
+      {/* Header */}
+      <div className="flex justify-between items-center mt-10 mb-2">
+        <h2 className="text-xl font-medium">Manage Products</h2>
       </div>
 
+      {/* Table & Pagination */}
+      <MSWTable columns={columns} data={products || []} />
+      <MSWPagination totalPage={meta?.totalPage} />
+
+      {/* Delete Modal */}
       <DeleteConfirmationModal
         name={selectedItem}
         isOpen={isModalOpen}

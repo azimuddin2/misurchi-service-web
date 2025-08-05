@@ -33,7 +33,7 @@ export function MSWTable<TData, TValue>({
   });
 
   return (
-    <div className="rounded-md border-0 bg-white">
+    <div className="rounded-md h-screen border-0 bg-white">
       <Table>
         <TableHeader className="bg-gray-50">
           {table.getHeaderGroups().map((headerGroup) => (

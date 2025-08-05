@@ -44,8 +44,9 @@ export const getAllProducts = async (
   }
 
   if (query?.createdAt) {
-    // Only send plain date, not full ISO timestamp
-    params.append('createdAt', query.createdAt.toString().slice(0, 10));
+    // Send full ISO string (e.g., 2025-08-04T00:00:00.000Z)
+    const date = new Date(query.createdAt.toString().slice(0, 10));
+    params.append('createdAt', date.toISOString());
   }
 
   try {
