@@ -23,7 +23,7 @@ import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import Image from 'next/image';
-import { format, parseISO, isSameDay } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { AppButton } from '@/components/shared/app-button';
 import { Checkbox } from '@/components/ui/checkbox';
 import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirmationModal';

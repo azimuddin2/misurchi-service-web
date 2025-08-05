@@ -1,6 +1,7 @@
 import ManageProducts from '@/components/modules/dashboard/vendor/manage-offering/products';
 import ManageServices from '@/components/modules/dashboard/vendor/manage-offering/services';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getAllServices } from '@/services/Packages';
 import { getAllProducts } from '@/services/Product';
 
 const ManageOfferingPage = async ({
@@ -9,17 +10,23 @@ const ManageOfferingPage = async ({
   searchParams: Promise<{
     page?: string;
     searchTerm?: string;
-    category?: string;
     createdAt?: string;
   }>;
 }) => {
   const query = await searchParams;
   const { page } = query;
-  const limit = 4;
+  const limit = 10;
 
-  const { data, meta } = await getAllProducts(page, limit, query);
-
-  // Fetch filtered and paginated products server side
+  const { data: productData, meta: productMeta } = await getAllProducts(
+    page,
+    limit,
+    query,
+  );
+  const { data: serviceData, meta: serviceMeta } = await getAllServices(
+    page,
+    limit,
+    query,
+  );
 
   return (
     <div>
@@ -54,11 +61,11 @@ const ManageOfferingPage = async ({
 
         {/* Content Panels */}
         <TabsContent value="products" className="mt-2">
-          <ManageProducts products={data} meta={meta} />
+          <ManageProducts products={productData} meta={productMeta} />
         </TabsContent>
 
         <TabsContent value="services" className="mt-4">
-          <ManageServices />
+          <ManageServices services={serviceData} meta={serviceMeta} />
         </TabsContent>
       </Tabs>
     </div>

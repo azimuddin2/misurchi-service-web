@@ -73,7 +73,10 @@ export function MSWTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-80 text-center">
+              <TableCell
+                colSpan={columns.length}
+                className=" h-screen text-center"
+              >
                 <Image
                   src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
                   alt="No results"
