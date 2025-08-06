@@ -1,6 +1,5 @@
 'use client';
 
-import { TMeta } from '@/types';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
@@ -30,6 +29,11 @@ import { RxUpdate } from 'react-icons/rx';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { TService } from '@/types/service.type';
+import {
+  useGetAllServicesQuery,
+  useServiceHighlightStatusMutation,
+  useUpdateServiceStatusMutation,
+} from '@/redux/features/service/serviceApi';
 
 const statusOptions = [
   { label: 'available', key: 'available' },
@@ -41,12 +45,7 @@ const highlightstatusOptions = [
   { label: 'Highlighted', key: 'Highlighted' },
 ];
 
-type TServicesProps = {
-  services: TService[];
-  meta: TMeta;
-};
-
-const ManageServices = ({ services, meta }: TServicesProps) => {
+const ManageServices = () => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -56,7 +55,6 @@ const ManageServices = ({ services, meta }: TServicesProps) => {
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // searchTeam & createdAt date filtering
   const [search, setSearch] = useState<string>(
     searchParams.get('searchTerm') || '',
   );
@@ -67,6 +65,27 @@ const ManageServices = ({ services, meta }: TServicesProps) => {
     initialDate,
   );
 
+  const page = searchParams.get('page') || 1;
+  const limit = searchParams.get('limit') || 10;
+  const searchTerm = searchParams.get('searchTerm') || '';
+  const createdAt = searchParams.get('createdAt') || '';
+
+  const { data, isLoading, isError, refetch } = useGetAllServicesQuery({
+    page,
+    limit,
+    query: {
+      searchTerm,
+      createdAt,
+    },
+  });
+
+  const services = data?.data || [];
+  const meta = data?.meta || { totalPage: 1 };
+
+  const [updateServiceStatus] = useUpdateServiceStatusMutation();
+  const [serviceHighlightStatus] = useServiceHighlightStatusMutation();
+
+  // searchTeam & createdAt date filtering
   const updateSearchParams = useCallback(
     (newParams: Record<string, string | null | undefined>) => {
       const currentParams = new URLSearchParams(searchParams.toString());
@@ -112,28 +131,44 @@ const ManageServices = ({ services, meta }: TServicesProps) => {
     setModalOpen(true);
   };
 
-  const handleStatusUpdate = async (productId: string, status: string) => {
-    const toastId = toast.loading('Updating Status...');
+  const handleStatusUpdate = async (serviceId: string, status: string) => {
+    const toastId = toast.loading('Updating status...');
+
+    const updateStatus = { status };
+
     try {
-      // TODO: API call here
-      toast.success('Status updated successfully');
+      const res = await updateServiceStatus({
+        id: serviceId,
+        status: updateStatus,
+      }).unwrap();
+
+      toast.success(res.message || 'Status updated');
+      refetch();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update status');
+      toast.error(error?.data?.message || 'Status update failed');
     } finally {
       toast.dismiss(toastId);
     }
   };
 
   const handleHighlightStatusUpdate = async (
-    productId: string,
+    serviceId: string,
     highlightStatus: string,
   ) => {
-    const toastId = toast.loading('Updating Highlight Status...');
+    const toastId = toast.loading('Updating highlight status...');
+
+    const updateHighlightStatus = { highlightStatus };
+
     try {
-      // TODO: API call here
-      toast.success('Highlight status updated successfully');
+      const res = await serviceHighlightStatus({
+        id: serviceId,
+        highlightStatus: updateHighlightStatus,
+      }).unwrap();
+
+      toast.success(res.message || 'Highlight status updated');
+      refetch();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update highlight status');
+      toast.error(error?.data?.message || 'Highlight status update failed');
     } finally {
       toast.dismiss(toastId);
     }
@@ -142,10 +177,10 @@ const ManageServices = ({ services, meta }: TServicesProps) => {
   const handleDeleteConfirm = async () => {
     try {
       // TODO: API call to delete
-      toast.success('Product deleted successfully');
+      toast.success('Service deleted successfully');
       setModalOpen(false);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to delete product');
+      toast.error(err.message || 'Failed to delete service');
     }
   };
 
@@ -334,7 +369,7 @@ const ManageServices = ({ services, meta }: TServicesProps) => {
 
   return (
     <div>
-      {/* Add Product Button */}
+      {/* Add Service Button */}
       <AppButton
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
@@ -352,7 +387,7 @@ const ManageServices = ({ services, meta }: TServicesProps) => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search products..."
+            placeholder="Search service..."
             className="border px-4 py-5 pr-12 rounded w-full"
           />
           <button

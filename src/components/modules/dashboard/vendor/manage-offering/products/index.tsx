@@ -29,9 +29,9 @@ import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirm
 import { RxUpdate } from 'react-icons/rx';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import { updateProductStatus } from '@/services/Product';
 import {
   useGetAllProductsQuery,
+  useProductHighlightStatusMutation,
   useUpdateProductStatusMutation,
 } from '@/redux/features/product/productApi';
 
@@ -84,6 +84,7 @@ const ManageProducts = () => {
   const meta = data?.meta || { totalPage: 1 };
 
   const [updateProductStatus] = useUpdateProductStatusMutation();
+  const [productHighlightStatus] = useProductHighlightStatusMutation();
 
   // search & createdAt date filtering part
   const updateSearchParams = useCallback(
@@ -155,12 +156,20 @@ const ManageProducts = () => {
     productId: string,
     highlightStatus: string,
   ) => {
-    const toastId = toast.loading('Updating Highlight Status...');
+    const toastId = toast.loading('Updating highlight status...');
+
+    const updateHighlightStatus = { highlightStatus };
+
     try {
-      // TODO: API call here
-      toast.success('Highlight status updated successfully');
+      const res = await productHighlightStatus({
+        id: productId,
+        highlightStatus: updateHighlightStatus,
+      }).unwrap();
+
+      toast.success(res.message || 'Highlight status updated');
+      refetch();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update highlight status');
+      toast.error(error?.data?.message || 'Highlight status update failed');
     } finally {
       toast.dismiss(toastId);
     }

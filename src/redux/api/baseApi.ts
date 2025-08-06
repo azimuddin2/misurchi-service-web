@@ -1,23 +1,30 @@
 import {
+  BaseQueryApi,
   BaseQueryFn,
+  createApi,
+  DefinitionType,
   FetchArgs,
   fetchBaseQuery,
-  createApi,
 } from '@reduxjs/toolkit/query/react';
-import { BaseQueryApi, DefinitionType } from '@reduxjs/toolkit/query';
-import { toast } from 'sonner';
-import { TResponse } from '../../types';
 import { RootState } from '../store';
 import { logout, setUser, TUser } from '../features/auth/authSlice';
+import { toast } from 'sonner';
+import { TResponse } from '../../types';
 
-// Base query using credentials (for sending cookies)
 const baseQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:5000/api',
-  credentials: 'include', // Send HttpOnly cookies
-  // No need to manually set Authorization if using cookies
+  credentials: 'include',
+  prepareHeaders: (headers, { getState }) => {
+    const token = (getState() as RootState).auth.token;
+
+    if (token) {
+      headers.set('authorization', token);
+    }
+
+    return headers;
+  },
 });
 
-// Base query with automatic token refresh
 const baseQueryWithRefreshToken: BaseQueryFn<
   FetchArgs,
   BaseQueryApi,
@@ -25,37 +32,30 @@ const baseQueryWithRefreshToken: BaseQueryFn<
 > = async (args, api, extraOptions): Promise<any> => {
   let result = (await baseQuery(args, api, extraOptions)) as TResponse<TUser>;
 
-  // 404 error
   if (result.error?.status === 404) {
     toast.error(result.error.data.message);
   }
 
-  // Handle 401 and try refresh
   if (result.error?.status === 401) {
-    try {
-      const refreshRes = await fetch(
-        'http://localhost:5000/api/auth/refresh-token',
-        {
-          method: 'POST',
-          credentials: 'include',
-        },
+    const res = await fetch('http://localhost:5000/api/auth/refresh-token', {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    const data = await res.json();
+
+    if (data?.data?.accessToken) {
+      const user = (api.getState() as RootState).auth.user;
+
+      api.dispatch(
+        setUser({
+          user,
+          token: data.data.accessToken,
+        }),
       );
 
-      const refreshData = await refreshRes.json();
-
-      if (refreshData?.data?.accessToken) {
-        // Optional: store token in Redux (not needed if using cookies only)
-        const currentUser = (api.getState() as RootState).auth.user;
-        api.dispatch(
-          setUser({ user: currentUser, token: refreshData.data.accessToken }),
-        );
-
-        // Retry the original request
-        result = (await baseQuery(args, api, extraOptions)) as TResponse<TUser>;
-      } else {
-        api.dispatch(logout());
-      }
-    } catch (refreshError) {
+      result = (await baseQuery(args, api, extraOptions)) as TResponse<TUser>;
+    } else {
       api.dispatch(logout());
     }
   }
@@ -63,7 +63,6 @@ const baseQueryWithRefreshToken: BaseQueryFn<
   return result;
 };
 
-// Create API
 export const baseApi = createApi({
   reducerPath: 'baseApi',
   baseQuery: baseQueryWithRefreshToken,

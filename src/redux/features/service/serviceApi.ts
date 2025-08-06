@@ -1,20 +1,20 @@
 import { TResponse } from '@/types';
 import { baseApi } from '../../api/baseApi';
-import { TProduct } from '@/types/product.type';
+import { TService } from '@/types/service.type';
 
-const productApi = baseApi.injectEndpoints({
+const serviceApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    addProduct: builder.mutation<TResponse<TProduct>, Partial<TProduct>>({
-      query: (productInfo) => ({
-        url: '/products',
+    addService: builder.mutation<TResponse<TService>, Partial<TService>>({
+      query: (serviceInfo) => ({
+        url: '/services',
         method: 'POST',
-        body: productInfo,
+        body: serviceInfo,
         credentials: 'include',
       }),
     }),
 
-    getAllProducts: builder.query<
-      TResponse<TProduct[]>,
+    getAllServices: builder.query<
+      TResponse<TService[]>,
       {
         page?: number | string;
         limit?: number | string;
@@ -43,31 +43,31 @@ const productApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/products?page=${page}&limit=${limit}&${params.toString()}`,
+          url: `/services?page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };
       },
     }),
 
-    updateProductStatus: builder.mutation<
-      TResponse<TProduct>,
+    updateServiceStatus: builder.mutation<
+      TResponse<TService>,
       { id: string; status: { status: string } }
     >({
       query: ({ id, status }) => ({
-        url: `/products/update-status/${id}`,
+        url: `/services/update-status/${id}`,
         method: 'PUT',
         body: status,
         credentials: 'include',
       }),
     }),
 
-    productHighlightStatus: builder.mutation<
-      TResponse<TProduct>,
+    serviceHighlightStatus: builder.mutation<
+      TResponse<TService>,
       { id: string; highlightStatus: { highlightStatus: string } }
     >({
       query: ({ id, highlightStatus }) => ({
-        url: `/products/highlight-status/${id}`,
+        url: `/services/highlight-status/${id}`,
         method: 'PUT',
         body: highlightStatus,
         credentials: 'include',
@@ -77,8 +77,8 @@ const productApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useAddProductMutation,
-  useGetAllProductsQuery,
-  useUpdateProductStatusMutation,
-  useProductHighlightStatusMutation,
-} = productApi;
+  useAddServiceMutation,
+  useGetAllServicesQuery,
+  useUpdateServiceStatusMutation,
+  useServiceHighlightStatusMutation,
+} = serviceApi;
