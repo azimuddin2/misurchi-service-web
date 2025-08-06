@@ -1,4 +1,4 @@
-import VendorSignupForm from '@/components/modules/auth/signup/VendorSignupForm';
+import VendorSignupForm from '../_components/VendorSignupForm';
 
 const VendorSignupPage = () => {
   return (

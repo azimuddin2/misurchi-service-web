@@ -11,6 +11,7 @@ const serviceApi = baseApi.injectEndpoints({
         body: serviceInfo,
         credentials: 'include',
       }),
+      invalidatesTags: ['Service'],
     }),
 
     getAllServices: builder.query<
@@ -48,6 +49,7 @@ const serviceApi = baseApi.injectEndpoints({
           credentials: 'include',
         };
       },
+      providesTags: ['Service'],
     }),
 
     updateServiceStatus: builder.mutation<
@@ -60,6 +62,7 @@ const serviceApi = baseApi.injectEndpoints({
         body: status,
         credentials: 'include',
       }),
+      invalidatesTags: ['Service'],
     }),
 
     serviceHighlightStatus: builder.mutation<
@@ -72,6 +75,16 @@ const serviceApi = baseApi.injectEndpoints({
         body: highlightStatus,
         credentials: 'include',
       }),
+      invalidatesTags: ['Service'],
+    }),
+
+    deleteService: builder.mutation<TResponse<TService>, string>({
+      query: (id) => ({
+        url: `/services/${id}`,
+        method: 'DELETE',
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Service'],
     }),
   }),
 });
@@ -81,4 +94,5 @@ export const {
   useGetAllServicesQuery,
   useUpdateServiceStatusMutation,
   useServiceHighlightStatusMutation,
+  useDeleteServiceMutation,
 } = serviceApi;

@@ -1,6 +1,6 @@
-import ManageProducts from '@/components/modules/dashboard/vendor/manage-offering/products';
-import ManageServices from '@/components/modules/dashboard/vendor/manage-offering/services';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ManageProducts from './_components/products';
+import ManageServices from './_components/services';
 
 const ManageOfferingPage = async () => {
   return (
@@ -39,7 +39,7 @@ const ManageOfferingPage = async () => {
           <ManageProducts />
         </TabsContent>
 
-        <TabsContent value="services" className="mt-4">
+        <TabsContent value="services" className="mt-2">
           <ManageServices />
         </TabsContent>
       </Tabs>

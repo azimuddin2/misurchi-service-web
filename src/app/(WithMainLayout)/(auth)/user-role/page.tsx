@@ -1,4 +1,4 @@
-import UserRole from '@/components/modules/auth';
+import UserRole from './_components';
 
 const UserRolePage = () => {
   return (

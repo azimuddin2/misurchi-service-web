@@ -1,5 +1,6 @@
 'use client';
 
+import { TProduct } from '@/types/product.type';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
@@ -28,16 +29,19 @@ import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirm
 import { RxUpdate } from 'react-icons/rx';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import { TService } from '@/types/service.type';
 import {
-  useGetAllServicesQuery,
-  useServiceHighlightStatusMutation,
-  useUpdateServiceStatusMutation,
-} from '@/redux/features/service/serviceApi';
+  useDeleteProductMutation,
+  useGetAllProductsQuery,
+  useProductHighlightStatusMutation,
+  useUpdateProductStatusMutation,
+} from '@/redux/features/product/productApi';
+import Spinner from '@/components/shared/Spinner';
 
 const statusOptions = [
-  { label: 'available', key: 'available' },
-  { label: 'unavailable', key: 'unavailable' },
+  { label: 'Available', key: 'Available' },
+  { label: 'Out of Stock', key: 'Out of Stock' },
+  { label: 'TBC', key: 'TBC' },
+  { label: 'Discontinued', key: 'Discontinued' },
 ];
 
 const highlightstatusOptions = [
@@ -45,7 +49,7 @@ const highlightstatusOptions = [
   { label: 'Highlighted', key: 'Highlighted' },
 ];
 
-const ManageServices = () => {
+const ManageProducts = () => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -58,7 +62,6 @@ const ManageServices = () => {
   const [search, setSearch] = useState<string>(
     searchParams.get('searchTerm') || '',
   );
-
   const initialDateParam = searchParams.get('createdAt');
   const initialDate = initialDateParam ? parseISO(initialDateParam) : undefined;
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
@@ -70,7 +73,7 @@ const ManageServices = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data, isLoading, isError, refetch } = useGetAllServicesQuery({
+  const { data, isLoading, refetch } = useGetAllProductsQuery({
     page,
     limit,
     query: {
@@ -79,13 +82,14 @@ const ManageServices = () => {
     },
   });
 
-  const services = data?.data || [];
+  const products = data?.data || [];
   const meta = data?.meta || { totalPage: 1 };
 
-  const [updateServiceStatus] = useUpdateServiceStatusMutation();
-  const [serviceHighlightStatus] = useServiceHighlightStatusMutation();
+  const [updateProductStatus] = useUpdateProductStatusMutation();
+  const [productHighlightStatus] = useProductHighlightStatusMutation();
+  const [deleteProduct] = useDeleteProductMutation();
 
-  // searchTeam & createdAt date filtering
+  // search & createdAt date filtering part
   const updateSearchParams = useCallback(
     (newParams: Record<string, string | null | undefined>) => {
       const currentParams = new URLSearchParams(searchParams.toString());
@@ -125,20 +129,20 @@ const ManageServices = () => {
   }, [searchParams]);
 
   // API call here backend
-  const handleDelete = (data: TService) => {
+  const handleDelete = (data: TProduct) => {
     setSelectedId(data?._id);
     setSelectedItem(data?.name);
     setModalOpen(true);
   };
 
-  const handleStatusUpdate = async (serviceId: string, status: string) => {
+  const handleStatusUpdate = async (productId: string, status: string) => {
     const toastId = toast.loading('Updating status...');
 
     const updateStatus = { status };
 
     try {
-      const res = await updateServiceStatus({
-        id: serviceId,
+      const res = await updateProductStatus({
+        id: productId,
         status: updateStatus,
       }).unwrap();
 
@@ -152,7 +156,7 @@ const ManageServices = () => {
   };
 
   const handleHighlightStatusUpdate = async (
-    serviceId: string,
+    productId: string,
     highlightStatus: string,
   ) => {
     const toastId = toast.loading('Updating highlight status...');
@@ -160,8 +164,8 @@ const ManageServices = () => {
     const updateHighlightStatus = { highlightStatus };
 
     try {
-      const res = await serviceHighlightStatus({
-        id: serviceId,
+      const res = await productHighlightStatus({
+        id: productId,
         highlightStatus: updateHighlightStatus,
       }).unwrap();
 
@@ -175,16 +179,25 @@ const ManageServices = () => {
   };
 
   const handleDeleteConfirm = async () => {
+    if (!selectedId) return;
+
+    const toastId = toast.loading('Deleting product...');
+
     try {
-      // TODO: API call to delete
-      toast.success('Service deleted successfully');
+      const res = await deleteProduct(selectedId).unwrap();
+      toast.success(res.message || 'Product deleted successfully');
       setModalOpen(false);
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to delete service');
+      setSelectedId(null);
+      setSelectedItem(null);
+      refetch(); // Refresh product list
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to delete product');
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 
-  const columns: ColumnDef<TService>[] = [
+  const columns: ColumnDef<TProduct>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -214,7 +227,7 @@ const ManageServices = () => {
     },
     {
       accessorKey: 'name',
-      header: 'Service Name',
+      header: 'Product Name',
       cell: ({ row }) => {
         const { images, name } = row.original;
         const imageUrl = images?.[0]?.url || '/placeholder.png';
@@ -243,8 +256,10 @@ const ManageServices = () => {
       cell: ({ row }) => {
         const status = row.original.status;
         const statusTextColorMap: Record<string, string> = {
-          available: 'text-[#165940]',
-          unavailable: 'text-[#E12728]',
+          Available: 'text-[#165940]',
+          'Out of Stock': 'text-[#E12728]',
+          TBC: 'text-[#0078BF]',
+          Discontinued: 'text-[#6B5103]',
         };
         const statusColor = statusTextColorMap[status] || 'text-gray-700';
         return (
@@ -324,7 +339,7 @@ const ManageServices = () => {
                 <Eye
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/listings/view-listing/${row.original._id}`,
+                      `/${user?.role}/manage-offering/view-product/${row.original._id}`,
                     )
                   }
                   size={20}
@@ -367,15 +382,19 @@ const ManageServices = () => {
     },
   ];
 
+  if (isLoading) {
+    return <Spinner />;
+  }
+
   return (
     <div>
-      {/* Add Service Button */}
+      {/* Add Product Button */}
       <AppButton
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
           <div className="flex justify-center items-center space-x-1 font-semibold">
             <PlusCircle size={24} />
-            <span className="uppercase text-sm font-semibold">Add Service</span>
+            <span className="uppercase text-sm font-semibold">Add Product</span>
           </div>
         }
       />
@@ -387,7 +406,7 @@ const ManageServices = () => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search service..."
+            placeholder="Search products..."
             className="border px-4 py-5 pr-12 rounded w-full"
           />
           <button
@@ -413,11 +432,11 @@ const ManageServices = () => {
 
       {/* Header */}
       <div className="flex justify-between items-center mt-10 mb-2">
-        <h2 className="text-xl font-medium">Manage Services</h2>
+        <h2 className="text-xl font-medium">Manage Products</h2>
       </div>
 
       {/* Table & Pagination */}
-      <MSWTable columns={columns} data={services || []} />
+      <MSWTable columns={columns} data={products || []} />
       <MSWPagination totalPage={meta?.totalPage} />
 
       {/* Delete Modal */}
@@ -431,4 +450,4 @@ const ManageServices = () => {
   );
 };
 
-export default ManageServices;
+export default ManageProducts;

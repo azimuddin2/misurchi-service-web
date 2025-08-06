@@ -1,4 +1,4 @@
-import About from '@/components/modules/about';
+import About from './_components';
 
 const AboutPage = () => {
   return (

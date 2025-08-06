@@ -11,6 +11,7 @@ const productApi = baseApi.injectEndpoints({
         body: productInfo,
         credentials: 'include',
       }),
+      invalidatesTags: ['Product'],
     }),
 
     getAllProducts: builder.query<
@@ -48,6 +49,7 @@ const productApi = baseApi.injectEndpoints({
           credentials: 'include',
         };
       },
+      providesTags: ['Product'],
     }),
 
     updateProductStatus: builder.mutation<
@@ -60,6 +62,7 @@ const productApi = baseApi.injectEndpoints({
         body: status,
         credentials: 'include',
       }),
+      invalidatesTags: ['Product'],
     }),
 
     productHighlightStatus: builder.mutation<
@@ -72,6 +75,16 @@ const productApi = baseApi.injectEndpoints({
         body: highlightStatus,
         credentials: 'include',
       }),
+      invalidatesTags: ['Product'],
+    }),
+
+    deleteProduct: builder.mutation<TResponse<TProduct>, string>({
+      query: (id) => ({
+        url: `/products/${id}`,
+        method: 'DELETE',
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Product'],
     }),
   }),
 });
@@ -81,4 +94,5 @@ export const {
   useGetAllProductsQuery,
   useUpdateProductStatusMutation,
   useProductHighlightStatusMutation,
+  useDeleteProductMutation,
 } = productApi;

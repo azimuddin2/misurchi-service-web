@@ -1,11 +1,7 @@
-import {
-  KnowAboutUs,
-  NewArrival,
-  OurHappyClients,
-} from '@/components/modules/home';
-import Banner from '@/components/modules/home/banner';
-import FAQSection from '@/components/modules/home/faq-seciton';
-import TimeOffer from '@/components/modules/home/time-offer';
+import { KnowAboutUs, NewArrival, OurHappyClients } from './_components';
+import Banner from './_components/banner';
+import FAQSection from './_components/faq-seciton';
+import TimeOffer from './_components/time-offer';
 
 const HomePage = () => {
   return (

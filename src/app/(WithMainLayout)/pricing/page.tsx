@@ -1,4 +1,4 @@
-import Pricing from '@/components/modules/pricing';
+import Pricing from './_components';
 
 const PricingPage = () => {
   return (
