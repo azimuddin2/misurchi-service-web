@@ -36,6 +36,7 @@ import {
   useUpdateProductStatusMutation,
 } from '@/redux/features/product/productApi';
 import Spinner from '@/components/shared/Spinner';
+import Link from 'next/link';
 
 const statusOptions = [
   { label: 'Available', key: 'Available' },
@@ -355,7 +356,7 @@ const ManageProducts = () => {
                 <Edit
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/listings/update-listing/${row.original._id}`,
+                      `/${user?.role}/manage-offering/update-product/${row.original._id}`,
                     )
                   }
                   size={20}
@@ -392,10 +393,13 @@ const ManageProducts = () => {
       <AppButton
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
-          <div className="flex justify-center items-center space-x-1 font-semibold">
+          <Link
+            href={`/${user?.role}/manage-offering/add-product`}
+            className="flex justify-center items-center space-x-1 font-semibold"
+          >
             <PlusCircle size={24} />
             <span className="uppercase text-sm font-semibold">Add Product</span>
-          </div>
+          </Link>
         }
       />
 

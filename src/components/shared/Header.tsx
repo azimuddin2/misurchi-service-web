@@ -173,7 +173,7 @@ export default function Header() {
                 Sign In
               </Link>
               <Link href="/user-role">
-                <Button className="text-[#fff] bg-[#0d3c59e9] px-3 py-5 text-sm cursor-pointer">
+                <Button className="text-[#fff] bg-gray-700/50 px-6 py-5 text-sm cursor-pointer">
                   Sign Up
                 </Button>
               </Link>
