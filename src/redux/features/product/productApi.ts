@@ -4,11 +4,11 @@ import { TProduct } from '@/types/product.type';
 
 const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    addProduct: builder.mutation<TResponse<TProduct>, Partial<TProduct>>({
-      query: (productInfo) => ({
+    addProduct: builder.mutation<TResponse<TProduct>, FormData>({
+      query: (formData) => ({
         url: '/products',
         method: 'POST',
-        body: productInfo,
+        body: formData,
         credentials: 'include',
       }),
       invalidatesTags: ['Product'],
