@@ -390,7 +390,7 @@ const UpdateProduct = ({ productId }: Props) => {
           />
 
           {/* Submit Button */}
-          <div className='grid grid-cols-2 gap-3'>
+          <div className="grid grid-cols-2 gap-3">
             <AppButton
               className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
               content={
