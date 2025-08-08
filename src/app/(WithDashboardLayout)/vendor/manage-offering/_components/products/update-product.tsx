@@ -129,7 +129,7 @@ const UpdateProduct = ({ productId }: Props) => {
         body: formData,
       }).unwrap();
       toast.success(res.message || 'Product update successfully');
-      router.push('/vendor/manage-offering');
+      router.push(`/vendor/manage-offering/view-product/${productId}`);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to add product');
     } finally {

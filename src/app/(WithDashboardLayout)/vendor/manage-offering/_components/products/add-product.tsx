@@ -67,7 +67,7 @@ const AddProduct = () => {
     try {
       const res = await addProduct(formData).unwrap();
       toast.success(res.message || 'Product added successfully');
-      router.push('/vendor/manage-offering');
+      router.push(`/vendor/manage-offering/view-product/${res.data?._id}`);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to add product');
     } finally {
