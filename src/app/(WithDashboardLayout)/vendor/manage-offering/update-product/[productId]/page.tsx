@@ -1,9 +1,9 @@
 import UpdateProduct from '../../_components/products/update-product';
 
-const UpdateProductPage = () => {
+const UpdateProductPage = ({ params }: { params: { productId: string } }) => {
   return (
     <div>
-      <UpdateProduct />
+      <UpdateProduct productId={params.productId} />
     </div>
   );
 };

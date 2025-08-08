@@ -52,6 +52,28 @@ const productApi = baseApi.injectEndpoints({
       providesTags: ['Product'],
     }),
 
+    getProductById: builder.query<TResponse<TProduct>, string>({
+      query: (id) => ({
+        url: `/products/${id}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Product'],
+    }),
+
+    updateProduct: builder.mutation<
+      TResponse<TProduct>, // Response type
+      { id: string; body: FormData } // Arg type
+    >({
+      query: ({ id, body }) => ({
+        url: `/products/${id}`,
+        method: 'PATCH',
+        body,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Product'],
+    }),
+
     updateProductStatus: builder.mutation<
       TResponse<TProduct>,
       { id: string; status: { status: string } }
@@ -92,6 +114,8 @@ const productApi = baseApi.injectEndpoints({
 export const {
   useAddProductMutation,
   useGetAllProductsQuery,
+  useGetProductByIdQuery,
+  useUpdateProductMutation,
   useUpdateProductStatusMutation,
   useProductHighlightStatusMutation,
   useDeleteProductMutation,
