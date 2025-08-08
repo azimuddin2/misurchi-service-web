@@ -1,9 +1,9 @@
-import React from 'react';
+import ManageTeamMembers from './_components';
 
 const TeamMembersPage = () => {
   return (
     <div>
-      <h2>Team Members Page</h2>
+      <ManageTeamMembers />
     </div>
   );
 };
