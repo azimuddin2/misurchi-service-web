@@ -180,6 +180,16 @@ const ManageTeamMembers = () => {
       },
     },
     {
+      accessorKey: 'email',
+      header: 'Email',
+      cell: ({ row }) => <span>{row.original.email}</span>,
+    },
+    {
+      accessorKey: 'phone',
+      header: 'Phone',
+      cell: ({ row }) => <span>{row.original.phone}</span>,
+    },
+    {
       accessorKey: 'specialty',
       header: 'Specialty',
       cell: ({ row }) => <span>{row.original.speciality}</span>,
