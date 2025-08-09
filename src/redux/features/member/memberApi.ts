@@ -52,28 +52,34 @@ const memberApi = baseApi.injectEndpoints({
       providesTags: ['Member'],
     }),
 
-    updateProduct: builder.mutation<
-      TResponse<TProduct>, // Response type
-      { id: string; body: FormData } // Arg type
+    updateMember: builder.mutation<
+      TResponse<TMember>,
+      { id: string; body: FormData }
     >({
       query: ({ id, body }) => ({
-        url: `/products/${id}`,
+        url: `/team-members/${id}`,
         method: 'PATCH',
         body,
         credentials: 'include',
       }),
-      invalidatesTags: ['Product'],
+      invalidatesTags: ['Member'],
     }),
 
-    deleteProduct: builder.mutation<TResponse<TProduct>, string>({
+    deleteMember: builder.mutation<TResponse<TMember>, string>({
       query: (id) => ({
-        url: `/products/${id}`,
+        url: `/team-members/${id}`,
         method: 'DELETE',
         credentials: 'include',
       }),
-      invalidatesTags: ['Product'],
+      invalidatesTags: ['Member'],
     }),
   }),
 });
 
-export const {} = memberApi;
+export const {
+  useAddMemberMutation,
+  useGetAllMembersQuery,
+  useGetMemberByIdQuery,
+  useUpdateMemberMutation,
+  useDeleteMemberMutation,
+} = memberApi;

@@ -1,6 +1,5 @@
 'use client';
 
-import { TProduct } from '@/types/product.type';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
@@ -10,13 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Edit, Eye, PlusCircle, Search, Trash2 } from 'lucide-react';
+import { Edit, PlusCircle, Search, Trash2 } from 'lucide-react';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
@@ -26,29 +19,15 @@ import { format, parseISO } from 'date-fns';
 import { AppButton } from '@/components/shared/app-button';
 import { Checkbox } from '@/components/ui/checkbox';
 import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirmationModal';
-import { RxUpdate } from 'react-icons/rx';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import {
-  useDeleteProductMutation,
-  useGetAllProductsQuery,
-  useProductHighlightStatusMutation,
-  useUpdateProductStatusMutation,
-} from '@/redux/features/product/productApi';
 import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
-
-const statusOptions = [
-  { label: 'Available', key: 'Available' },
-  { label: 'Out of Stock', key: 'Out of Stock' },
-  { label: 'TBC', key: 'TBC' },
-  { label: 'Discontinued', key: 'Discontinued' },
-];
-
-const highlightstatusOptions = [
-  { label: 'Highlight', key: 'Highlight' },
-  { label: 'Highlighted', key: 'Highlighted' },
-];
+import {
+  useDeleteMemberMutation,
+  useGetAllMembersQuery,
+} from '@/redux/features/member/memberApi';
+import { TMember } from '@/types/member.type';
 
 const ManageTeamMembers = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -74,7 +53,7 @@ const ManageTeamMembers = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data, isLoading, refetch } = useGetAllProductsQuery({
+  const { data, isLoading, refetch } = useGetAllMembersQuery({
     page,
     limit,
     query: {
@@ -83,12 +62,10 @@ const ManageTeamMembers = () => {
     },
   });
 
-  const products = data?.data || [];
+  const members = data?.data || [];
   const meta = data?.meta || { totalPage: 1 };
 
-  const [updateProductStatus] = useUpdateProductStatusMutation();
-  const [productHighlightStatus] = useProductHighlightStatusMutation();
-  const [deleteProduct] = useDeleteProductMutation();
+  const [deleteMember] = useDeleteMemberMutation();
 
   // search & createdAt date filtering part
   const updateSearchParams = useCallback(
@@ -130,75 +107,32 @@ const ManageTeamMembers = () => {
   }, [searchParams]);
 
   // API call here backend
-  const handleDelete = (data: TProduct) => {
+  const handleDelete = (data: TMember) => {
     setSelectedId(data?._id);
     setSelectedItem(data?.name);
     setModalOpen(true);
   };
 
-  const handleStatusUpdate = async (productId: string, status: string) => {
-    const toastId = toast.loading('Updating status...');
-
-    const updateStatus = { status };
-
-    try {
-      const res = await updateProductStatus({
-        id: productId,
-        status: updateStatus,
-      }).unwrap();
-
-      toast.success(res.message || 'Status updated');
-      refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Status update failed');
-    } finally {
-      toast.dismiss(toastId);
-    }
-  };
-
-  const handleHighlightStatusUpdate = async (
-    productId: string,
-    highlightStatus: string,
-  ) => {
-    const toastId = toast.loading('Updating highlight status...');
-
-    const updateHighlightStatus = { highlightStatus };
-
-    try {
-      const res = await productHighlightStatus({
-        id: productId,
-        highlightStatus: updateHighlightStatus,
-      }).unwrap();
-
-      toast.success(res.message || 'Highlight status updated');
-      refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Highlight status update failed');
-    } finally {
-      toast.dismiss(toastId);
-    }
-  };
-
   const handleDeleteConfirm = async () => {
     if (!selectedId) return;
 
-    const toastId = toast.loading('Deleting product...');
+    const toastId = toast.loading('Deleting member...');
 
     try {
-      const res = await deleteProduct(selectedId).unwrap();
-      toast.success(res.message || 'Product deleted successfully');
+      const res = await deleteMember(selectedId).unwrap();
+      toast.success(res.message || 'Member deleted successfully');
       setModalOpen(false);
       setSelectedId(null);
       setSelectedItem(null);
-      refetch(); // Refresh product list
+      refetch(); // Refresh Member list
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to delete product');
+      toast.error(error?.data?.message || 'Failed to delete member');
     } finally {
       toast.dismiss(toastId);
     }
   };
 
-  const columns: ColumnDef<TProduct>[] = [
+  const columns: ColumnDef<TMember>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -228,18 +162,17 @@ const ManageTeamMembers = () => {
     },
     {
       accessorKey: 'name',
-      header: 'Product Name',
+      header: 'Name',
       cell: ({ row }) => {
-        const { images, name } = row.original;
-        const imageUrl = images?.[0]?.url || '/placeholder.png';
+        const { image, name } = row.original;
         return (
           <div className="flex items-start space-x-3">
             <Image
-              src={imageUrl}
+              src={image}
               alt={name}
               width={100}
               height={100}
-              className="w-14 h-14 rounded-sm object-cover border"
+              className="w-14 h-14 rounded-full object-cover border"
             />
             <span className="truncate">{name}</span>
           </div>
@@ -247,87 +180,20 @@ const ManageTeamMembers = () => {
       },
     },
     {
-      accessorKey: 'price',
-      header: 'Price',
-      cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
+      accessorKey: 'specialty',
+      header: 'Specialty',
+      cell: ({ row }) => <span>{row.original.speciality}</span>,
     },
     {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({ row }) => {
-        const status = row.original.status;
-        const statusTextColorMap: Record<string, string> = {
-          Available: 'text-[#165940]',
-          'Out of Stock': 'text-[#E12728]',
-          TBC: 'text-[#0078BF]',
-          Discontinued: 'text-[#6B5103]',
-        };
-        const statusColor = statusTextColorMap[status] || 'text-gray-700';
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
-            >
-              <RxUpdate className="w-4 h-4" />
-              {status}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-44">
-              {statusOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.key}
-                  onClick={() =>
-                    handleStatusUpdate(row.original._id, option.key)
-                  }
-                  className="capitalize px-3 py-2 hover:bg-gray-100"
-                >
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+      accessorKey: 'role',
+      header: 'Role',
+      cell: ({ row }) => <span>{row.original.role}</span>,
     },
     {
       accessorKey: 'createdAt',
-      header: 'Date',
+      header: 'Join Date',
       cell: ({ row }) =>
         format(new Date(row.original.createdAt), 'dd MMM, yyyy'),
-    },
-    {
-      accessorKey: 'highlightStatus',
-      header: 'Highlight Status',
-      cell: ({ row }) => {
-        const status = row.original.highlightStatus;
-        const statusTextColorMap: Record<string, string> = {
-          Highlight: 'text-[#1D4ED8]',
-          Highlighted: 'text-[#165940]',
-        };
-        const statusColor = statusTextColorMap[status] || 'text-gray-700';
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
-            >
-              <RxUpdate className="w-4 h-4" />
-              {status}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-44">
-              {highlightstatusOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.key}
-                  onClick={() =>
-                    handleHighlightStatusUpdate(row.original._id, option.key)
-                  }
-                  className="capitalize px-3 py-2 hover:bg-gray-100"
-                >
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
     },
     {
       accessorKey: 'action',
@@ -337,26 +203,10 @@ const ManageTeamMembers = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Eye
-                  onClick={() =>
-                    router.push(
-                      `/${user?.role}/manage-offering/view-product/${row.original._id}`,
-                    )
-                  }
-                  size={20}
-                  className="text-blue-400 cursor-pointer"
-                />
-              </TooltipTrigger>
-              <TooltipContent>View</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
                 <Edit
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/manage-offering/update-product/${row.original._id}`,
+                      `/${user?.role}/team-members/update-member/${row.original._id}`,
                     )
                   }
                   size={20}
@@ -389,16 +239,16 @@ const ManageTeamMembers = () => {
 
   return (
     <div>
-      {/* Add Product Button */}
+      {/* Add Member Button */}
       <AppButton
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
           <Link
-            href={`/${user?.role}/manage-offering/add-product`}
+            href={`/${user?.role}/team-members/add-member`}
             className="flex justify-center items-center space-x-1 font-semibold"
           >
             <PlusCircle size={24} />
-            <span className="uppercase text-sm font-semibold">Add Product</span>
+            <span className="uppercase text-sm font-semibold">Add Member</span>
           </Link>
         }
       />
@@ -410,7 +260,7 @@ const ManageTeamMembers = () => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search products..."
+            placeholder="Search members..."
             className="border px-4 py-5 pr-12 rounded w-full"
           />
           <button
@@ -436,11 +286,11 @@ const ManageTeamMembers = () => {
 
       {/* Header */}
       <div className="flex justify-between items-center mt-10 mb-2">
-        <h2 className="text-xl font-medium">Manage Products</h2>
+        <h2 className="text-xl font-medium">Manage Members</h2>
       </div>
 
       {/* Table & Pagination */}
-      <MSWTable columns={columns} data={products || []} />
+      <MSWTable columns={columns} data={members || []} />
       <MSWPagination totalPage={meta?.totalPage} />
 
       {/* Delete Modal */}
