@@ -443,6 +443,26 @@ const VendorProfile = () => {
             />
           </div>
 
+          <div className="mt-8 h-full rounded-lg overflow-hidden">
+            <div
+              style={{
+                width: '100%',
+              }}
+            >
+              <iframe
+                width="100%"
+                height="400"
+                frameBorder="0"
+                scrolling="no"
+                src="https://maps.google.com/maps?width=100%25&amp;height=400&amp;hl=en&amp;q=123A,%20Washington,%20UK+(Soft%20Technology)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
+              >
+                <a href="https://www.gps.ie/collections/sports-gps/">
+                  Cycling gps
+                </a>
+              </iframe>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
             {/* Submit Button */}
             <AppButton

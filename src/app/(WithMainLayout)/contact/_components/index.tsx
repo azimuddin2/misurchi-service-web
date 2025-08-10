@@ -176,7 +176,7 @@ export default function Contact() {
         </form>
       </div>
 
-      <div className="mt-8 h-64 rounded-lg overflow-hidden">
+      <div className="mt-8 h-full rounded-lg overflow-hidden">
         <div
           style={{
             width: '100%',
