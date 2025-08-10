@@ -1,9 +1,9 @@
-import React from 'react';
+import VendorProfile from './_components/vendor-profile';
 
 const VendorProfilePage = () => {
   return (
     <div>
-      <h2>Vendor Profile Page</h2>
+      <VendorProfile />
     </div>
   );
 };

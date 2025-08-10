@@ -76,7 +76,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg flex-grow max-w-4xl p-4 lg:p-8 shadow">
+    <div className="bg-white rounded-lg flex-grow max-w-5xl p-4 lg:p-8 shadow">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {/* Images part */}

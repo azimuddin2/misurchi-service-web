@@ -65,14 +65,15 @@ export default function Header() {
         {user?.userId ? (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <Avatar className="cursor-pointer">
+              <Avatar className="cursor-pointer border border-gray-300">
                 <AvatarImage src={user?.image} />
                 <AvatarFallback>{user.name?.slice(0, 1)}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="rounded-[10px] mt-2 w-80 mr-3 p-3">
               <div>
-                <Avatar className="mx-auto w-12 h-12">
+                <Avatar className="mx-auto w-14 h-14 border border-[#093954]">
+                  <AvatarImage src={user?.image} />
                   <AvatarFallback className="bg-[#093954] text-white text-2xl">
                     {user?.name?.slice(0, 1)}
                   </AvatarFallback>

@@ -79,7 +79,7 @@ export default function CountryStateCitySelector({
   }, [userAddress?.country]);
 
   return (
-    <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-2">
+    <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-3">
       {/* Country */}
       <FormField
         control={control}
