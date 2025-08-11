@@ -9,6 +9,7 @@ const authApi = baseApi.injectEndpoints({
         body: userInfo,
       }),
     }),
+
     vendorSignup: builder.mutation({
       query: (userInfo) => ({
         url: '/users/vendor/signup',
@@ -16,6 +17,7 @@ const authApi = baseApi.injectEndpoints({
         body: userInfo,
       }),
     }),
+
     login: builder.mutation({
       query: (userInfo) => ({
         url: '/auth/login',
@@ -23,6 +25,7 @@ const authApi = baseApi.injectEndpoints({
         body: userInfo,
       }),
     }),
+
     forgotPassword: builder.mutation({
       query: (data) => ({
         url: '/auth/forgot-password',
@@ -30,6 +33,7 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+
     resetPassword: builder.mutation({
       query: (data) => ({
         url: '/auth/reset-password',

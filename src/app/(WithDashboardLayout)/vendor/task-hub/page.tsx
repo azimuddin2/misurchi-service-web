@@ -1,9 +1,9 @@
-import React from 'react';
+import ManageTaskHub from './_components';
 
 const TaskHubPage = () => {
   return (
     <div>
-      <h2>Task Hub Page</h2>
+      <ManageTaskHub />
     </div>
   );
 };
