@@ -33,7 +33,6 @@ import { Button } from '@/components/ui/button';
 import { roleOptions } from '@/constants/teamMemberRoles';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import {
-  useAddMemberMutation,
   useGetMemberByIdQuery,
   useUpdateMemberMutation,
 } from '@/redux/features/member/memberApi';
@@ -52,7 +51,7 @@ const UpdateMember = ({ memberId }: Props) => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
 
-  const { data, isLoading } = useGetMemberByIdQuery(memberId);
+  const { data } = useGetMemberByIdQuery(memberId);
   const member: TMember | undefined = data?.data;
 
   const [updateMember] = useUpdateMemberMutation();
@@ -125,7 +124,6 @@ const UpdateMember = ({ memberId }: Props) => {
         id: memberId,
         body: formData,
       }).unwrap();
-      console.log(res);
 
       toast.success(res.message || 'Product added successfully');
       router.push(`/vendor/team-members`);

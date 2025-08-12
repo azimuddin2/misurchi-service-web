@@ -2,7 +2,7 @@
 
 import { AppButton } from '@/components/shared/app-button';
 import { ArrowRight, Clock } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Form,
   FormControl,
@@ -34,18 +34,38 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useAddTaskMutation } from '@/redux/features/task/taskApi';
-import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
+import {
+  useGetTaskByIdQuery,
+  useUpdateTaskMutation,
+} from '@/redux/features/task/taskApi';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { TTask } from '@/types/task.type';
+import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
+import Link from 'next/link';
 import { taskSchema } from './taskValidation';
 
-const AddTask = () => {
+type Props = {
+  taskId: string;
+};
+
+const UpdateTask = ({ taskId }: Props) => {
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>('');
 
   const user = useAppSelector(selectCurrentUser);
   const userId = user?.userId as string;
   const router = useRouter();
+
+  const { data: membersData } = useGetAllMembersQuery({
+    userId,
+  });
+
+  const members = membersData?.data || [];
+
+  const { data, refetch } = useGetTaskByIdQuery(taskId);
+  const task: TTask | undefined = data?.data;
+
+  const [updateTask] = useUpdateTaskMutation();
 
   // Generate times every 30 minutes for one day, starting at midnight
   const times = useMemo(() => {
@@ -61,19 +81,41 @@ const AddTask = () => {
 
   const form = useForm({
     resolver: zodResolver(taskSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      date: '',
+      time: '',
+      assignTeamMember: '',
+    },
   });
+
+  useEffect(() => {
+    if (task) {
+      // Set form default values
+      form.reset({
+        title: task.title || '',
+        description: task.description || '',
+        date: task.date || '',
+        time: task.time || '',
+        assignTeamMember: task.assignTeamMember || '',
+      });
+
+      // Set date state from ISO date string
+      if (task.date) {
+        setDate(new Date(task.date));
+      }
+
+      // Set time state
+      if (task.time) {
+        setTime(task.time);
+      }
+    }
+  }, [task, form]);
 
   const {
     formState: { isSubmitting },
   } = form;
-
-  const { data, isLoading, refetch } = useGetAllMembersQuery({
-    userId,
-  });
-
-  const members = data?.data || [];
-
-  const [AddTask] = useAddTaskMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     if (!date) {
@@ -86,7 +128,6 @@ const AddTask = () => {
     }
 
     const taskData = {
-      user: user?.userId,
       ...data,
       date: date instanceof Date ? date.toISOString().split('T')[0] : date,
       time,
@@ -95,8 +136,11 @@ const AddTask = () => {
     const toastId = toast.loading('Adding task...');
 
     try {
-      const res = await AddTask(taskData).unwrap();
-      toast.success(res.message || 'Task added successfully');
+      const res = await updateTask({
+        id: taskId,
+        body: taskData,
+      }).unwrap();
+      toast.success(res.message || 'Task updated successfully');
       router.push(`/${user?.role}/task-hub`);
       refetch();
     } catch (error: any) {
@@ -237,7 +281,7 @@ const AddTask = () => {
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={field.value || task?.assignTeamMember}
                 >
                   <FormControl>
                     <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
@@ -257,20 +301,31 @@ const AddTask = () => {
             )}
           />
 
-          {/* Submit Button */}
-          <AppButton
-            className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 mt-5"
-            content={
-              <div className="flex justify-center items-center space-x-2 font-semibold">
-                <p>{isSubmitting ? 'Saving...' : 'Save'}</p>
-                <ArrowRight />
-              </div>
-            }
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-5">
+            <AppButton
+              className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
+              content={
+                <div className="flex justify-center items-center space-x-2 font-semibold">
+                  <p>{isSubmitting ? 'Updateing...' : 'Update'}</p>
+                  <ArrowRight />
+                </div>
+              }
+            />
+
+            <div className="p-3 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80">
+              <Link
+                href={`/${user?.role || 'vendor'}/task-hub`}
+                className="w-full inline-flex justify-center items-center space-x-1 font-semibold"
+              >
+                <span className="uppercase text-sm font-semibold">Cancel</span>
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
         </form>
       </Form>
     </div>
   );
 };
 
-export default AddTask;
+export default UpdateTask;
