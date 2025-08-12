@@ -36,6 +36,7 @@ import {
   useUpdateServiceStatusMutation,
 } from '@/redux/features/service/serviceApi';
 import Spinner from '@/components/shared/Spinner';
+import Link from 'next/link';
 
 const statusOptions = [
   { label: 'available', key: 'available' },
@@ -391,10 +392,13 @@ const ManageServices = () => {
       <AppButton
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
-          <div className="flex justify-center items-center space-x-1 font-semibold">
+          <Link
+            href={`/${user?.role}/manage-offering/add-service`}
+            className="flex justify-center items-center space-x-1 font-semibold"
+          >
             <PlusCircle size={24} />
             <span className="uppercase text-sm font-semibold">Add Service</span>
-          </div>
+          </Link>
         }
       />
 
