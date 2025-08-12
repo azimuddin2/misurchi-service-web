@@ -17,12 +17,13 @@ const productApi = baseApi.injectEndpoints({
     getAllProducts: builder.query<
       TResponse<TProduct[]>,
       {
+        userId: string;
         page?: number | string;
         limit?: number | string;
         query?: Record<string, string | string[] | undefined>;
       }
     >({
-      query: ({ page = 1, limit = 10, query }) => {
+      query: ({ userId, page = 1, limit = 10, query }) => {
         const params = new URLSearchParams();
 
         if (query?.price) {
@@ -44,7 +45,7 @@ const productApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/products?page=${page}&limit=${limit}&${params.toString()}`,
+          url: `/products?user=${userId}&page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };

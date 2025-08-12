@@ -31,6 +31,7 @@ import { TMember } from '@/types/member.type';
 
 const ManageTeamMembers = () => {
   const user = useAppSelector(selectCurrentUser);
+  const userId = user?.userId as string;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -54,6 +55,7 @@ const ManageTeamMembers = () => {
   const createdAt = searchParams.get('createdAt') || '';
 
   const { data, isLoading, refetch } = useGetAllMembersQuery({
+    userId,
     page,
     limit,
     query: {

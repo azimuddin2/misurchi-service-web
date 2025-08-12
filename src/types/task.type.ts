@@ -1,5 +1,6 @@
 export type TTask = {
   _id: string;
+  user: string;
   title: string;
   description: string;
   date: string;

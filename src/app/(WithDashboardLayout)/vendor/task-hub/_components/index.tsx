@@ -39,7 +39,7 @@ import {
 const statusOptions = [
   { label: 'To-Do', key: 'To-Do' },
   { label: 'In Progress', key: 'In Progress' },
-  { label: 'Needs Review', key: 'Needs Review ' },
+  { label: 'Needs Review', key: 'Needs Review' },
   { label: 'Blocked/Dependencies', key: 'Blocked/Dependencies' },
   { label: 'Done', key: 'Done' },
   { label: 'Obsolete', key: 'Obsolete' },
@@ -47,6 +47,7 @@ const statusOptions = [
 
 const ManageTaskHub = () => {
   const user = useAppSelector(selectCurrentUser);
+  const userId = user?.userId as string;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -70,6 +71,7 @@ const ManageTaskHub = () => {
   const createdAt = searchParams.get('createdAt') || '';
 
   const { data, isLoading, refetch } = useGetAllTasksQuery({
+    userId,
     page,
     limit,
     query: {
@@ -141,6 +143,8 @@ const ManageTaskHub = () => {
         status: updateStatus,
       }).unwrap();
 
+      console.log(res);
+
       toast.success(res.message || 'Status updated');
       refetch();
     } catch (error: any) {
@@ -207,7 +211,7 @@ const ManageTaskHub = () => {
       header: 'Estimated Completion Date/Time',
       cell: ({ row }) => (
         <div>
-          <p>{row.original.date}</p>
+          <p>{format(new Date(row.original.createdAt), 'dd MMM, yyyy')}</p>
           <p>{row.original.time}</p>
         </div>
       ),
@@ -223,10 +227,12 @@ const ManageTaskHub = () => {
       cell: ({ row }) => {
         const status = row.original.status;
         const statusTextColorMap: Record<string, string> = {
-          Available: 'text-[#165940]',
-          'Out of Stock': 'text-[#E12728]',
-          TBC: 'text-[#0078BF]',
-          Discontinued: 'text-[#6B5103]',
+          'To-Do': 'text-[#165940]',
+          'In Progress': 'text-[#0078BF]',
+          'Needs Review': 'text-[#E12728]',
+          'Blocked/Dependencies': 'text-[#6B5103]',
+          Done: 'text-[#165940]',
+          Obsolete: 'text-[#6B5103]',
         };
         const statusColor = statusTextColorMap[status] || 'text-gray-700';
         return (

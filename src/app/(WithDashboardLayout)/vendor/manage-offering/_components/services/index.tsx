@@ -49,6 +49,7 @@ const highlightstatusOptions = [
 
 const ManageServices = () => {
   const user = useAppSelector(selectCurrentUser);
+  const userId = user?.userId as string;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -73,6 +74,7 @@ const ManageServices = () => {
   const createdAt = searchParams.get('createdAt') || '';
 
   const { data, isLoading, refetch } = useGetAllServicesQuery({
+    userId,
     page,
     limit,
     query: {

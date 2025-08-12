@@ -17,12 +17,13 @@ const serviceApi = baseApi.injectEndpoints({
     getAllServices: builder.query<
       TResponse<TService[]>,
       {
+        userId: string;
         page?: number | string;
         limit?: number | string;
         query?: Record<string, string | string[] | undefined>;
       }
     >({
-      query: ({ page = 1, limit = 10, query }) => {
+      query: ({ userId, page = 1, limit = 10, query }) => {
         const params = new URLSearchParams();
 
         if (query?.price) {
@@ -44,7 +45,7 @@ const serviceApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/services?page=${page}&limit=${limit}&${params.toString()}`,
+          url: `/services?user=${userId}&page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };

@@ -34,14 +34,17 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { roleOptions } from '@/constants/teamMemberRoles';
 import { useAddTaskMutation } from '@/redux/features/task/taskApi';
+import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { addTaskSchema } from './addTaskValidation';
 
 const AddTask = () => {
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>('');
 
   const user = useAppSelector(selectCurrentUser);
+  const userId = user?.userId as string;
   const router = useRouter();
 
   // Generate times every 30 minutes for one day, starting at midnight
@@ -57,12 +60,18 @@ const AddTask = () => {
   }, []);
 
   const form = useForm({
-    // resolver: zodResolver(addProductSchema), // add if needed
+    resolver: zodResolver(addTaskSchema),
   });
 
   const {
     formState: { isSubmitting },
   } = form;
+
+  const { data, isLoading, refetch } = useGetAllMembersQuery({
+    userId,
+  });
+
+  const members = data?.data || [];
 
   const [AddTask] = useAddTaskMutation();
 
@@ -76,25 +85,25 @@ const AddTask = () => {
       return;
     }
 
-    const modifiedData = {
+    const taskData = {
       user: user?.userId,
       ...data,
-      date,
+      date: date instanceof Date ? date.toISOString().split('T')[0] : date,
       time,
     };
-    console.log('Submitting:', modifiedData);
 
     const toastId = toast.loading('Adding task...');
 
-    // try {
-    //   const res = await AddTask(modifiedData).unwrap();
-    //   toast.success(res.message || 'Task added successfully');
-    //   router.push(`/tasks/${res.data?._id}`); // adjust route as needed
-    // } catch (error: any) {
-    //   toast.error(error?.data?.message || 'Failed to add task');
-    // } finally {
-    //   toast.dismiss(toastId);
-    // }
+    try {
+      const res = await AddTask(taskData).unwrap();
+      toast.success(res.message || 'Task added successfully');
+      router.push(`/${user?.role}/task-hub`);
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to add task');
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   return (
@@ -220,7 +229,7 @@ const AddTask = () => {
           {/* Assign to member */}
           <FormField
             control={form.control}
-            name="role"
+            name="assignTeamMember"
             render={({ field }) => (
               <FormItem className="lg:mb-0 mb-5">
                 <FormLabel className="!text-gray-700 !text-base font-medium">
@@ -236,9 +245,9 @@ const AddTask = () => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="max-h-60 overflow-y-auto">
-                    {roleOptions.map((tz) => (
-                      <SelectItem key={tz.value} value={tz.value}>
-                        {tz.label}
+                    {members?.map((member) => (
+                      <SelectItem key={member.name} value={member.name}>
+                        {member.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -52,6 +52,7 @@ const highlightstatusOptions = [
 
 const ManageProducts = () => {
   const user = useAppSelector(selectCurrentUser);
+  const userId = user?.userId as string;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -75,6 +76,7 @@ const ManageProducts = () => {
   const createdAt = searchParams.get('createdAt') || '';
 
   const { data, isLoading, refetch } = useGetAllProductsQuery({
+    userId,
     page,
     limit,
     query: {
