@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import { Check, X, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import checkIcon from '@/assets/icons/check.png';
+import closeIcon from '@/assets/icons/close.png'
 
 export default function Pricing() {
   return (
@@ -18,57 +21,59 @@ export default function Pricing() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-5 mt-5">
         {/* Basic Plan */}
-        <div className="border border-gray-200 rounded-lg p-8 shadow-sm">
-          <h2 className="text-2xl font-bold text-center mb-2">Basic Plan</h2>
+        <div className="bg-white rounded-lg p-8 shadow-xl">
+          <h2 className="text-2xl text-[#212529] font-bold text-center mb-2">
+            Basic Plan
+          </h2>
           <p className="text-gray-500 text-center mb-6">
             Unlimited to free subscription plan
           </p>
 
-          <div className="bg-gradient-to-r from-green-500 to-green-500 text-white text-center py-4 rounded-md mb-8">
+          <div className="bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white text-center py-4 rounded-md mb-8">
             <span className="text-3xl font-bold">Free</span>
           </div>
 
           <ul className="space-y-4 mb-8">
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Cost: Free</span>
             </li>
-            <li className="flex items-start">
-              <X className="h-5 w-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={closeIcon} alt="x" width={16} />
               <span>Add Team Members: No</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Validity: Unlimited</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Add Service Max: 10</span>
             </li>
-            <li className="flex items-start">
-              <X className="h-5 w-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={closeIcon} alt="x" width={16} />
               <span>Grant permission Access: No</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Add Product Max: 10</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Transaction percentage: 7.5%</span>
             </li>
-            <li className="flex items-start">
-              <X className="h-5 w-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={closeIcon} alt="x" width={16} />
               <span>Shared Calendar: No</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Highlight offering Max 1</span>
             </li>
-            <li className="flex items-start">
-              <X className="h-5 w-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={closeIcon} alt="x" width={16} />
               <span>Task Hub: No</span>
             </li>
           </ul>
@@ -77,61 +82,63 @@ export default function Pricing() {
             href="/get-started"
             className="block text-center border border-gray-300 rounded-md py-3 px-4 font-medium hover:bg-gray-50 transition-colors"
           >
-            GET STARTED <ArrowRight className="inline-block ml-2 h-4 w-4" />
+            Get Started <ArrowRight className="inline-block ml-2 h-4 w-4" />
           </Link>
         </div>
 
         {/* Advance Plan */}
-        <div className="border border-gray-200 rounded-lg p-8 shadow-sm">
-          <h2 className="text-2xl font-bold text-center mb-2">Advance Plan</h2>
+        <div className="bg-white rounded-lg p-8 shadow-xl">
+          <h2 className="text-2xl text-[#212529] font-bold text-center mb-2">
+            Advance Plan
+          </h2>
           <p className="text-gray-500 text-center mb-6">
             Limited to paid subscription plan
           </p>
 
-          <div className="bg-gradient-to-r from-green-500 to-green-500 text-white text-center py-4 rounded-md mb-8">
+          <div className=" bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white text-center py-4 rounded-md mb-8">
             <span className="text-3xl font-bold">$52.00</span>
             <span className="text-xl">/month</span>
           </div>
 
           <ul className="space-y-4 mb-8">
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Cost: $52.00 per month</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Add Team Members: Yes</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Validity: Limited to paid subscription</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Add Service Max: Unlimited</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Grant permission Access: Yes</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Add Product Max: Unlimited</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Transaction percentage: 5%</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Shared Calendar: Yes</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Highlight offering Max 5</span>
             </li>
-            <li className="flex items-start">
-              <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+            <li className="flex items-center gap-2">
+              <Image src={checkIcon} alt="check" width={20} />
               <span>Task Hub: Yes</span>
             </li>
           </ul>
@@ -140,7 +147,7 @@ export default function Pricing() {
             href="/get-started"
             className="block text-center border border-gray-300 rounded-md py-3 px-4 font-medium hover:bg-gray-50 transition-colors"
           >
-            GET STARTED <ArrowRight className="inline-block ml-2 h-4 w-4" />
+            Get Started <ArrowRight className="inline-block ml-2 h-4 w-4" />
           </Link>
         </div>
       </div>

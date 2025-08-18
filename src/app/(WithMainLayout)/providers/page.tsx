@@ -1,7 +1,9 @@
+import Providers from "./_components";
+
 const ProvidersPage = () => {
   return (
     <div>
-      <h2>Provider Page</h2>
+      <Providers />
     </div>
   );
 };
