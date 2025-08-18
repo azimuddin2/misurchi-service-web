@@ -10,6 +10,7 @@ import {
   UserRound,
   ListTodo,
   UsersRound,
+  Calendar,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -82,6 +83,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Manage Offering',
         url: `/vendor/manage-offering`,
         icon: StoreIcon,
+      },
+      {
+        title: 'Shared Calendar',
+        url: `/vendor/shared-calendar`,
+        icon: Calendar,
       },
       {
         title: 'Task Hub',

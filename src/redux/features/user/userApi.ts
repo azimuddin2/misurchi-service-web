@@ -3,7 +3,6 @@ import { baseApi } from '../../api/baseApi';
 
 const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-
     getAllVendorUser: builder.query<
       TResponse<TVendorUser[]>,
       {
@@ -60,5 +59,5 @@ const userApi = baseApi.injectEndpoints({
 export const {
   useGetAllVendorUserQuery,
   useGetVendorProfileQuery,
-  useUpdateVendorProfileMutation
+  useUpdateVendorProfileMutation,
 } = userApi;

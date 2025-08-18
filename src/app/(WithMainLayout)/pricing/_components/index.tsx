@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import checkIcon from '@/assets/icons/check.png';
-import closeIcon from '@/assets/icons/close.png'
+import closeIcon from '@/assets/icons/close.png';
 
 export default function Pricing() {
   return (

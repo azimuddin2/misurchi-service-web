@@ -1,9 +1,9 @@
-import React from 'react';
+import Dashboard from './_components';
 
 const VendorDashboardPage = () => {
   return (
     <div>
-      <h2>Vendor Dashboard Page</h2>
+      <Dashboard />
     </div>
   );
 };

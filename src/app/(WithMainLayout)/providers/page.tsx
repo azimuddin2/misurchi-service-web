@@ -1,4 +1,4 @@
-import Providers from "./_components";
+import Providers from './_components';
 
 const ProvidersPage = () => {
   return (
