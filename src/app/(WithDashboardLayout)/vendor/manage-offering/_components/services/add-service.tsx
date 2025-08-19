@@ -1,208 +1,238 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import {
+  CheckCircle,
+  ArrowLeft,
+  Calendar,
+  Settings,
+  Sparkles,
+} from 'lucide-react';
+import { ServiceDetailsStep } from './service-details-step';
+import { AvailabilityStep } from './availability-step';
+import { ReviewStep } from './review-step';
+import { Progress } from '@/components/ui/progress';
 
-type DaySchedule = {
-  enabled: boolean;
-  startTime: string;
-  endTime: string;
-  seats: number | '';
-};
+interface ServiceData {
+  name: string;
+  type: string;
+  duration: string;
+  price: string;
+  discountPrice: string;
+  description: string;
+  images: string[];
+  availability: {
+    weeklySchedule: Record<
+      string,
+      { enabled: boolean; startTime: string; endTime: string; seats: number }
+    >;
+    holidays: Array<{
+      date: string;
+      startTime: string;
+      endTime: string;
+      seats: number;
+    }>;
+  };
+}
 
-const defaultDaySchedule: DaySchedule = {
-  enabled: false,
-  startTime: '09:00',
-  endTime: '17:00',
-  seats: 15,
-};
-
-const days = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
+const steps = [
+  {
+    id: 1,
+    title: 'Service Details',
+    description: 'Basic information about your service',
+    icon: Settings,
+  },
+  {
+    id: 2,
+    title: 'Availability',
+    description: 'Set your schedule and capacity',
+    icon: Calendar,
+  },
+  {
+    id: 3,
+    title: 'Review & Publish',
+    description: 'Review and publish your service',
+    icon: Sparkles,
+  },
 ];
 
-const AddService = () => {
-  // State for Weekly schedule - one entry per day
-  const [weeklySchedule, setWeeklySchedule] = useState<
-    Record<string, DaySchedule>
-  >(() =>
-    days.reduce(
-      (acc, day) => {
-        acc[day] = { ...defaultDaySchedule };
-        return acc;
-      },
-      {} as Record<string, DaySchedule>,
-    ),
-  );
+export function AddService() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [serviceData, setServiceData] = useState<Partial<ServiceData>>({});
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
-  // State for Holiday Hours calendar date
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date(),
-  );
+  const handleStepComplete = (stepData: any) => {
+    setServiceData((prev) => ({ ...prev, ...stepData }));
 
-  // Handler to toggle enabled switch per day
-  const handleToggleDay = (day: string) => {
-    setWeeklySchedule((prev) => ({
-      ...prev,
-      [day]: { ...prev[day], enabled: !prev[day].enabled },
-    }));
+    if (!completedSteps.includes(currentStep)) {
+      setCompletedSteps((prev) => [...prev, currentStep]);
+    }
+
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
-  // Handler to update time or seats for a day
-  const handleChange = (
-    day: string,
-    field: keyof DaySchedule,
-    value: string | number,
-  ) => {
-    setWeeklySchedule((prev) => ({
-      ...prev,
-      [day]: { ...prev[day], [field]: value },
-    }));
+  const handleStepBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
   };
+
+  const handleStepClick = (stepId: number) => {
+    if (stepId <= currentStep || completedSteps.includes(stepId)) {
+      setCurrentStep(stepId);
+    }
+  };
+
+  const progress = ((currentStep - 1) / (steps.length - 1)) * 100;
 
   return (
-    <div className="max-w-5xl p-6 space-y-8">
-      <Card className=" shadow border-none">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold">
-            Manage Service Availability
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Weekly Schedule */}
-          <div className="space-y-4">
-            <h2 className="font-semibold">Weekly Schedule</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              {/* Calendar to pick week start or any date */}
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                className="max-w-xs"
-              />
+    <div className="px-4 py-8 max-w-4xl">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+          Create New Service
+        </h1>
+        <p className="text-gray-600">
+          Set up your service in just a few simple steps
+        </p>
+      </div>
 
-              {/* Schedule per day */}
-              <div className="space-y-3 flex-1">
-                {days.map((day) => {
-                  const schedule = weeklySchedule[day];
-                  return (
-                    <div
-                      key={day}
-                      className="grid grid-cols-[auto_100px_1fr_auto_1fr_100px] items-center gap-4"
+      {/* Progress Bar */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          {steps.map((step, index) => {
+            const isActive = currentStep === step.id;
+            const isCompleted = completedSteps.includes(step.id);
+            const isAccessible = step.id <= currentStep || isCompleted;
+
+            return (
+              <div
+                key={step.id}
+                className={`flex items-center cursor-pointer transition-all duration-200 ${
+                  isAccessible
+                    ? 'hover:scale-105'
+                    : 'cursor-not-allowed opacity-50'
+                }`}
+                onClick={() => handleStepClick(step.id)}
+              >
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isCompleted
+                        ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white'
+                        : isActive
+                          ? 'bg-green-100 text-green-600 ring-4 ring-green-100'
+                          : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <step.icon className="w-6 h-6" />
+                    )}
+                  </div>
+                  <div className="mt-2 text-center">
+                    <p
+                      className={`text-sm font-medium ${isActive ? 'text-green-600' : 'text-gray-600'}`}
                     >
-                      <Switch
-                        checked={schedule.enabled}
-                        onCheckedChange={() => handleToggleDay(day)}
-                        aria-label={`Enable ${day} schedule`}
-                      />
-                      <span className="font-medium">{day}</span>
-                      <Input
-                        type="time"
-                        value={schedule.startTime}
-                        disabled={!schedule.enabled}
-                        onChange={(e) =>
-                          handleChange(day, 'startTime', e.target.value)
-                        }
-                        aria-label={`${day} start time`}
-                      />
-                      <span className="text-center">-</span>
-                      <Input
-                        type="time"
-                        value={schedule.endTime}
-                        disabled={!schedule.enabled}
-                        onChange={(e) =>
-                          handleChange(day, 'endTime', e.target.value)
-                        }
-                        aria-label={`${day} end time`}
-                      />
-                      <Input
-                        type="number"
-                        className="w-full"
-                        placeholder="Seats"
-                        value={schedule.seats}
-                        disabled={!schedule.enabled}
-                        min={0}
-                        onChange={(e) =>
-                          handleChange(day, 'seats', Number(e.target.value))
-                        }
-                        aria-label={`${day} seats available`}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Holiday Hours */}
-          <div className="space-y-4">
-            <h2 className="font-semibold">Holiday Hours</h2>
-            <div className="flex gap-6 flex-col md:flex-row">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-              />
-              <div className="space-y-4 w-full">
-                <div className="flex gap-4">
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Start Time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="09:00">09:00 AM</SelectItem>
-                      <SelectItem value="10:00">10:00 AM</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="End Time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="17:00">05:00 PM</SelectItem>
-                      <SelectItem value="18:00">06:00 PM</SelectItem>
-                    </SelectContent>
-                  </Select>
+                      {step.title}
+                    </p>
+                    <p className="text-xs text-gray-400 max-w-24">
+                      {step.description}
+                    </p>
+                  </div>
                 </div>
-                <Input type="number" placeholder="Seats" />
-                <Button className="w-full">Save Slot</Button>
+                {index < steps.length - 1 && (
+                  <div
+                    className={`w-16 h-0.5 mx-4 ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}`}
+                  />
+                )}
               </div>
+            );
+          })}
+        </div>
+        <Progress value={progress} className="h-2" />
+      </div>
+
+      {/* Step Content */}
+      <Card className="shadow border-0">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl text-gray-900">
+                {steps[currentStep - 1].title}
+              </CardTitle>
+              <p className="text-gray-600 mt-1">
+                {steps[currentStep - 1].description}
+              </p>
             </div>
+            <Badge
+              variant="outline"
+              className="text-green-600 border-green-500"
+            >
+              Step {currentStep} of {steps.length}
+            </Badge>
           </div>
-
-          <Separator />
-
-          {/* Save Changes */}
-          <div className="pt-4">
-            <Button className="w-full" size="lg">
-              Save Changes
-            </Button>
-          </div>
+        </CardHeader>
+        <CardContent>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {currentStep === 1 && (
+                <ServiceDetailsStep
+                  data={serviceData}
+                  onNext={handleStepComplete}
+                />
+              )}
+              {currentStep === 2 && (
+                <AvailabilityStep
+                  data={serviceData}
+                  onNext={handleStepComplete}
+                  onBack={handleStepBack}
+                />
+              )}
+              {currentStep === 3 && (
+                <ReviewStep
+                  data={serviceData as ServiceData}
+                  onBack={handleStepBack}
+                  onComplete={() => {
+                    console.log('[v0] Service creation completed', serviceData);
+                    // Handle final submission
+                  }}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </CardContent>
       </Card>
+
+      {/* Navigation Footer */}
+      <div className="flex justify-between items-center mt-8">
+        <Button
+          variant="outline"
+          onClick={handleStepBack}
+          disabled={currentStep === 1}
+          className="flex items-center gap-2 bg-transparent"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Previous
+        </Button>
+        <div className="text-sm text-gray-500">
+          {completedSteps.length} of {steps.length} steps completed
+        </div>
+        <div className="w-20" /> {/* Spacer for alignment */}
+      </div>
     </div>
   );
-};
-
-export default AddService;
+}
