@@ -52,6 +52,18 @@ const monthNames = [
 
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+// ✅ Helper to format time into 12-hour with AM/PM
+const formatTime = (time: string) => {
+  if (!time) return '';
+  const [hours, minutes] = time.split(':').map(Number);
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12;
+  return `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0',
+  )} ${ampm}`;
+};
+
 export function AvailabilityStep({
   data,
   onNext,
@@ -205,7 +217,7 @@ export function AvailabilityStep({
           onDoubleClick={() => toggleDateAvailability(dateStr)}
           className={`
             h-10 w-10 rounded-lg text-sm font-medium transition-all duration-200
-            ${isSelected ? 'bg-green-600 text-white shadow-lg' : ''}
+            ${isSelected ? 'bg-gradient-to-t to-green-800 from-green-600/70 text-white shadow-lg' : ''}
             ${isToday && !isSelected ? 'bg-blue-100 text-blue-600 border border-blue-300' : ''}
             ${isAvailable && !isSelected && !isToday ? 'bg-green-50 text-green-700 hover:bg-green-100' : ''}
             ${!isAvailable && !isSelected && !isToday ? 'bg-gray-100 text-gray-400 hover:bg-gray-200' : ''}
@@ -249,7 +261,6 @@ export function AvailabilityStep({
       availability: {
         weeklySchedule,
         holidays,
-        customDates: customAvailability, // Added custom dates to submission
       },
     });
   };
@@ -478,10 +489,10 @@ export function AvailabilityStep({
             <div className="flex items-end">
               <Button
                 onClick={addHoliday}
-                className="w-full text-[#000000] border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] p-5 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 font-semibold"
+                className=" uppercase w-full text-[#000000] border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] p-5 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 font-semibold"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add
+                Add Slot
               </Button>
             </div>
           </div>
@@ -502,7 +513,8 @@ export function AvailabilityStep({
                   <div className="flex items-center gap-4">
                     <span className="font-medium">{holiday.date}</span>
                     <span className="text-gray-600">
-                      {holiday.startTime} - {holiday.endTime}
+                      {formatTime(holiday.startTime)} -{' '}
+                      {formatTime(holiday.endTime)}
                     </span>
                     <span className="text-sm text-gray-500">
                       {holiday.seats} seats

@@ -16,28 +16,7 @@ import { ServiceDetailsStep } from './service-details-step';
 import { AvailabilityStep } from './availability-step';
 import { ReviewStep } from './review-step';
 import { Progress } from '@/components/ui/progress';
-
-interface ServiceData {
-  name: string;
-  type: string;
-  duration: string;
-  price: string;
-  discountPrice: string;
-  description: string;
-  images: string[];
-  availability: {
-    weeklySchedule: Record<
-      string,
-      { enabled: boolean; startTime: string; endTime: string; seats: number }
-    >;
-    holidays: Array<{
-      date: string;
-      startTime: string;
-      endTime: string;
-      seats: number;
-    }>;
-  };
-}
+import { TService } from '@/types/service.type';
 
 const steps = [
   {
@@ -62,7 +41,7 @@ const steps = [
 
 export function AddService() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [serviceData, setServiceData] = useState<Partial<ServiceData>>({});
+  const [serviceData, setServiceData] = useState<Partial<TService>>({});
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   const handleStepComplete = (stepData: any) => {
@@ -90,6 +69,38 @@ export function AddService() {
   };
 
   const progress = ((currentStep - 1) / (steps.length - 1)) * 100;
+
+  // Database Save
+  const handleDataSave = () => {
+    const base64Images: string[] = serviceData.images || [];
+
+    // Convert base64 strings to File objects
+    const files: File[] = base64Images.map((base64, idx) => {
+      const arr = base64.split(',');
+      const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], `image_${idx + 1}.${mime.split('/')[1]}`, {
+        type: mime,
+      });
+    });
+
+    // You can now append these files to FormData to send to backend
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(serviceData)); // your other data
+    files.forEach((file) => formData.append('images', file));
+
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    // Now you can call your addProduct mutation or API
+    // addProduct(formData)
+  };
 
   return (
     <div className="px-4 py-8 max-w-4xl">
@@ -150,14 +161,21 @@ export function AddService() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-16 h-0.5 mx-4 ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}`}
+                    className={`w-16 h-1 mx-4 transition-colors duration-300 ${
+                      isCompleted || currentStep > step.id
+                        ? 'bg-gradient-to-t to-green-800 from-green-500/70'
+                        : 'bg-gray-200'
+                    }`}
                   />
                 )}
               </div>
             );
           })}
         </div>
-        <Progress value={progress} className="h-2" />
+        <Progress
+          value={progress}
+          className="h-2 [&>div]:bg-gradient-to-t [&>div]:from-green-500/70 [&>div]:to-green-600 transition-all duration-500"
+        />
       </div>
 
       {/* Step Content */}
@@ -204,12 +222,9 @@ export function AddService() {
               )}
               {currentStep === 3 && (
                 <ReviewStep
-                  data={serviceData as ServiceData}
+                  data={serviceData as TService}
                   onBack={handleStepBack}
-                  onComplete={() => {
-                    console.log('[v0] Service creation completed', serviceData);
-                    // Handle final submission
-                  }}
+                  onComplete={handleDataSave}
                 />
               )}
             </motion.div>
