@@ -1,7 +1,7 @@
 'use client';
 
 import { AppButton } from '@/components/shared/app-button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FileImage } from 'lucide-react';
 import { useState } from 'react';
 import {
   Form,
@@ -61,6 +61,8 @@ const AddProduct = () => {
     imageFiles.forEach((file) => {
       formData.append('images', file); //✅Append multiple images
     });
+
+    console.log(imageFiles);
 
     const toastId = toast.loading('Adding product...');
 

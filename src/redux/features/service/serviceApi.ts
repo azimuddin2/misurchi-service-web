@@ -4,11 +4,11 @@ import { TService } from '@/types/service.type';
 
 const serviceApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    addService: builder.mutation<TResponse<TService>, Partial<TService>>({
-      query: (serviceInfo) => ({
+    addService: builder.mutation<TResponse<TService>, FormData>({
+      query: (formData) => ({
         url: '/services',
         method: 'POST',
-        body: serviceInfo,
+        body: formData,
         credentials: 'include',
       }),
       invalidatesTags: ['Service'],

@@ -1,13 +1,15 @@
-export interface IServicePricing {
+export type TStatus = 'available' | 'unavailable';
+
+export type TServicePricing = {
   id: string;
   duration: string;
   price: string;
-  discountPrice: string;
+  discount: string;
   finalPrice: string;
-}
+};
 
 // Define a Day type (strict union instead of free string)
-type WeekDay =
+export type TWeekDay =
   | 'monday'
   | 'tuesday'
   | 'wednesday'
@@ -17,39 +19,45 @@ type WeekDay =
   | 'sunday';
 
 // Schedule structure for a single day
-interface DaySchedule {
+export type TDaySchedule = {
   enabled: boolean;
   startTime: string; // e.g., "09:00"
   endTime: string; // e.g., "17:00"
   seats: number;
-}
+};
 
 // Holiday schedule (for exceptions)
-interface HolidaySchedule {
+export type THolidaySchedule = {
   date: string; // ISO date string "2025-08-20"
   startTime: string; // e.g., "10:00"
   endTime: string; // e.g., "14:00"
   seats: number;
-}
+};
+
+export type TImage = {
+  url: string;
+  key: string;
+};
 
 // Main ServiceData type
 export type TService = {
   user: string;
+  deleteKey?: string[];
+  _id: string;
   name: string;
   type: string;
-  savedServices: IServicePricing[];
+  savedServices: TServicePricing[];
   description: string; // optional
-  images: string[];
+  images: TImage[];
   status: string;
   highlightStatus: string;
 
   availability: {
-    weeklySchedule: Partial<Record<WeekDay, DaySchedule>>; // not all days required
-    holidays?: HolidaySchedule[]; // optional
+    weeklySchedule: Partial<Record<TWeekDay, TDaySchedule>>; // not all days required
+    holidays?: THolidaySchedule[]; // optional
   };
 
   isDeleted: boolean;
-  _id: string;
   createdAt: string;
   updatedAt: string;
   __v: number;

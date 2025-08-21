@@ -17,6 +17,10 @@ import { AvailabilityStep } from './availability-step';
 import { ReviewStep } from './review-step';
 import { Progress } from '@/components/ui/progress';
 import { TService } from '@/types/service.type';
+import { toast } from 'sonner';
+import { useAddServiceMutation } from '@/redux/features/service/serviceApi';
+import { useAppSelector } from '@/redux/hooks';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 const steps = [
   {
@@ -40,8 +44,9 @@ const steps = [
 ];
 
 export function AddService() {
+  const user = useAppSelector(selectCurrentUser);
   const [currentStep, setCurrentStep] = useState(1);
-  const [serviceData, setServiceData] = useState<Partial<TService>>({});
+  const [serviceData, setServiceData] = useState({});
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   const handleStepComplete = (stepData: any) => {
@@ -70,9 +75,11 @@ export function AddService() {
 
   const progress = ((currentStep - 1) / (steps.length - 1)) * 100;
 
+  const [addService] = useAddServiceMutation();
+
   // Database Save
-  const handleDataSave = () => {
-    const base64Images: string[] = serviceData.images || [];
+  const handleDataSave = async () => {
+    const base64Images: string[] = serviceData?.images || [];
 
     // Convert base64 strings to File objects
     const files: File[] = base64Images.map((base64, idx) => {
@@ -89,17 +96,28 @@ export function AddService() {
       });
     });
 
+    const modifiedData = {
+      user: user?.userId,
+      ...serviceData,
+    };
+
     // You can now append these files to FormData to send to backend
     const formData = new FormData();
-    formData.append('data', JSON.stringify(serviceData)); // your other data
+    formData.append('data', JSON.stringify(modifiedData)); // your other data
     files.forEach((file) => formData.append('images', file));
 
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
+    const toastId = toast.loading('Adding service...');
 
-    // Now you can call your addProduct mutation or API
-    // addProduct(formData)
+    try {
+      const res = await addService(formData).unwrap();
+      console.log(res);
+      toast.success(res.message || 'Product added successfully');
+      // router.push(`/vendor/manage-offering/view-product/${res.data?._id}`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to add product');
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   return (

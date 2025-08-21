@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,9 @@ import {
 } from '@/components/ui/form';
 import { AppButton } from '@/components/shared/app-button';
 import { Badge } from '@/components/ui/badge';
-import { IServicePricing } from '@/types/service.type';
+import { ServiceStatus } from '@/constants/service';
+import { Checkbox } from '@/components/ui/checkbox';
+import { TServicePricing } from '@/types/service.type';
 
 const serviceSchema = z.object({
   name: z.string({ required_error: 'Service name is required' }),
@@ -44,14 +46,15 @@ const serviceSchema = z.object({
   pricing: z.object({
     duration: z.string({ required_error: 'Duration is required' }),
     price: z.string({ required_error: 'Price is required' }),
-    discountPrice: z.string().optional(),
+    discount: z.string().optional(),
+  }),
+  status: z.enum([...ServiceStatus] as [string, ...string[]], {
+    required_error: 'Product status is required',
   }),
   description: z
-    .string()
+    .string({ required_error: 'Description is required' })
     .min(100, 'Description must be at least 100 characters'),
 });
-
-type ServiceFormData = z.infer<typeof serviceSchema>;
 
 interface ServiceDetailsStepProps {
   data: any;
@@ -60,12 +63,12 @@ interface ServiceDetailsStepProps {
 
 export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
   const [images, setImages] = useState<string[]>(data?.images || []);
-  const [savedServices, setSavedServices] = useState<IServicePricing[]>(
+  const [savedServices, setSavedServices] = useState<TServicePricing[]>(
     data?.savedServices || [],
   );
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const form = useForm<ServiceFormData>({
+  const form = useForm({
     resolver: zodResolver(serviceSchema),
     defaultValues: {
       name: data?.name,
@@ -73,8 +76,9 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
       pricing: {
         duration: data?.pricing?.duration,
         price: data?.pricing?.price,
-        discountPrice: data?.pricing?.discountPrice,
+        discount: data?.pricing?.discount,
       },
+      status: data?.status,
       description: data?.description,
     },
   });
@@ -97,22 +101,22 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
   const saveServiceEntry = () => {
     const duration = form.getValues('pricing.duration');
     const price = form.getValues('pricing.price');
-    const discountPrice = form.getValues('pricing.discountPrice') || 'none';
+    const discount = form.getValues('pricing.discount') || 'none';
 
     if (!duration || !price || Number.parseFloat(price) <= 0) {
       form.setError('pricing.price', { message: 'Please enter a valid price' });
       return;
     }
 
-    const priceCalc = calculateFinalPrice(price, discountPrice);
+    const priceCalc = calculateFinalPrice(price, discount);
     const finalPrice =
       typeof priceCalc === 'string' ? priceCalc : priceCalc.final;
 
-    const newEntry: IServicePricing = {
+    const newEntry: TServicePricing = {
       id: editingId || Date.now().toString(),
       duration,
       price,
-      discountPrice,
+      discount,
       finalPrice,
     };
 
@@ -127,13 +131,13 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
 
     // Clear form after saving
     form.setValue('pricing.duration', '30 min');
-    form.setValue('pricing.discountPrice', '');
+    form.setValue('pricing.discount', '');
   };
 
-  const editServiceEntry = (entry: IServicePricing) => {
+  const editServiceEntry = (entry: TServicePricing) => {
     form.setValue('pricing.duration', entry.duration);
     form.setValue('pricing.price', entry.price);
-    form.setValue('pricing.discountPrice', entry.discountPrice);
+    form.setValue('pricing.discount', entry.discount);
     setEditingId(entry.id);
   };
 
@@ -160,7 +164,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const onSubmit = (formData: ServiceFormData) => {
+  const onSubmit: SubmitHandler<FieldValues> = (formData) => {
     let finalSavedServices = [...savedServices];
 
     // If no services are saved but pricing data exists, auto-save it
@@ -171,16 +175,16 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
     ) {
       const priceCalc = calculateFinalPrice(
         formData.pricing.price,
-        formData.pricing.discountPrice || 'none',
+        formData.pricing.discount || 'none',
       );
       const finalPrice =
         typeof priceCalc === 'string' ? priceCalc : priceCalc.final;
 
-      const autoSavedEntry: IServicePricing = {
+      const autoSavedEntry: TServicePricing = {
         id: Date.now().toString(),
         duration: formData.pricing.duration,
         price: formData.pricing.price,
-        discountPrice: formData.pricing.discountPrice || 'none',
+        discount: formData.pricing.discount || 'none',
         finalPrice,
       };
 
@@ -191,7 +195,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
   };
 
   const watchedPrice = form.watch('pricing.price');
-  const watchedDiscount = form.watch('pricing.discountPrice');
+  const watchedDiscount = form.watch('pricing.discount');
   const pricePreview = watchedPrice
     ? calculateFinalPrice(watchedPrice, watchedDiscount || 'none')
     : null;
@@ -367,7 +371,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
             {/* Discount Percentage */}
             <FormField
               control={form.control}
-              name="pricing.discountPrice"
+              name="pricing.discount"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="!text-gray-700 !text-sm font-medium">
@@ -419,12 +423,12 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                     <>
                       <div className="flex justify-between items-center text-sm text-red-600">
                         <span>Discount ({watchedDiscount}):</span>
-                        <span>-${pricePreview.discount}</span>
+                        <span>-${pricePreview?.discount}</span>
                       </div>
                       <div className="flex justify-between items-center text-sm text-green-600">
                         <span>You Save:</span>
                         <span className="font-semibold">
-                          ${pricePreview.discount}
+                          ${pricePreview?.discount}
                         </span>
                       </div>
                     </>
@@ -490,14 +494,14 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                         ${Number.parseFloat(entry.price).toFixed(2)}
                       </td>
                       <td className="p-4">
-                        {entry.discountPrice === 'none' ? (
+                        {entry.discount === 'none' ? (
                           <Badge variant="outline">No Discount</Badge>
                         ) : (
                           <Badge
                             variant="secondary"
                             className="bg-red-100 text-red-700"
                           >
-                            {entry.discountPrice}
+                            {entry.discount}
                           </Badge>
                         )}
                       </td>
@@ -539,6 +543,38 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
             </div>
           </div>
         )}
+
+        {/* Status */}
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="!text-gray-700 !text-base font-medium">
+                Status Options
+              </FormLabel>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-5 lg:px-10 my-3">
+                {ServiceStatus.map((status) => (
+                  <FormItem
+                    key={status}
+                    className="flex items-center space-x-2"
+                  >
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value === status}
+                        onCheckedChange={() => {
+                          // Set the selected status string
+                          field.onChange(status);
+                        }}
+                      />
+                    </FormControl>
+                    <FormLabel className="font-normal">{status}</FormLabel>
+                  </FormItem>
+                ))}
+              </div>
+            </FormItem>
+          )}
+        />
 
         {/* Description */}
         <FormField

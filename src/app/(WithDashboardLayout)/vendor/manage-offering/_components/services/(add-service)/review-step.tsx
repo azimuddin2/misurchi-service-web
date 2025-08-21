@@ -96,6 +96,17 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
                           New Service
                         </span>
                       </div>
+                      <div>
+                        <Badge
+                          className={
+                            data.status === 'available'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-200 text-gray-700 capitalize'
+                          }
+                        >
+                          {data.status}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -113,7 +124,9 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
                   <div className="p-2 bg-gradient-to-r from-blue-100 to-green-100 rounded-full">
                     <ImageIcon className="w-5 h-5 text-blue-600" />
                   </div>
-                  Service Gallery ({data.images.length} images)
+                  <span className="text-lg font-semibold">
+                    Service Gallery ({data.images.length} images)
+                  </span>
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {data.images.map((image: string, index: number) => (
@@ -199,8 +212,7 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
                       </div>
 
                       <div className="flex items-center gap-3 lg:col-span-1">
-                        {service.discountPrice &&
-                        service.discountPrice !== 'none' ? (
+                        {service.discount && service.discount !== 'none' ? (
                           <>
                             <div className="p-3 bg-gradient-to-r from-red-100 to-pink-100 rounded-full">
                               <Tag className="w-5 h-5 text-red-600" />
@@ -208,7 +220,7 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
                             <div>
                               <p className="text-sm text-gray-500">Discount</p>
                               <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 text-sm px-3 py-1">
-                                {service.discountPrice} OFF
+                                {service.discount} OFF
                               </Badge>
                             </div>
                           </>

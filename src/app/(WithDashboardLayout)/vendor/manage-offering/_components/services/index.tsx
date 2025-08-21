@@ -250,7 +250,10 @@ const ManageServices = () => {
     {
       accessorKey: 'price',
       header: 'Price',
-      cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
+      cell: ({ row }) => {
+        const firstService = row.original.savedServices?.[0]; // first service
+        return firstService ? `$${Number(firstService.price).toFixed(2)}` : '-';
+      },
     },
     {
       accessorKey: 'status',
