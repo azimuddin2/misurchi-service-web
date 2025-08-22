@@ -46,11 +46,11 @@ const steps = [
 export function AddService() {
   const user = useAppSelector(selectCurrentUser);
   const [currentStep, setCurrentStep] = useState(1);
-  const [serviceData, setServiceData] = useState({});
+  const [serviceData, setServiceData] = useState<any>({});
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   const handleStepComplete = (stepData: any) => {
-    setServiceData((prev) => ({ ...prev, ...stepData }));
+    setServiceData((prev: any) => ({ ...prev, ...stepData }));
 
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps((prev) => [...prev, currentStep]);
@@ -77,34 +77,21 @@ export function AddService() {
 
   const [addService] = useAddServiceMutation();
 
-  // Database Save
+  //Todo: Database Save data
   const handleDataSave = async () => {
-    const base64Images: string[] = serviceData?.images || [];
-
-    // Convert base64 strings to File objects
-    const files: File[] = base64Images.map((base64, idx) => {
-      const arr = base64.split(',');
-      const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
-      const bstr = atob(arr[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new File([u8arr], `image_${idx + 1}.${mime.split('/')[1]}`, {
-        type: mime,
-      });
-    });
+    const files: File[] = serviceData?.imageFiles || [];
 
     const modifiedData = {
       user: user?.userId,
       ...serviceData,
     };
 
-    // You can now append these files to FormData to send to backend
     const formData = new FormData();
-    formData.append('data', JSON.stringify(modifiedData)); // your other data
-    files.forEach((file) => formData.append('images', file));
+    formData.append('data', JSON.stringify(modifiedData));
+
+    files.forEach((file) => {
+      formData.append('images', file);
+    });
 
     const toastId = toast.loading('Adding service...');
 

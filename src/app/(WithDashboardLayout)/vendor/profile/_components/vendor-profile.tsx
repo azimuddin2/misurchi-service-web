@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/form';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { currencyOptions } from '@/constants/currency';
 import { timezonesOptions } from '@/constants/timezones';
 import { workHourOptions } from '@/constants/workHour';

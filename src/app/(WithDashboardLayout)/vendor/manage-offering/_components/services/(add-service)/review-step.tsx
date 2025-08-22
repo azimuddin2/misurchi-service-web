@@ -100,7 +100,7 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
                         <Badge
                           className={
                             data.status === 'available'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-green-100 text-green-800 capitalize'
                               : 'bg-gray-200 text-gray-700 capitalize'
                           }
                         >

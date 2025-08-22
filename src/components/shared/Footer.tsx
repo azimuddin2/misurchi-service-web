@@ -17,10 +17,9 @@ export const Footer = () => {
 
         {/* About Description */}
         <div className="text-center text-lg text-gray-50 max-w-3xl mx-auto">
-          We're dedicated to providing the best products and services to our
-          customers. Whether you're a vendor showcasing your offerings or a user
-          searching for top-rated solutions, we offer a seamless experience for
-          everyone.
+          {
+            'We&apos;re dedicated to providing the best products and services to our customers. Whether you&apos;re a vendor showcasing your offerings or a user searching for top-rated solutions, we offer a seamless experience for everyone.'
+          }
         </div>
 
         {/* Social Links */}

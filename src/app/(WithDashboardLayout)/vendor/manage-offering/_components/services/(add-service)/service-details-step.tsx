@@ -63,6 +63,9 @@ interface ServiceDetailsStepProps {
 
 export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
   const [images, setImages] = useState<string[]>(data?.images || []);
+  const [imageFiles, setImageFiles] = useState<File[] | []>(
+    data?.imageFiles || [],
+  );
   const [savedServices, setSavedServices] = useState<TServicePricing[]>(
     data?.savedServices || [],
   );
@@ -148,7 +151,13 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      Array.from(files).forEach((file) => {
+      const fileArray = Array.from(files); // Convert FileList → File[]
+
+      // Save file objects
+      setImageFiles((prev) => [...prev, ...fileArray]);
+
+      // Generate preview URLs
+      fileArray.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result) {
@@ -162,6 +171,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
 
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit: SubmitHandler<FieldValues> = (formData) => {
@@ -191,7 +201,12 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
       finalSavedServices = [autoSavedEntry];
     }
 
-    onNext({ ...formData, images, savedServices: finalSavedServices });
+    onNext({
+      ...formData,
+      images,
+      imageFiles,
+      savedServices: finalSavedServices,
+    });
   };
 
   const watchedPrice = form.watch('pricing.price');

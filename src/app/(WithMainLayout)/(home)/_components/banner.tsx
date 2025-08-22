@@ -17,9 +17,9 @@ const Banner = () => {
             Exclusive Products
           </h2>
           <p className="text-gray-400 mt-4 max-w-2xl mx-auto">
-            No Matter How Big or Small. Whether You're Looking for Premium
-            Products to Enhance Your Lifestyle or Expert Services to Support
-            Your Business
+            {
+              'No Matter How Big or Small. Whether You&apos;re Looking for Premium Products to Enhance Your Lifestyle or Expert Services to Support Your Business'
+            }
           </p>
 
           {/* Search Bar */}
