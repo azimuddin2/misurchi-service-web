@@ -101,18 +101,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: 'Settings',
-        url: '/vendor/edit-profile',
+        url: '/vendor/settings',
         icon: Settings,
-        items: [
-          {
-            title: 'Edit Profile',
-            url: '/vendor/edit-profile',
-          },
-          {
-            title: 'View Profile',
-            url: '/vendor/view-profile',
-          },
-        ],
       },
     );
   }
