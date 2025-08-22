@@ -60,7 +60,7 @@ const ChangePassword = () => {
 
   return (
     <div className="font-sora">
-      <h2 className="text-2xl font-semibold py-2 mb-5">Change Password</h2>
+      <h2 className="text-2xl font-semibold py-2 mb-4">Change Password</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {/* Old Password */}

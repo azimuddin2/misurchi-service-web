@@ -1,0 +1,98 @@
+'use client';
+
+import { useForm } from 'react-hook-form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from '@/components/ui/form';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
+import Link from 'next/link';
+
+type NotificationFormValues = {
+  enableNotification: boolean;
+};
+
+const Notifications = () => {
+  const form = useForm<NotificationFormValues>({
+    defaultValues: {
+      enableNotification: true, // ✅ default enabled
+    },
+  });
+
+  const handleToggle = async (checked: boolean) => {
+    form.setValue('enableNotification', checked);
+
+    const toastId = toast.loading('Updating notifications...');
+    try {
+      // Example: API call
+      // await updateNotificationSettings({ enableNotification: checked });
+
+      toast.success(
+        checked
+          ? 'Notifications enabled successfully!'
+          : 'Notifications disabled successfully!',
+      );
+    } catch (error: any) {
+      toast.error(error?.message || 'Something went wrong');
+    } finally {
+      toast.dismiss(toastId);
+    }
+  };
+
+  return (
+    <div className="my-6">
+      {/* Notifications */}
+      <div>
+        <h1 className="text-2xl font-semibold py-2">Notifications</h1>
+        <Form {...form}>
+          <div className="space-y-6">
+            <FormField
+              control={form.control}
+              name="enableNotification"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg p-4 shadow">
+                  <div>
+                    <FormLabel className="text-base font-medium text-gray-800">
+                      Enable Notifications
+                    </FormLabel>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={handleToggle}
+                      className="
+                      data-[state=checked]:bg-gradient-to-r
+                      data-[state=checked]:from-green-600
+                      data-[state=checked]:to-green-800
+                      data-[state=checked]:border-green-700
+                    "
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+        </Form>
+      </div>
+
+      {/* Feedback Log History */}
+      <div className="flex flex-col sm:flex-row items-center justify-between rounded-lg p-4 shadow mt-5 bg-white">
+        <h2 className="text-base font-medium text-gray-800">
+          Feedback Log History
+        </h2>
+        <Link
+          href="/feedback-history"
+          className="mt-2 sm:mt-0 text-[#0078BF] border-b border-[#0078BF] hover:text-blue-600 transition-colors"
+        >
+          Go to Feedback
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+export default Notifications;
