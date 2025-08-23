@@ -13,7 +13,11 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "5mb",
     },
-  }
+  },
+  i18n: {
+    locales: ["en", "bn"],
+    defaultLocale: "en",
+  },
 };
 
 export default nextConfig;

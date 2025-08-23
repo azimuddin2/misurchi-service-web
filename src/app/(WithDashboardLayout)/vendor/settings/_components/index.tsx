@@ -2,7 +2,7 @@
 
 import BusinessPreferences from './business-preferences';
 import ChangePassword from './change-password';
-import LanguageSwitcher from './language-settings';
+import LanguageSettings from './language-settings';
 import Notifications from './notifications';
 
 const Settings = () => {
@@ -11,7 +11,7 @@ const Settings = () => {
       <ChangePassword />
       <Notifications />
       <BusinessPreferences />
-      <LanguageSwitcher />
+      <LanguageSettings />
     </div>
   );
 };
