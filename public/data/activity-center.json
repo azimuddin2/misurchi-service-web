@@ -1,0 +1,114 @@
+{
+    "orderProducts": [
+        {
+            "orderId": "#ORD-0001",
+            "createdAt": "2025-01-01T00:00:00Z",
+            "userId": "mongodb-id-001",
+            "customerName": "Azim Uddin",
+            "customerEmail": "azimuddin@gmail.com",
+            "cancelDate": "2025-01-05T00:00:00Z",
+            "deliveryStatus": "shipped",
+            "refund": "full amount",
+            "status": "approved",
+            "productId": "68a6f0b206e1dfe47b26251f",
+            "quantity": 1,
+            "price": 250
+        },
+        {
+            "orderId": "#ORD-0002",
+            "createdAt": "2025-02-10T12:30:00Z",
+            "userId": "mongodb-id-002",
+            "customerName": "Alice Smith",
+            "customerEmail": "alice.smith@gmail.com",
+            "cancelDate": "2025-02-15T00:00:00Z",
+            "deliveryStatus": "pending",
+            "refund": "no refund",
+            "status": "rejected",
+            "productId": "68a97f24aaf1e296702b5baa",
+            "quantity": 2,
+            "price": 150
+        },
+        {
+            "orderId": "#ORD-0003",
+            "createdAt": "2025-03-05T08:45:00Z",
+            "userId": "mongodb-id-003",
+            "customerName": "Michael Johnson",
+            "customerEmail": "michael.johnson@gmail.com",
+            "cancelDate": "2025-03-10T00:00:00Z",
+            "deliveryStatus": "delivered",
+            "refund": "full amount",
+            "status": "approved",
+            "productId": "68a7f4a0783f8e9129e8e096",
+            "quantity": 1,
+            "price": 300
+        },
+        {
+            "orderId": "#ORD-0004",
+            "createdAt": "2025-04-12T14:20:00Z",
+            "userId": "mongodb-id-004",
+            "customerName": "Sophia Lee",
+            "customerEmail": "sophia.lee@gmail.com",
+            "cancelDate": "2025-04-15T00:00:00Z",
+            "deliveryStatus": "cancelled",
+            "refund": "no refund",
+            "status": "rejected",
+            "productId": "68a6f3b906e1dfe47b26252d",
+            "quantity": 1,
+            "price": 120
+        }
+    ],
+    "orderServices": [
+        {
+            "orderId": "#SORD-0001",
+            "createdAt": "2025-01-05T10:00:00Z",
+            "userId": "mongodb-id-101",
+            "customerName": "Default Customer",
+            "customerEmail": "defaultcustomer@gmail.com",
+            "serviceName": "Website Development",
+            "hours": 40,
+            "ratePerHour": 30,
+            "totalPrice": 1200,
+            "status": "Pending",
+            "completionDate": "2025-01-25T00:00:00Z"
+        },
+        {
+            "orderId": "#SORD-0002",
+            "createdAt": "2025-02-10T12:00:00Z",
+            "userId": "mongodb-id-102",
+            "customerName": "Alice Smith",
+            "customerEmail": "alice.smith@gmail.com",
+            "serviceName": "SEO Optimization",
+            "hours": 15,
+            "ratePerHour": 25,
+            "totalPrice": 375,
+            "status": "In-Progress",
+            "completionDate": "2025-02-20T00:00:00Z"
+        },
+        {
+            "orderId": "#SORD-0003",
+            "createdAt": "2025-03-01T09:30:00Z",
+            "userId": "mongodb-id-103",
+            "customerName": "Michael Johnson",
+            "customerEmail": "michael.johnson@gmail.com",
+            "serviceName": "Graphic Design",
+            "hours": 10,
+            "ratePerHour": 40,
+            "totalPrice": 400,
+            "status": "Completed",
+            "completionDate": "2025-03-05T00:00:00Z"
+        },
+        {
+            "orderId": "#SORD-0004",
+            "createdAt": "2025-04-12T14:20:00Z",
+            "userId": "mongodb-id-104",
+            "customerName": "Sophia Lee",
+            "customerEmail": "sophia.lee@gmail.com",
+            "serviceName": "App Development",
+            "hours": 60,
+            "ratePerHour": 35,
+            "totalPrice": 2100,
+            "status": "Approved",
+            "completionDate": "2025-05-20T00:00:00Z"
+        }
+    ]
+}

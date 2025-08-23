@@ -44,6 +44,7 @@ export type TService = {
   user: string;
   deleteKey?: string[];
   _id: string;
+  serviceId: string;
   name: string;
   type: string;
   savedServices: TServicePricing[];

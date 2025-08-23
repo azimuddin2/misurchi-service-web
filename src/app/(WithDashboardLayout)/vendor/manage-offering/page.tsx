@@ -6,11 +6,14 @@ const ManageOfferingPage = async () => {
   return (
     <div>
       <Tabs defaultValue="products" className="w-full max-w-6xl mx-auto">
-        <TabsList className="flex rounded-md shadow-md w-full py-6">
+        <TabsList
+          style={{ background: 'none' }}
+          className="flex rounded-md w-full py-5 lg:max-w-6xl gap-1 mx-auto lg:gap-3 shadow-none"
+        >
           {/* Products Tab */}
           <TabsTrigger
             value="products"
-            className="w-full cursor-pointer text-[#165940] text-lg rounded-md font-medium py-6 transition 
+            className="w-full cursor-pointer text-[#165940] bg-gray-100 text-lg rounded-md font-medium py-6 transition 
             data-[state=active]:bg-gradient-to-t 
             data-[state=active]:from-[#cadfe7] 
             data-[state=active]:to-[#d9ebe8] 
@@ -23,7 +26,7 @@ const ManageOfferingPage = async () => {
           {/* Services Tab */}
           <TabsTrigger
             value="services"
-            className="w-full cursor-pointer text-[#165940] text-lg rounded-md font-medium py-6 transition 
+            className="w-full cursor-pointer text-[#165940] bg-gray-100 text-lg rounded-md font-medium py-6 transition 
             data-[state=active]:bg-gradient-to-t 
             data-[state=active]:from-[#cadfe7] 
             data-[state=active]:to-[#d9ebe8] 

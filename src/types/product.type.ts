@@ -2,6 +2,7 @@ export type TProduct = {
   _id: string;
   user: string;
   name: string;
+  productCode: string;
   images: TImage[];
   productType: string;
   quantity: number;
