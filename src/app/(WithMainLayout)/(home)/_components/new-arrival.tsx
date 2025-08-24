@@ -41,7 +41,7 @@ export const NewArrival = () => {
       <Container>
         {/* New Arrivals sections head content displayed here */}
         <SectionHeadWithBorder
-          title="New Arrivlas"
+          title="New Join"
           rightContent={
             <div className="flex gap-x-4 p-1 px-4 shadow-sm">
               <p className="uppercase font-semibold tracking-tight">View All</p>

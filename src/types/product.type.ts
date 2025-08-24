@@ -1,6 +1,8 @@
+import { IUser } from './user.type';
+
 export type TProduct = {
   _id: string;
-  user: string;
+  user: IUser;
   name: string;
   productCode: string;
   images: TImage[];

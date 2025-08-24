@@ -76,7 +76,7 @@ const UpdateProduct = ({ productId }: Props) => {
         productType: product.productType,
         quantity: String(product.quantity),
         price: String(product.price),
-        discountPrice: String(product.discountPrice ?? ''),
+        discountPrice: product.discountPrice || 'none', // backend value, e.g. "20%" or fallback
         colors: product.colors?.join(', ') ?? '',
         size: product.size ?? '',
         status: product.status ?? '',
@@ -282,7 +282,7 @@ const UpdateProduct = ({ productId }: Props) => {
                   </FormLabel>
                   <FormControl>
                     <Select
-                      value={field.value || 'none'}
+                      value={field.value || 'none'} // uses backend value directly
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
@@ -290,7 +290,6 @@ const UpdateProduct = ({ productId }: Props) => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">No Discount</SelectItem>
-                        {/* Generate discounts from 5% to 100% in steps of 5 */}
                         {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map(
                           (percent) => (
                             <SelectItem key={percent} value={`${percent}%`}>

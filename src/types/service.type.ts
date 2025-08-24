@@ -1,3 +1,5 @@
+import { IUser } from './user.type';
+
 export type TStatus = 'available' | 'unavailable';
 
 export type TServicePricing = {
@@ -41,7 +43,7 @@ export type TImage = {
 
 // Main ServiceData type
 export type TService = {
-  user: string;
+  user: IUser;
   deleteKey?: string[];
   _id: string;
   serviceId: string;
