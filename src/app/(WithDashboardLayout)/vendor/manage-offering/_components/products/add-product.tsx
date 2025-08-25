@@ -1,7 +1,7 @@
 'use client';
 
 import { AppButton } from '@/components/shared/app-button';
-import { ArrowRight, FileImage } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import {
   Form,
@@ -11,6 +11,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
@@ -53,7 +60,6 @@ const AddProduct = () => {
       colors,
       quantity: Number(data.quantity),
       price: Number(data.price),
-      discountPrice: Number(data.discountPrice),
     };
 
     const formData = new FormData();
@@ -204,18 +210,30 @@ const AddProduct = () => {
               control={form.control}
               name="discountPrice"
               render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Discount Price
+                <FormItem>
+                  <FormLabel className="!text-gray-700 !text-sm font-medium">
+                    Discount Percentage
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Discount Price"
-                      {...field}
-                      value={field.value || ''}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                    />
+                    <Select
+                      value={field.value || 'none'}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
+                        <SelectValue placeholder="Select discount" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No Discount</SelectItem>
+                        {/* Generate discounts from 5% to 100% in steps of 5 */}
+                        {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map(
+                          (percent) => (
+                            <SelectItem key={percent} value={`${percent}%`}>
+                              {percent}% Off
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

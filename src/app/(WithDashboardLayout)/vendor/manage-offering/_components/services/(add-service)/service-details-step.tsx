@@ -71,6 +71,8 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
   );
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  const durations = Array.from({ length: 48 }, (_, i) => (i + 1) * 30);
+
   const form = useForm({
     resolver: zodResolver(serviceSchema),
     defaultValues: {
@@ -334,16 +336,21 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                       <SelectValue placeholder="Select duration" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="30 min">30 minutes</SelectItem>
-                      <SelectItem value="45 min">45 minutes</SelectItem>
-                      <SelectItem value="1 hr">1 hour</SelectItem>
-                      <SelectItem value="1.5 hrs">1.5 hours</SelectItem>
-                      <SelectItem value="2 hrs">2 hours</SelectItem>
-                      <SelectItem value="2.5 hrs">2.5 hours</SelectItem>
-                      <SelectItem value="3 hrs">3 hours</SelectItem>
-                      <SelectItem value="4 hrs">4 hours</SelectItem>
-                      <SelectItem value="5 hrs">5 hours</SelectItem>
-                      <SelectItem value="6 hrs">6 hours</SelectItem>
+                      {durations.map((mins) => {
+                        const hrs = mins / 60;
+                        return (
+                          <SelectItem
+                            key={mins}
+                            value={`${hrs >= 1 ? hrs + ' hr' : mins + ' min'}`}
+                          >
+                            {hrs >= 1
+                              ? hrs % 1 === 0
+                                ? `${hrs} ${hrs === 1 ? 'hour' : 'hours'}`
+                                : `${hrs} hours`
+                              : `${mins} minutes`}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -402,14 +409,14 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">No Discount</SelectItem>
-                        <SelectItem value="5%">5% Off</SelectItem>
-                        <SelectItem value="10%">10% Off</SelectItem>
-                        <SelectItem value="15%">15% Off</SelectItem>
-                        <SelectItem value="20%">20% Off</SelectItem>
-                        <SelectItem value="25%">25% Off</SelectItem>
-                        <SelectItem value="30%">30% Off</SelectItem>
-                        <SelectItem value="40%">40% Off</SelectItem>
-                        <SelectItem value="50%">50% Off</SelectItem>
+                        {/* Generate discounts from 5% to 100% in steps of 5 */}
+                        {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map(
+                          (percent) => (
+                            <SelectItem key={percent} value={`${percent}%`}>
+                              {percent}% Off
+                            </SelectItem>
+                          ),
+                        )}
                       </SelectContent>
                     </Select>
                   </FormControl>

@@ -7,7 +7,7 @@ export type TProduct = {
   productType: string;
   quantity: number;
   price: number;
-  discountPrice: number;
+  discountPrice: string;
   colors: string[];
   size: string;
   status: 'Available' | 'Out of Stock' | 'TBC' | 'Discontinued';

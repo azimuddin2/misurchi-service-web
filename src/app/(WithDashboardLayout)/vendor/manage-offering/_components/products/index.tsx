@@ -31,7 +31,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import {
   useDeleteProductMutation,
-  useGetAllProductsQuery,
+  useGetAllProductsByUserQuery,
   useProductHighlightStatusMutation,
   useUpdateProductStatusMutation,
 } from '@/redux/features/product/productApi';
@@ -75,7 +75,7 @@ const ManageProducts = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data, isLoading, refetch } = useGetAllProductsQuery({
+  const { data, isLoading, refetch } = useGetAllProductsByUserQuery({
     userId,
     page,
     limit,

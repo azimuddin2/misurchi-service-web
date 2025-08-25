@@ -17,6 +17,44 @@ const serviceApi = baseApi.injectEndpoints({
     getAllServices: builder.query<
       TResponse<TService[]>,
       {
+        page?: number | string;
+        limit?: number | string;
+        query?: Record<string, string | string[] | undefined>;
+      }
+    >({
+      query: ({ page = 1, limit = 10, query }) => {
+        const params = new URLSearchParams();
+
+        if (query?.price) {
+          params.append('minPrice', '0');
+          params.append('maxPrice', query.price.toString());
+        }
+
+        if (query?.category) {
+          params.append('category', query.category.toString());
+        }
+
+        if (query?.searchTerm) {
+          params.append('searchTerm', query.searchTerm.toString());
+        }
+
+        if (query?.createdAt) {
+          const date = new Date(query.createdAt.toString().slice(0, 10));
+          params.append('createdAt', date.toISOString());
+        }
+
+        return {
+          url: `/services?page=${page}&limit=${limit}&${params.toString()}`,
+          method: 'GET',
+          credentials: 'include',
+        };
+      },
+      providesTags: ['Service'],
+    }),
+
+    getAllServicesByUser: builder.query<
+      TResponse<TService[]>,
+      {
         userId: string;
         page?: number | string;
         limit?: number | string;
@@ -93,6 +131,7 @@ const serviceApi = baseApi.injectEndpoints({
 export const {
   useAddServiceMutation,
   useGetAllServicesQuery,
+  useGetAllServicesByUserQuery,
   useUpdateServiceStatusMutation,
   useServiceHighlightStatusMutation,
   useDeleteServiceMutation,

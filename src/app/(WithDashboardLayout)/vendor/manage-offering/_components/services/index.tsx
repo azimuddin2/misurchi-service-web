@@ -31,7 +31,7 @@ import { Input } from '@/components/ui/input';
 import { TService } from '@/types/service.type';
 import {
   useDeleteServiceMutation,
-  useGetAllServicesQuery,
+  useGetAllServicesByUserQuery,
   useServiceHighlightStatusMutation,
   useUpdateServiceStatusMutation,
 } from '@/redux/features/service/serviceApi';
@@ -74,7 +74,7 @@ const ManageServices = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data, isLoading, refetch } = useGetAllServicesQuery({
+  const { data, isLoading, refetch } = useGetAllServicesByUserQuery({
     userId,
     page,
     limit,

@@ -123,7 +123,7 @@ const ViewProduct = ({ productId }: Props) => {
         <hr />
         <p className="my-2 font-medium flex justify-between items-center">
           <span>Discount</span>
-          <span className="font-medium">{product?.discountPrice}%</span>
+          <span className="font-medium">{product?.discountPrice}</span>
         </p>
         <hr />
         <p className="my-2 font-medium flex justify-between items-center">
