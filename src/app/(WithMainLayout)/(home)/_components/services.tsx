@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 const Services = () => {
   const { data, isLoading } = useGetAllServicesQuery({});
-  const services = data?.data || [];
+  const services = data?.data?.slice(0, 8) || [];
 
   if (isLoading) {
     return <Spinner />;

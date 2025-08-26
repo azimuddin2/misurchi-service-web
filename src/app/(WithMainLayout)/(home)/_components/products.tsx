@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 const Products = () => {
   const { data, isLoading } = useGetAllProductsQuery({});
-  const products = data?.data || [];
+  const products = data?.data?.slice(0, 8) || [];
 
   if (isLoading) {
     return <Spinner />;
