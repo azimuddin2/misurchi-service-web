@@ -327,28 +327,22 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
                       transition={{ delay: index * 0.1 }}
                       className="bg-gradient-to-br from-white to-purple-50/30 p-6 rounded-2xl border-2 border-purple-100 hover:border-purple-200 transition-all duration-300 shadow-sm hover:shadow-lg"
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex justify-between">
                         <div className="flex items-center gap-3">
                           <div className="p-3 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full">
                             <Calendar className="w-5 h-5 text-purple-600" />
                           </div>
                           <div>
-                            <p className="font-bold text-lg text-gray-800">
+                            <p className="font-semibold text-lg text-gray-800">
                               {schedule.day}
                             </p>
                             <p className="text-sm text-gray-500">Available</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-gray-800">
+                          <p className="font-semibold text-gray-800">
                             {schedule.startTime} - {schedule.endTime}
                           </p>
-                          <div className="flex items-center gap-1 justify-end mt-1">
-                            <Users className="w-4 h-4 text-green-600" />
-                            <span className="text-green-600 font-semibold text-sm">
-                              {schedule.seats} seats
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -368,58 +362,6 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
                 </div>
               )}
             </div>
-
-            {data.availability?.holidays &&
-              data.availability.holidays.length > 0 && (
-                <>
-                  <Separator className="my-8" />
-                  <div>
-                    <h4 className="font-bold text-xl mb-6 text-gray-800">
-                      Special Holiday Hours
-                    </h4>
-                    <div className="space-y-4">
-                      {data.availability.holidays.map(
-                        (holiday: any, index: number) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="bg-gradient-to-br from-white to-amber-50/30 p-6 rounded-2xl border-2 border-amber-100 hover:border-amber-200 transition-all duration-300 shadow-sm hover:shadow-lg"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <div className="p-3 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full">
-                                  <MapPin className="w-5 h-5 text-amber-600" />
-                                </div>
-                                <div>
-                                  <p className="font-bold text-lg text-gray-800">
-                                    {holiday.date}
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                    Special Hours
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-bold text-gray-800">
-                                  {holiday.startTime} - {holiday.endTime}
-                                </p>
-                                <div className="flex items-center gap-1 justify-end mt-1">
-                                  <Users className="w-4 h-4 text-blue-600" />
-                                  <span className="text-blue-600 font-semibold text-sm">
-                                    {holiday.seats} seats
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
           </CardContent>
         </Card>
       </motion.div>
@@ -428,7 +370,7 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="flex flex-col lg:flex-row justify-between gap-6 pt-8"
+        className="flex flex-col lg:flex-row justify-between gap-6 pt-3"
       >
         <Button
           onClick={onBack}

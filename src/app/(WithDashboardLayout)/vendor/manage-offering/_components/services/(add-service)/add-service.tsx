@@ -98,10 +98,10 @@ export function AddService() {
     try {
       const res = await addService(formData).unwrap();
       console.log(res);
-      toast.success(res.message || 'Product added successfully');
+      toast.success(res.message || 'Service added successfully');
       // router.push(`/vendor/manage-offering/view-product/${res.data?._id}`);
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to add product');
+      toast.error(error?.data?.message || 'Failed to add service');
     } finally {
       toast.dismiss(toastId);
     }

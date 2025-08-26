@@ -579,7 +579,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                 {ServiceStatus.map((status) => (
                   <FormItem
                     key={status}
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-2 capitalize"
                   >
                     <FormControl>
                       <Checkbox

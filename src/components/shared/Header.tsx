@@ -102,7 +102,7 @@ export default function Header() {
                   <Link href="/vendor/manage-offering">
                     <DropdownMenuItem className="rounded-[5px] cursor-pointer">
                       <Store />
-                      <span>Manage Offerings</span>
+                      <span>Manage Offering</span>
                     </DropdownMenuItem>
                   </Link>
                 </>

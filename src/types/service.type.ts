@@ -25,15 +25,6 @@ export type TDaySchedule = {
   enabled: boolean;
   startTime: string; // e.g., "09:00"
   endTime: string; // e.g., "17:00"
-  seats: number;
-};
-
-// Holiday schedule (for exceptions)
-export type THolidaySchedule = {
-  date: string; // ISO date string "2025-08-20"
-  startTime: string; // e.g., "10:00"
-  endTime: string; // e.g., "14:00"
-  seats: number;
 };
 
 export type TImage = {
@@ -57,7 +48,6 @@ export type TService = {
 
   availability: {
     weeklySchedule: Partial<Record<TWeekDay, TDaySchedule>>; // not all days required
-    holidays?: THolidaySchedule[]; // optional
   };
 
   isDeleted: boolean;

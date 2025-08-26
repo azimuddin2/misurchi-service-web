@@ -10,14 +10,13 @@ import {
   CalendarIcon,
   Clock,
   Users,
-  Plus,
-  Trash2,
   ChevronLeft,
   ChevronRight,
   ArrowRight,
   ArrowLeft,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { TimeSelect } from '@/components/ui/core/time-select';
 
 interface AvailabilityStepProps {
   data: any;
@@ -77,58 +76,15 @@ export function AvailabilityStep({
 
   const [weeklySchedule, setWeeklySchedule] = useState(
     data?.availability?.weeklySchedule || {
-      sunday: {
-        enabled: false,
-        startTime: '09:00',
-        endTime: '17:00',
-        seats: 15,
-      },
-      monday: {
-        enabled: true,
-        startTime: '09:00',
-        endTime: '17:00',
-        seats: 15,
-      },
-      tuesday: {
-        enabled: true,
-        startTime: '09:00',
-        endTime: '17:00',
-        seats: 15,
-      },
-      wednesday: {
-        enabled: true,
-        startTime: '09:00',
-        endTime: '17:00',
-        seats: 15,
-      },
-      thursday: {
-        enabled: true,
-        startTime: '09:00',
-        endTime: '17:00',
-        seats: 15,
-      },
-      friday: {
-        enabled: true,
-        startTime: '09:00',
-        endTime: '17:00',
-        seats: 15,
-      },
-      saturday: {
-        enabled: false,
-        startTime: '09:00',
-        endTime: '17:00',
-        seats: 15,
-      },
+      sunday: { enabled: false, startTime: '9:00 AM', endTime: '5:00 PM' },
+      monday: { enabled: true, startTime: '9:00 AM', endTime: '5:00 PM' },
+      tuesday: { enabled: true, startTime: '9:00 AM', endTime: '5:00 PM' },
+      wednesday: { enabled: true, startTime: '9:00 AM', endTime: '5:00 PM' },
+      thursday: { enabled: true, startTime: '9:00 AM', endTime: '5:00 PM' },
+      friday: { enabled: true, startTime: '9:00 AM', endTime: '5:00 PM' },
+      saturday: { enabled: false, startTime: '9:00 AM', endTime: '5:00 PM' },
     },
   );
-
-  const [holidays, setHolidays] = useState(data?.availability?.holidays || []);
-  const [newHoliday, setNewHoliday] = useState({
-    date: '',
-    startTime: '10:00',
-    endTime: '17:00',
-    seats: 15,
-  });
 
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -151,10 +107,6 @@ export function AvailabilityStep({
       return customAvailability[dateStr].enabled;
     }
 
-    // Check if it's a holiday
-    const isHoliday = holidays.some((h) => h.date === dateStr);
-    if (isHoliday) return true;
-
     // Check weekly schedule
     return weeklySchedule[dayKey].enabled;
   };
@@ -173,7 +125,6 @@ export function AvailabilityStep({
 
   const handleDateClick = (dateStr: string) => {
     setSelectedDate(dateStr);
-    setNewHoliday((prev) => ({ ...prev, date: dateStr }));
   };
 
   const toggleDateAvailability = (dateStr: string) => {
@@ -234,33 +185,16 @@ export function AvailabilityStep({
   };
 
   const updateSchedule = (day: string, field: string, value: any) => {
-    setWeeklySchedule((prev) => ({
+    setWeeklySchedule((prev: any) => ({
       ...prev,
       [day]: { ...prev[day], [field]: value },
     }));
-  };
-
-  const addHoliday = () => {
-    if (newHoliday.date) {
-      setHolidays((prev) => [...prev, { ...newHoliday, id: Date.now() }]);
-      setNewHoliday({
-        date: '',
-        startTime: '10:00',
-        endTime: '17:00',
-        seats: 15,
-      });
-    }
-  };
-
-  const removeHoliday = (index: number) => {
-    setHolidays((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = () => {
     onNext({
       availability: {
         weeklySchedule,
-        holidays,
       },
     });
   };
@@ -372,43 +306,25 @@ export function AvailabilityStep({
 
               {weeklySchedule[day.key].enabled ? (
                 <div className="flex items-center gap-4 flex-1">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <Input
-                      type="time"
-                      value={weeklySchedule[day.key].startTime}
-                      onChange={(e) =>
-                        updateSchedule(day.key, 'startTime', e.target.value)
-                      }
-                      className="w-32"
-                    />
-                    <span className="text-gray-500">to</span>
-                    <Input
-                      type="time"
-                      value={weeklySchedule[day.key].endTime}
-                      onChange={(e) =>
-                        updateSchedule(day.key, 'endTime', e.target.value)
-                      }
-                      className="w-32"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-gray-500" />
-                    <Input
-                      type="number"
-                      value={weeklySchedule[day.key].seats}
-                      onChange={(e) =>
-                        updateSchedule(
-                          day.key,
-                          'seats',
-                          Number.parseInt(e.target.value),
-                        )
-                      }
-                      className="w-20"
-                      min="1"
-                    />
-                    <span className="text-sm text-gray-500">seats</span>
+                  <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500">Start Time</span>
+                      <TimeSelect
+                        value={weeklySchedule[day.key].startTime}
+                        onChange={(val) =>
+                          updateSchedule(day.key, 'startTime', val)
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500 text-sm">End Time</span>
+                      <TimeSelect
+                        value={weeklySchedule[day.key].endTime}
+                        onChange={(val) =>
+                          updateSchedule(day.key, 'endTime', val)
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -419,124 +335,8 @@ export function AvailabilityStep({
         </CardContent>
       </Card>
 
-      {/* Holiday Hours */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5 text-green-600" />
-            Holiday Hours
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Add New Holiday */}
-          <div className="grid grid-cols-1 gap-4 p-3 lg:p-5 bg-gray-50 rounded-lg">
-            <div>
-              <Label className="text-sm">Date</Label>
-              <Input
-                className="bg-[#ffffff] py-5 border-none w-full rounded-sm"
-                type="date"
-                value={newHoliday.date}
-                onChange={(e) =>
-                  setNewHoliday((prev) => ({ ...prev, date: e.target.value }))
-                }
-              />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <div>
-                <Label className="text-sm">Start Time</Label>
-                <Input
-                  className="bg-[#ffffff] py-5 border-none w-full rounded-sm"
-                  type="time"
-                  value={newHoliday.startTime}
-                  onChange={(e) =>
-                    setNewHoliday((prev) => ({
-                      ...prev,
-                      startTime: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div>
-                <Label className="text-sm">End Time</Label>
-                <Input
-                  className="bg-[#ffffff] py-5 border-none w-full rounded-sm"
-                  type="time"
-                  value={newHoliday.endTime}
-                  onChange={(e) =>
-                    setNewHoliday((prev) => ({
-                      ...prev,
-                      endTime: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-sm">Seats</Label>
-              <Input
-                className="bg-[#ffffff] py-5 border-none w-full rounded-sm"
-                type="number"
-                value={newHoliday.seats}
-                onChange={(e) =>
-                  setNewHoliday((prev) => ({
-                    ...prev,
-                    seats: Number.parseInt(e.target.value),
-                  }))
-                }
-                min="1"
-              />
-            </div>
-            <div className="flex items-end">
-              <Button
-                onClick={addHoliday}
-                className=" uppercase w-full text-[#000000] border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] p-5 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 font-semibold"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Slot
-              </Button>
-            </div>
-          </div>
-
-          {/* Holiday List */}
-          {holidays.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Scheduled Holiday Hours
-              </Label>
-              {holidays.map((holiday, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="font-medium">{holiday.date}</span>
-                    <span className="text-gray-600">
-                      {formatTime(holiday.startTime)} -{' '}
-                      {formatTime(holiday.endTime)}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      {holiday.seats} seats
-                    </span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeHoliday(index)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Navigation */}
-      <div className="lg:flex justify-between pt-4">
+      <div className="lg:flex justify-between">
         <Button
           onClick={onBack}
           className="w-full lg:w-2/6 text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] p-5 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 "
