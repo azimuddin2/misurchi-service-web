@@ -61,7 +61,7 @@ const ProductCard = ({ product }: ProductProps) => {
           <div className="flex items-center gap-2">
             <Avatar className="w-10 h-10 border-none">
               <AvatarImage src={product?.user?.image} />
-              <AvatarFallback className="bg-[#093954] text-white text-2xl">
+              <AvatarFallback className="bg-[#093954] text-white text-xl">
                 {product?.user?.fullName?.slice(0, 1)}
               </AvatarFallback>
             </Avatar>

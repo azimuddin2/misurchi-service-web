@@ -50,17 +50,25 @@ const MSWPagination = ({ totalPage }: { totalPage: number }) => {
       >
         <ArrowLeft />
       </Button>
-      {[...Array(totalPage)].map((_, index) => (
-        <Button
-          key={index}
-          onClick={() => updatePage(index + 1)}
-          variant={currentPage === index + 1 ? 'default' : 'outline'}
-          size="sm"
-          className="w-8 h-8 rounded-full flex justify-center items-center"
-        >
-          {index + 1}
-        </Button>
-      ))}
+      {[...Array(totalPage)].map((_, index) => {
+        const pageNum = index + 1;
+        const isActive = currentPage === pageNum;
+
+        return (
+          <Button
+            key={pageNum}
+            onClick={() => updatePage(pageNum)}
+            size="sm"
+            className={`w-8 h-8 rounded-full flex justify-center items-center transition-colors ${
+              isActive
+                ? 'bg-[#003250] text-white hover:bg-[#003250]'
+                : 'bg-white text-gray-700 border hover:bg-gray-100'
+            }`}
+          >
+            {pageNum}
+          </Button>
+        );
+      })}
       <Button
         onClick={handleNext}
         disabled={currentPage === totalPage}
