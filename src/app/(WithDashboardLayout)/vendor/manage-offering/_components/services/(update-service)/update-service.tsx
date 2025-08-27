@@ -1,0 +1,285 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  CheckCircle,
+  ArrowLeft,
+  Calendar,
+  Settings,
+  Sparkles,
+} from 'lucide-react';
+import { ServiceDetailsStep } from './service-details-step';
+import { AvailabilityStep } from './availability-step';
+import { ReviewStep } from './review-step';
+import { Progress } from '@/components/ui/progress';
+import { TService } from '@/types/service.type';
+import { toast } from 'sonner';
+import {
+  useAddServiceMutation,
+  useGetServiceByIdQuery,
+} from '@/redux/features/service/serviceApi';
+import { useAppSelector } from '@/redux/hooks';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+
+const steps = [
+  {
+    id: 1,
+    title: 'Service Details',
+    description: 'Basic information about your service',
+    icon: Settings,
+  },
+  {
+    id: 2,
+    title: 'Availability',
+    description: 'Set your schedule and capacity',
+    icon: Calendar,
+  },
+  {
+    id: 3,
+    title: 'Review & Publish',
+    description: 'Review and publish your service',
+    icon: Sparkles,
+  },
+];
+
+type Props = {
+  serviceId: string;
+};
+
+const UpdateService = ({ serviceId }: Props) => {
+  const user = useAppSelector(selectCurrentUser);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [serviceData, setServiceData] = useState<any>({});
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+
+  const handleStepComplete = (stepData: any) => {
+    setServiceData((prev: any) => ({
+      ...prev,
+      ...stepData, // merge new changes
+    }));
+    if (!completedSteps.includes(currentStep)) {
+      setCompletedSteps((prev) => [...prev, currentStep]);
+    }
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleStepBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleStepClick = (stepId: number) => {
+    if (stepId <= currentStep || completedSteps.includes(stepId)) {
+      setCurrentStep(stepId);
+    }
+  };
+
+  const progress = ((currentStep - 1) / (steps.length - 1)) * 100;
+
+  const { data, isLoading } = useGetServiceByIdQuery(serviceId);
+  const service = data?.data;
+
+  useEffect(() => {
+    if (service) {
+      setServiceData({
+        ...service,
+        imageFiles: [], // you can map existing images to preview if needed
+      });
+    }
+  }, [service]);
+
+  const [addService] = useAddServiceMutation();
+
+  //Todo: Database Save data
+  const handleDataSave = async () => {
+    const files: File[] = serviceData?.imageFiles || [];
+
+    const modifiedData = {
+      user: user?.userId,
+      ...serviceData,
+    };
+
+    console.log(modifiedData);
+
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(modifiedData));
+
+    files.forEach((file) => {
+      formData.append('images', file);
+    });
+
+    // const toastId = toast.loading('Adding service...');
+
+    // try {
+    //     const res = await addService(formData).unwrap();
+    //     console.log(res);
+    //     toast.success(res.message || 'Service added successfully');
+    //     // router.push(`/vendor/manage-offering/view-product/${res.data?._id}`);
+    // } catch (error: any) {
+    //     toast.error(error?.data?.message || 'Failed to add service');
+    // } finally {
+    //     toast.dismiss(toastId);
+    // }
+  };
+
+  return (
+    <div className="px-4 py-8 max-w-4xl">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-xl lg:text-3xl font-semibold text-gray-900 mb-2">
+          Update Service _ {service?.name}
+        </h1>
+        <p className="text-gray-600">
+          Set up your service in just a few simple steps
+        </p>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          {steps.map((step, index) => {
+            const isActive = currentStep === step.id;
+            const isCompleted = completedSteps.includes(step.id);
+            const isAccessible = step.id <= currentStep || isCompleted;
+
+            return (
+              <div
+                key={step.id}
+                className={`flex items-center cursor-pointer transition-all duration-200 ${
+                  isAccessible
+                    ? 'hover:scale-105'
+                    : 'cursor-not-allowed opacity-50'
+                }`}
+                onClick={() => handleStepClick(step.id)}
+              >
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isCompleted
+                        ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white'
+                        : isActive
+                          ? 'bg-green-100 text-green-600 ring-4 ring-green-100'
+                          : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <step.icon className="w-6 h-6" />
+                    )}
+                  </div>
+                  <div className="mt-2 text-center">
+                    <p
+                      className={`text-sm font-medium ${isActive ? 'text-green-600' : 'text-gray-600'}`}
+                    >
+                      {step.title}
+                    </p>
+                    <p className="text-xs text-gray-400 max-w-24">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+                {index < steps.length - 1 && (
+                  <div
+                    className={`w-16 h-1 mx-4 transition-colors duration-300 ${
+                      isCompleted || currentStep > step.id
+                        ? 'bg-gradient-to-t to-green-800 from-green-500/70'
+                        : 'bg-gray-200'
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <Progress
+          value={progress}
+          className="h-2 [&>div]:bg-gradient-to-t [&>div]:from-green-500/70 [&>div]:to-green-600 transition-all duration-500"
+        />
+      </div>
+
+      {/* Step Content */}
+      <Card className="shadow border-0">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl text-gray-900">
+                {steps[currentStep - 1].title}
+              </CardTitle>
+              <p className="text-gray-600 mt-1">
+                {steps[currentStep - 1].description}
+              </p>
+            </div>
+            <Badge
+              variant="outline"
+              className="text-green-600 border-green-500"
+            >
+              Step {currentStep} of {steps.length}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {currentStep === 1 && (
+                <ServiceDetailsStep
+                  data={serviceData}
+                  onNext={(updatedData) => {
+                    setServiceData(updatedData); // contains updated images + savedServices
+                    setCurrentStep(2);
+                  }}
+                />
+              )}
+              {currentStep === 2 && (
+                <AvailabilityStep
+                  data={serviceData}
+                  onNext={handleStepComplete}
+                  onBack={handleStepBack}
+                />
+              )}
+              {currentStep === 3 && (
+                <ReviewStep
+                  data={serviceData as TService}
+                  onBack={handleStepBack}
+                  onComplete={handleDataSave}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </CardContent>
+      </Card>
+
+      {/* Navigation Footer */}
+      <div className="flex justify-between items-center mt-8">
+        <Button
+          variant="outline"
+          onClick={handleStepBack}
+          disabled={currentStep === 1}
+          className="flex items-center gap-2 bg-transparent"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Previous
+        </Button>
+        <div className="text-sm text-gray-500">
+          {completedSteps.length} of {steps.length} steps completed
+        </div>
+        <div className="w-20" /> {/* Spacer for alignment */}
+      </div>
+    </div>
+  );
+};
+
+export default UpdateService;

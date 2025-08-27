@@ -358,7 +358,7 @@ const ManageServices = () => {
                 <Edit
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/listings/update-listing/${row.original._id}`,
+                      `/${user?.role}/manage-offering/update-service/${row.original._id}`,
                     )
                   }
                   size={20}

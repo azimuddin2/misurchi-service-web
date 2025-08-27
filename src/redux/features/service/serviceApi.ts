@@ -91,6 +91,28 @@ const serviceApi = baseApi.injectEndpoints({
       providesTags: ['Service'],
     }),
 
+    getServiceById: builder.query<TResponse<TService>, string>({
+      query: (id) => ({
+        url: `/services/${id}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Service'],
+    }),
+
+    updateService: builder.mutation<
+      TResponse<TService>, // Response type
+      { id: string; body: FormData } // Arg type
+    >({
+      query: ({ id, body }) => ({
+        url: `/services/${id}`,
+        method: 'PATCH',
+        body,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Service'],
+    }),
+
     updateServiceStatus: builder.mutation<
       TResponse<TService>,
       { id: string; status: { status: string } }
@@ -132,6 +154,8 @@ export const {
   useAddServiceMutation,
   useGetAllServicesQuery,
   useGetAllServicesByUserQuery,
+  useGetServiceByIdQuery,
+  useUpdateServiceMutation,
   useUpdateServiceStatusMutation,
   useServiceHighlightStatusMutation,
   useDeleteServiceMutation,
