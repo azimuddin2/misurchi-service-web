@@ -32,19 +32,6 @@ export default function FilterSidebar() {
     'Top Rated',
   ];
 
-  const serviceTypes = [
-    'Beauty & Personal Care',
-    'Health & Wellness',
-    'Home Services',
-    'Event Services',
-    'Education & Tutoring',
-    'Pet Services',
-    'Photography & Videography',
-    'Baking Services',
-    'Catering & Food Services',
-    'Cleaning',
-  ];
-
   const productTypes = [
     'Fitness Equipment',
     'Electronics',
@@ -59,7 +46,14 @@ export default function FilterSidebar() {
     'Books & Media',
   ];
 
-  const discounts = ['All', '10% - 20% Off', '20% - 30% Off', '30% Above'];
+  const discounts = [
+    'All',
+    '10% - 20% Off',
+    '20% - 30% Off',
+    '30% - 40% Off',
+    '40% - 50% Off',
+    '50% Above',
+  ];
 
   return (
     <>
@@ -124,26 +118,6 @@ export default function FilterSidebar() {
                     className="text-sm text-gray-700"
                   >
                     {item}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-
-          {/* Service Types */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3">Service Types</h2>
-            <RadioGroup
-              onValueChange={(val) => handleSearchQuery('service', val)}
-            >
-              {serviceTypes.map((service) => (
-                <div key={service} className="flex items-center gap-2">
-                  <RadioGroupItem value={service} id={`service-${service}`} />
-                  <Label
-                    htmlFor={`service-${service}`}
-                    className="text-sm text-gray-700"
-                  >
-                    {service}
                   </Label>
                 </div>
               ))}

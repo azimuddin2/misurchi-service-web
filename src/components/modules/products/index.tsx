@@ -7,9 +7,9 @@ import { Search } from 'lucide-react';
 import ProductCard from '@/components/modules/cards/product-card';
 import Spinner from '@/components/shared/Spinner';
 import MSWPagination from '@/components/ui/core/MSWPagination';
-import FilterSidebar from './filter-sidebar';
 import { useGetAllProductsQuery } from '@/redux/features/product/productApi';
 import { TProduct } from '@/types/product.type';
+import FilterSidebar from './filter-sidebar';
 
 const AllProducts = () => {
   const router = useRouter();
@@ -20,7 +20,7 @@ const AllProducts = () => {
   );
 
   const page = searchParams.get('page') || 1;
-  const limit = searchParams.get('limit') || 6;
+  const limit = searchParams.get('limit') || 9;
   const searchTerm = searchParams.get('searchTerm') || '';
 
   const { data, isLoading } = useGetAllProductsQuery({
@@ -67,13 +67,13 @@ const AllProducts = () => {
         </div>
 
         <div className="w-full lg:mb-0">
-          <div className="max-w-2xl mx-auto relative">
+          <div className="max-w-3xl relative">
             <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Service or Products"
+                placeholder="Search product here..."
                 className="w-full px-6 py-3 outline-none"
               />
               <button

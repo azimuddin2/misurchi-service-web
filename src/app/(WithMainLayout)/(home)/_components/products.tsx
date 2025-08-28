@@ -28,7 +28,7 @@ const Products = () => {
           className="lg:w-1/4 text-white border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
           content={
             <Link
-              href={`/all-products-services`}
+              href={`/all-products-services?tab=products`}
               className="flex justify-center items-center space-x-1 font-semibold"
             >
               <span className="uppercase text-sm font-semibold mr-2">

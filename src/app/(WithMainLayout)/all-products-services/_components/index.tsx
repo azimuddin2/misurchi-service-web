@@ -1,13 +1,29 @@
 'use client';
 
+import AllProducts from '@/components/modules/products';
+import AllServices from '@/components/modules/services';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AllProducts from './all-products';
-import AllServices from './all-services';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const AllProductsServices = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Get initial tab from params (first load only)
+  const initialTab = searchParams.get('tab') || 'products';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Remove the tab param from the URL after reading it
+  useEffect(() => {
+    if (searchParams.get('tab')) {
+      router.replace('/all-products-services'); // clean URL
+    }
+  }, [searchParams, router]);
+
   return (
     <div className="container lg:mx-auto my-10">
-      <Tabs defaultValue="products">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList
           style={{ background: 'none' }}
           className="flex rounded-md w-full py-5 lg:max-w-6xl gap-1 mx-auto lg:gap-3 shadow-none"

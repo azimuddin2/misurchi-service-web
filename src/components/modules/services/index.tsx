@@ -4,11 +4,11 @@ import ServiceCard from '@/components/modules/cards/service-card';
 import Spinner from '@/components/shared/Spinner';
 import { useGetAllServicesQuery } from '@/redux/features/service/serviceApi';
 import { useRouter, useSearchParams } from 'next/navigation';
-import FilterSidebar from './filter-sidebar';
 import { Search } from 'lucide-react';
 import { TService } from '@/types/service.type';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useCallback, useEffect, useState } from 'react';
+import FilterSidebar from './filter-sidebar';
 
 const AllServices = () => {
   const router = useRouter();
@@ -19,7 +19,7 @@ const AllServices = () => {
   );
 
   const page = searchParams.get('page') || 1;
-  const limit = searchParams.get('limit') || 6;
+  const limit = searchParams.get('limit') || 9;
   const searchTerm = searchParams.get('searchTerm') || '';
 
   const { data, isLoading } = useGetAllServicesQuery({
@@ -67,13 +67,13 @@ const AllServices = () => {
           <FilterSidebar />
         </div>
         <div className="w-full lg:mb-0">
-          <div className="max-w-2xl mx-auto relative">
+          <div className="max-w-3xl relative">
             <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Service or Products"
+                placeholder="Search service here..."
                 className="w-full px-6 py-3 outline-none"
               />
               <button
