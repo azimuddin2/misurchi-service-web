@@ -1,6 +1,5 @@
 'use client';
 
-import Container from '@/components/shared/Container';
 import { Switch } from '@/components/ui/switch';
 import { useGetAllVendorUserQuery } from '@/redux/features/user/userApi';
 import { Search } from 'lucide-react';

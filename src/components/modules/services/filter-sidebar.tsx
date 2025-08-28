@@ -5,21 +5,45 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { X, Filter, CircleX } from 'lucide-react';
 
 export default function FilterSidebar() {
   const [price, setPrice] = useState([0, 500]);
   const [isOpen, setIsOpen] = useState(false);
 
+  const [selectedRecommended, setSelectedRecommended] = useState<string[]>([]);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedDiscounts, setSelectedDiscounts] = useState<string[]>([]);
+
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const handleSearchQuery = (query: string, value: string | number) => {
+  const handleSearchQuery = (query: string, values: string[]) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set(query, value.toString());
+    if (values.length > 0) {
+      params.set(query, values.join(','));
+    } else {
+      params.delete(query);
+    }
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const toggleSelection = (
+    value: string,
+    selected: string[],
+    setSelected: (vals: string[]) => void,
+    query: string,
+  ) => {
+    let newSelected: string[];
+    if (selected.includes(value)) {
+      newSelected = selected.filter((v) => v !== value);
+    } else {
+      newSelected = [...selected, value];
+    }
+    setSelected(newSelected);
+    handleSearchQuery(query, newSelected);
   };
 
   // Filter options
@@ -45,7 +69,14 @@ export default function FilterSidebar() {
     'Cleaning',
   ];
 
-  const discounts = ['All', '10% - 20% Off', '20% - 30% Off', '30% Above'];
+  const discounts = [
+    'All',
+    '10% - 20% Off',
+    '20% - 30% Off',
+    '30% - 40% Off',
+    '40% - 50% Off',
+    '50% Above',
+  ];
 
   return (
     <>
@@ -62,7 +93,7 @@ export default function FilterSidebar() {
         </Button>
       </div>
 
-      {/* Sidebar (desktop always visible) */}
+      {/* Sidebar */}
       <div
         className={`
           fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-lg transform 
@@ -87,7 +118,6 @@ export default function FilterSidebar() {
                 <CircleX size={20} />
               </Button>
             )}
-            {/* Close button (only mobile) */}
             <button className="md:hidden p-2" onClick={() => setIsOpen(false)}>
               <X className="w-5 h-5" />
             </button>
@@ -99,41 +129,55 @@ export default function FilterSidebar() {
           {/* Recommended */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Recommended</h2>
-            <RadioGroup
-              onValueChange={(val) => handleSearchQuery('recommended', val)}
-            >
-              {recommended.map((item) => (
-                <div key={item} className="flex items-center gap-2">
-                  <RadioGroupItem value={item} id={`rec-${item}`} />
-                  <Label
-                    htmlFor={`rec-${item}`}
-                    className="text-sm text-gray-700"
-                  >
-                    {item}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+            {recommended.map((item) => (
+              <div key={item} className="flex items-center gap-2 mb-1">
+                <Checkbox
+                  checked={selectedRecommended.includes(item)}
+                  onCheckedChange={() =>
+                    toggleSelection(
+                      item,
+                      selectedRecommended,
+                      setSelectedRecommended,
+                      'recommended',
+                    )
+                  }
+                  id={`rec-${item}`}
+                />
+                <Label
+                  htmlFor={`rec-${item}`}
+                  className="text-sm text-gray-700"
+                >
+                  {item}
+                </Label>
+              </div>
+            ))}
           </div>
 
           {/* Service Types */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Service Types</h2>
-            <RadioGroup
-              onValueChange={(val) => handleSearchQuery('service', val)}
-            >
-              {serviceTypes.map((service) => (
-                <div key={service} className="flex items-center gap-2">
-                  <RadioGroupItem value={service} id={`service-${service}`} />
-                  <Label
-                    htmlFor={`service-${service}`}
-                    className="text-sm text-gray-700"
-                  >
-                    {service}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+            {serviceTypes.map((service) => (
+              <div key={service} className="flex items-center gap-2 mb-1">
+                <Checkbox
+                  checked={selectedServices.includes(service)}
+                  onCheckedChange={() =>
+                    toggleSelection(
+                      service,
+                      selectedServices,
+                      setSelectedServices,
+                      'service',
+                    )
+                  }
+                  id={`service-${service}`}
+                />
+                <Label
+                  htmlFor={`service-${service}`}
+                  className="text-sm text-gray-700"
+                >
+                  {service}
+                </Label>
+              </div>
+            ))}
           </div>
 
           {/* Price */}
@@ -149,7 +193,7 @@ export default function FilterSidebar() {
               value={price}
               onValueChange={(value) => {
                 setPrice(value);
-                handleSearchQuery('price', `${value[0]}-${value[1]}`);
+                handleSearchQuery('price', [`${value[0]}-${value[1]}`]);
               }}
               className="w-full"
             />
@@ -158,26 +202,33 @@ export default function FilterSidebar() {
           {/* Discount */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Discount</h2>
-            <RadioGroup
-              onValueChange={(val) => handleSearchQuery('discount', val)}
-            >
-              {discounts.map((discount) => (
-                <div key={discount} className="flex items-center gap-2">
-                  <RadioGroupItem value={discount} id={`disc-${discount}`} />
-                  <Label
-                    htmlFor={`disc-${discount}`}
-                    className="text-sm text-gray-700"
-                  >
-                    {discount}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+            {discounts.map((discount) => (
+              <div key={discount} className="flex items-center gap-2 mb-1">
+                <Checkbox
+                  checked={selectedDiscounts.includes(discount)}
+                  onCheckedChange={() =>
+                    toggleSelection(
+                      discount,
+                      selectedDiscounts,
+                      setSelectedDiscounts,
+                      'discount',
+                    )
+                  }
+                  id={`disc-${discount}`}
+                />
+                <Label
+                  htmlFor={`disc-${discount}`}
+                  className="text-sm text-gray-700"
+                >
+                  {discount}
+                </Label>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Overlay (mobile only) */}
+      {/* Overlay */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
