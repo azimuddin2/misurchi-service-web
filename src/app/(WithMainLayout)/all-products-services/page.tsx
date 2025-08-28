@@ -2,7 +2,7 @@ import AllProductsServices from './_components';
 
 const AllProductsServicesPage = () => {
   return (
-    <div>
+    <div className="px-3 lg:px-0">
       <AllProductsServices />
     </div>
   );

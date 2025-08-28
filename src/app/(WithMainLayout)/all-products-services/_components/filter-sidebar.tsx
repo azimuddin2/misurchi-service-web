@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { X, Filter } from 'lucide-react';
+import { X, Filter, CircleX } from 'lucide-react';
 
 export default function FilterSidebar() {
   const [price, setPrice] = useState([0, 500]);
@@ -64,7 +64,7 @@ export default function FilterSidebar() {
   return (
     <>
       {/* Mobile Filter Toggle */}
-      <div className="md:hidden mb-4 ">
+      <div className="md:hidden mb-4">
         <Button
           variant="outline"
           size="sm"
@@ -86,7 +86,7 @@ export default function FilterSidebar() {
         `}
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 p-4 border-b">
+        <div className="flex justify-between items-center mb-2 p-4 border-b">
           <h2 className="text-xl font-semibold">Filter</h2>
           <div className="flex items-center gap-2">
             {searchParams.toString().length > 0 && (
@@ -95,9 +95,10 @@ export default function FilterSidebar() {
                   router.push(`${pathname}`, { scroll: false });
                 }}
                 size="sm"
-                className="bg-black hover:bg-gray-700 text-white"
+                className="bg-red-400 hover:bg-red-500 text-white rounded flex items-center cursor-pointer"
               >
-                Clear
+                <span className="text-sm">Clear</span>
+                <CircleX size={20} />
               </Button>
             )}
             {/* Close button (only mobile) */}
