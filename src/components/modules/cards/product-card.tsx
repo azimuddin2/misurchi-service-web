@@ -111,7 +111,7 @@ const ProductCard = ({ product }: ProductProps) => {
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
           <Link
-            href={`/`}
+            href={`/products/${product._id}`}
             className="flex justify-center items-center space-x-1 font-semibold"
           >
             <span className="uppercase text-sm font-semibold mr-2">
