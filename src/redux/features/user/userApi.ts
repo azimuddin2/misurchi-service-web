@@ -41,6 +41,15 @@ const userApi = baseApi.injectEndpoints({
       providesTags: ['User'],
     }),
 
+    getVendorUserById: builder.query<TResponse<TVendorUser>, string>({
+      query: (id) => ({
+        url: `/vendors/${id}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['User'],
+    }),
+
     updateVendorProfile: builder.mutation<
       TResponse<TVendorUser>,
       { email: string; body: FormData }
@@ -59,5 +68,6 @@ const userApi = baseApi.injectEndpoints({
 export const {
   useGetAllVendorUserQuery,
   useGetVendorProfileQuery,
+  useGetVendorUserByIdQuery,
   useUpdateVendorProfileMutation,
 } = userApi;

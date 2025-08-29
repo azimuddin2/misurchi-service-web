@@ -44,6 +44,7 @@ export type TVendorUser = {
   workHours: string;
   firstName: string;
   lastName: string;
+  description: string;
   createdAt: string;
   updatedAt: string;
   __v: number;

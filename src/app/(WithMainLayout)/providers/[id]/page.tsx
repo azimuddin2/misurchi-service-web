@@ -1,4 +1,4 @@
-import ProviderProfile from '../_components/vendor-profile';
+import ProviderProfile from '../_components/provider-profile';
 
 const ProviderProfilePage = ({ params }: { params: { id: string } }) => {
   return (

@@ -67,6 +67,7 @@ const VendorProfile = () => {
       workHours: '',
       firstName: '',
       lastName: '',
+      description: '',
     },
   });
 
@@ -86,6 +87,7 @@ const VendorProfile = () => {
         workHours: vendorUser.workHours || '',
         firstName: vendorUser.firstName || '',
         lastName: vendorUser.lastName || '',
+        description: vendorUser.description || '',
       });
       setImagePreview(vendorUser.image ? [vendorUser.image] : []);
     }
@@ -441,6 +443,28 @@ const VendorProfile = () => {
               )}
             />
           </div>
+
+          {/*  Description */}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="!text-gray-700 !text-base font-medium">
+                  Description
+                </FormLabel>
+                <FormControl>
+                  <textarea
+                    {...field}
+                    rows={8}
+                    className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"
+                    placeholder="Enter description here..."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <div className="mt-8 h-full rounded-lg overflow-hidden">
             <div
