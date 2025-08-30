@@ -1,148 +1,239 @@
 'use client';
 
-import { AppButton } from '@/components/shared/app-button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { useGetProductByIdQuery } from '@/redux/features/product/productApi';
 import { TProduct } from '@/types/product.type';
-import { Link, Star } from 'lucide-react';
+import { MapPin, Minus, Plus, Send, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import StarRatings from 'react-star-ratings';
 
 type Props = {
   productId: string;
 };
 
 const ProductDetails = ({ productId }: Props) => {
+  const [quantity, setQuantity] = useState<number>(1);
   const { data, isLoading } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  // When data is loaded, set the first image as default
+  useEffect(() => {
+    if (product?.images?.length) {
+      setSelectedImage(product.images[0].url);
+    }
+  }, [product]);
+
+  const price = Number(product?.price || 0);
+  const discountStr = product?.discountPrice || '0%';
+
+  // Remove the '%' and convert to number
+  const discountPercent = Number(discountStr.replace('%', ''));
+
+  // Calculate discounted price
+  const discountedPrice = price - (price * discountPercent) / 100;
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 my-10">
-      {/* Product Image Section */}
-      <div>
-        <div className="rounded-lg flex items-center justify-center h-[400px] relative">
-          {selectedImage && (
-            <Image
-              src={selectedImage}
-              alt="Product Image"
-              width={400}
-              height={400}
-              className="rounded"
-            />
-          )}
-        </div>
-        <div className="gap-3 mt-12 flex justify-start">
-          {product?.images?.map((image, index) => (
-            <button
-              key={index}
-              className={`border-2 rounded-md p-1 ${
-                selectedImage === image.url
-                  ? 'border-[#093954]'
-                  : 'border-gray-300'
-              }`}
-              onClick={() => setSelectedImage(image.url)}
-            >
+    <div className="my-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        {/* Product Image Section */}
+        <div>
+          <div className="rounded-lg flex items-center justify-center h-[400px] relative overflow-hidden">
+            {selectedImage && (
               <Image
-                src={image.url}
-                alt="Thumbnail"
-                width={100}
-                height={100}
-                className="rounded-md cursor-pointer"
+                src={selectedImage}
+                alt="Product Image"
+                width={400}
+                height={400}
+                className="rounded object-contain transition-transform duration-300 hover:scale-110"
               />
-            </button>
-          ))}
+            )}
+          </div>
+          {/* Thumbnails */}
+          <div className="gap-3 mt-12 flex justify-start flex-wrap">
+            {product?.images?.map((image, index) => (
+              <button
+                key={index}
+                type="button"
+                className={`border-2 rounded-md p-1 transition ${
+                  selectedImage === image.url
+                    ? 'border-green-800'
+                    : 'border-gray-300'
+                }`}
+                onClick={() => setSelectedImage(image.url)}
+              >
+                <Image
+                  src={image.url}
+                  alt={`Thumbnail ${index + 1}`}
+                  width={100}
+                  height={100}
+                  className="rounded-md cursor-pointer object-cover"
+                />
+              </button>
+            ))}
+          </div>
+
+          {/* Vendor Profile */}
+          <div className="mt-12 hidden lg:block">
+            <div className="flex items-center gap-3">
+              <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
+                <AvatarImage src={product?.user?.image} />
+                <AvatarFallback>
+                  {product?.user?.fullName?.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-lg">{product?.user?.fullName}</p>
+                <p className="flex items-center gap-1">
+                  {' '}
+                  <MapPin /> <span>{product?.user?.country}</span>
+                </p>
+              </div>
+            </div>
+
+            <Button className="w-1/2 text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
+              <Plus className="w-5 h-5" />
+              <span className="uppercase text-sm font-semibold">Follow</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Product Info */}
+        <div className="mt-5 lg:mt-0">
+          {/* Product first part */}
+          <div className="mb-6">
+            <h2>
+              {product?.discountPrice && (
+                <span className="bg-[#FCE9EACC] text-[#5F1011] p-3 rounded font-semibold uppercase">
+                  Special Offer
+                </span>
+              )}
+            </h2>
+
+            <div className="flex items-center gap-2 mt-5">
+              <StarRatings
+                rating={4.5}
+                starRatedColor="#E8B006"
+                name="rating"
+                starSpacing="1px"
+                starDimension="24px"
+              />
+              <p className="text-[#6B7280] text-base">(4.0/128 reviews)</p>
+            </div>
+
+            <h1 className="text-2xl text-[#212529] my-3">{product?.name}</h1>
+
+            <div>
+              {/* Original Price */}
+              <div className="flex items-center">
+                <p
+                  className={`text-xl font-medium ${
+                    discountPercent > 0
+                      ? 'text-gray-500 line-through pr-3'
+                      : 'text-gray-800'
+                  }`}
+                >
+                  ${price.toFixed(2)}
+                </p>
+                {product?.discountPrice && (
+                  <span className="text-sm font-semibold text-[#E12728] uppercase italic">
+                    {product?.discountPrice} Off
+                  </span>
+                )}
+              </div>
+
+              {/* Discounted Price */}
+              {discountPercent > 0 && (
+                <p className="text-2xl font-semibold text-gray-800 mt-1">
+                  ${discountedPrice.toFixed(2)}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Product second part  */}
+          <div>
+            <div className="my-2 font-medium flex justify-between items-center p-5 border-t">
+              <span>Product Code</span>
+              <span className="font-medium">{product?.productCode}</span>
+            </div>
+
+            <div className="my-2 font-medium flex justify-between items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5">
+              <span>Product Type</span>
+              <span className="font-medium">{product?.productType}</span>
+            </div>
+
+            <div className="my-2 font-medium flex justify-between items-center p-5">
+              <span>Size</span>
+              <span className="font-medium">{product?.size}</span>
+            </div>
+
+            <div className="my-2 font-medium flex justify-between items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5">
+              <span>Product Colors</span>
+              <div className="flex gap-2 flex-wrap">
+                {product?.colors?.map((color: string, index: number) => (
+                  <span
+                    key={index}
+                    className="rounded-full text-sm font-medium border capitalize"
+                    style={{ backgroundColor: color, color: '#fff' }}
+                  >
+                    {color}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity & Stock */}
+            <div className="my-2 font-medium flex justify-between items-center p-5">
+              <div className="flex items-center gap-1">
+                <p className="text-gray-600 text-base mr-2">Quantity </p>
+                <Button
+                  onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}
+                  variant="outline"
+                  className="size-8 rounded-sm bg-white"
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <p className="font-medium text-lg p-2">{quantity}</p>
+                <Button
+                  onClick={() => setQuantity(quantity + 1)}
+                  variant="outline"
+                  className="size-8 rounded-sm bg-white"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
+                Status: {product?.status}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <Button className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-6 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
+              <ShoppingCart className="w-6 h-6" />
+              <span className="uppercase text-sm font-semibold">
+                Add to cart
+              </span>
+            </Button>
+
+            <Button className="w-full text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
+              <Send className="w-5 h-5" />
+              <span className="uppercase text-sm font-semibold">Message</span>
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Listing Info */}
-      <div className="mt-5 lg:mt-0">
-        <h2 className="font-bold text-xl mb-4">{product?.name}</h2>
-        {/* <p className="text-justify text-gray-500 font-light text-sm">
-                    {isReadMore
-                        ? product?.description.slice(0, 200) + '...'
-                        : product?.description}
-                    <span onClick={toggleReadMore} className="inline">
-                        {isReadMore ? (
-                            <span className="link font-semibold text-primary cursor-pointer">
-                                more?
-                            </span>
-                        ) : (
-                            <span className="link font-semibold text-primary ms-1 cursor-pointer">
-                                less
-                            </span>
-                        )}
-                    </span>
-                </p> */}
-        <div className="flex items-center justify-between my-5 text-gray-500 text-xs">
-          <p className="rounded-full px-4 py-1 bg-gray-100 flex items-center justify-center gap-1">
-            <Star className="w-4 h-4" fill="orange" stroke="orange" />
-            {5} Ratings
-          </p>
-          <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
-            Status: {product?.status}
-          </p>
-          <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
-            Highlight Status: {product?.highlightStatus}
-          </p>
-        </div>
-        <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
-          <span>Product Type</span>
-          <span className="font-medium">{product?.productType}</span>
-        </p>
-        <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
-          <span>Product Name</span>
-          <span className="font-medium">{product?.name}</span>
-        </p>
-        <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
-          <span>Price</span>
-          <span className="font-medium">${product?.price}</span>
-        </p>
-        <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
-          <span>Discount</span>
-          <span className="font-medium">{product?.discountPrice}</span>
-        </p>
-        <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
-          <span>Size</span>
-          <span className="font-medium">{product?.size}</span>
-        </p>
-        <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
-          <span>Product Colors</span>
-          <div className="flex gap-2 mt-1 flex-wrap">
-            {product?.colors?.map((color: string, index: number) => (
-              <span
-                key={index}
-                className="px-3 py-1 rounded-full text-sm font-medium border capitalize"
-                style={{ backgroundColor: color, color: '#fff' }}
-              >
-                {color}
-              </span>
-            ))}
-          </div>
-        </p>
-
-        <div className="flex items-end justify-end">
-          <AppButton
-            className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white"
-            content={
-              <Link
-                href={`/`}
-                className="flex justify-center items-center space-x-1 font-semibold"
-              >
-                <span className="uppercase text-sm font-semibold">
-                  Edit Product
-                </span>
-                {/* <ArrowRight /> */}
-              </Link>
-            }
-          />
-        </div>
+      {/* Description */}
+      <div className="mt-10">
+        <h5 className="text-lg font-medium uppercase border-b py-1">
+          Description
+        </h5>
+        <p className="mt-2 text-base text-gray-500">{product?.description}</p>
       </div>
     </div>
   );

@@ -24,6 +24,13 @@ const ViewProduct = ({ productId }: Props) => {
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  // When data is loaded, set the first image as default
+  useEffect(() => {
+    if (product?.images?.length) {
+      setSelectedImage(product.images[0].url);
+    }
+  }, [product]);
+
   const [isReadMore, setIsReadMore] = useState<boolean>(true);
 
   const toggleReadMore = () => {
@@ -47,27 +54,30 @@ const ViewProduct = ({ productId }: Props) => {
               alt="Product Image"
               width={400}
               height={400}
-              className="rounded"
+              className="rounded object-contain"
             />
           )}
         </div>
-        <div className="gap-3 mt-12 flex justify-start">
+
+        {/* Thumbnails */}
+        <div className="gap-3 mt-12 flex justify-start flex-wrap">
           {product?.images?.map((image, index) => (
             <button
               key={index}
-              className={`border-2 rounded-md p-1 ${
+              type="button"
+              className={`border-2 rounded-md p-1 transition ${
                 selectedImage === image.url
-                  ? 'border-[#093954]'
+                  ? 'border-green-700'
                   : 'border-gray-300'
               }`}
               onClick={() => setSelectedImage(image.url)}
             >
               <Image
                 src={image.url}
-                alt="Thumbnail"
+                alt={`Thumbnail ${index + 1}`}
                 width={100}
                 height={100}
-                className="rounded-md cursor-pointer"
+                className="rounded-md cursor-pointer object-cover"
               />
             </button>
           ))}
@@ -77,61 +87,47 @@ const ViewProduct = ({ productId }: Props) => {
       {/* Listing Info */}
       <div className="mt-5 lg:mt-0">
         <h2 className="font-bold text-xl mb-4">{product?.name}</h2>
-        <p className="text-justify text-gray-500 font-light text-sm">
-          {isReadMore
-            ? product?.description.slice(0, 200) + '...'
-            : product?.description}
-          <span onClick={toggleReadMore} className="inline">
-            {isReadMore ? (
-              <span className="link font-semibold text-primary cursor-pointer">
-                more?
-              </span>
-            ) : (
-              <span className="link font-semibold text-primary ms-1 cursor-pointer">
-                less
-              </span>
-            )}
-          </span>
-        </p>
+
         <div className="flex items-center justify-between my-5 text-gray-500 text-xs">
-          <p className="rounded-full px-4 py-1 bg-gray-100 flex items-center justify-center gap-1">
+          <div className="rounded-full px-4 py-1 bg-gray-100 flex items-center justify-center gap-1">
             <Star className="w-4 h-4" fill="orange" stroke="orange" />
             {5} Ratings
-          </p>
-          <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
+          </div>
+          <div className="rounded-full px-4 py-1 bg-gray-100 capitalize">
             Status: {product?.status}
-          </p>
-          <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
+          </div>
+          <div className="rounded-full px-4 py-1 bg-gray-100 capitalize">
             Highlight Status: {product?.highlightStatus}
-          </p>
+          </div>
         </div>
+
         <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
+        <div className="my-2 font-medium flex justify-between items-center">
           <span>Product Type</span>
           <span className="font-medium">{product?.productType}</span>
-        </p>
+        </div>
         <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
+        <div className="my-2 font-medium flex justify-between items-center">
           <span>Product Name</span>
           <span className="font-medium">{product?.name}</span>
-        </p>
+        </div>
         <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
+        <div className="my-2 font-medium flex justify-between items-center">
           <span>Price</span>
           <span className="font-medium">${product?.price}</span>
-        </p>
+        </div>
         <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
+        <div className="my-2 font-medium flex justify-between items-center">
           <span>Discount</span>
           <span className="font-medium">{product?.discountPrice}</span>
-        </p>
+        </div>
         <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
+        <div className="my-2 font-medium flex justify-between items-center">
           <span>Size</span>
           <span className="font-medium">{product?.size}</span>
-        </p>
+        </div>
         <hr />
-        <p className="my-2 font-medium flex justify-between items-center">
+        <div className="my-2 font-medium flex justify-between items-start">
           <span>Product Colors</span>
           <div className="flex gap-2 mt-1 flex-wrap">
             {product?.colors?.map((color: string, index: number) => (
@@ -144,7 +140,7 @@ const ViewProduct = ({ productId }: Props) => {
               </span>
             ))}
           </div>
-        </p>
+        </div>
 
         <div className="flex items-end justify-end">
           <AppButton

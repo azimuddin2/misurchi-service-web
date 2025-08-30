@@ -2,7 +2,7 @@ import ServiceDetails from '../_component';
 
 const ServiceDetailsPage = ({ params }: { params: { id: string } }) => {
   return (
-    <div>
+    <div className="max-w-7xl mx-auto px-3 lg:px-5">
       <ServiceDetails serviceId={params.id} />
     </div>
   );
