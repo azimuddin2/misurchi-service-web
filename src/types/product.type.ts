@@ -15,6 +15,8 @@ export type TProduct = {
   status: 'Available' | 'Out of Stock' | 'TBC' | 'Discontinued';
   highlightStatus: string;
   description: string;
+  reviews?: string[]; // can store populated reviews
+  avgRating?: number;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;

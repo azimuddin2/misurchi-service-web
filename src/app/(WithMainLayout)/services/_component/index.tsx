@@ -8,6 +8,9 @@ import { ArrowRight, MapPin, Plus, Send } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
+import AddReview from './add-review';
+import ViewReviews from './view-reviews';
+import { Progress } from '@/components/ui/progress';
 
 type Props = {
   serviceId: string;
@@ -115,13 +118,15 @@ const ServiceDetails = ({ serviceId }: Props) => {
 
             <div className="flex items-center gap-2 mt-5">
               <StarRatings
-                rating={4.5}
+                rating={service?.avgRating}
                 starRatedColor="#E8B006"
                 name="rating"
                 starSpacing="1px"
                 starDimension="24px"
               />
-              <p className="text-[#6B7280] text-base">(4.0/128 reviews)</p>
+              <p className="text-[#6B7280] text-base">
+                ({service?.avgRating} / {service?.reviews?.length} reviews)
+              </p>
             </div>
 
             <h1 className="text-2xl text-[#212529] my-3">{service?.name}</h1>
@@ -212,6 +217,47 @@ const ServiceDetails = ({ serviceId }: Props) => {
         </h5>
         <p className="mt-2 text-base text-gray-500">{service?.description}</p>
       </div>
+
+      <div className="lg:flex my-10 gap-4">
+        {/* Average rating */}
+        <div className="lg:w-4/12 bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
+          <h2 className="text-2xl mb-2">Average Rating</h2>
+          <div className="flex items-center gap-2 mt-5">
+            <StarRatings
+              rating={service?.avgRating}
+              starRatedColor="#E8B006"
+              name="rating"
+              starSpacing="1px"
+              starDimension="24px"
+            />
+            <p className="text-[#6B7280] text-base">
+              ({service?.avgRating} / {service?.reviews?.length} reviews)
+            </p>
+          </div>
+
+          <div className="mt-5 space-y-2">
+            {[5, 4, 3, 2, 1].map((star) => (
+              <div key={star} className="flex items-center gap-3">
+                <span className="w-4 text-sm font-medium text-gray-700">
+                  {star}
+                </span>
+                <Progress
+                  value={0}
+                  className="flex-1 h-1 bg-gray-200 rounded-full"
+                />
+                <span className="w-10 text-sm text-gray-600">{0}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Add Review */}
+        <div className="lg:w-3/4">
+          <AddReview serviceId={serviceId} />
+        </div>
+      </div>
+
+      <ViewReviews serviceId={serviceId} />
     </div>
   );
 };

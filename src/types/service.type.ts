@@ -50,6 +50,9 @@ export type TService = {
     weeklySchedule: Partial<Record<TWeekDay, TDaySchedule>>; // not all days required
   };
 
+  reviews?: string[]; // can store populated reviews
+  avgRating?: number;
+
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;

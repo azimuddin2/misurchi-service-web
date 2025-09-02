@@ -90,15 +90,17 @@ const ProductCard = ({ product }: ProductProps) => {
         </div>
 
         <div>
-          <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2 mt-5">
             <StarRatings
-              rating={4}
+              rating={product?.avgRating}
               starRatedColor="#E8B006"
               name="rating"
               starSpacing="1px"
-              starDimension="20px"
+              starDimension="24px"
             />
-            <p className="text-[#6B7280]">(4.0/128 reviews)</p>
+            <p className="text-[#6B7280] text-base">
+              ({product?.avgRating} / {product?.reviews?.length} reviews)
+            </p>
           </div>
           <p className="flex items-center mt-3">
             <MapPin className="text-[#6B7280] mr-1" />

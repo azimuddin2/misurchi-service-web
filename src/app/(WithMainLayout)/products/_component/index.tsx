@@ -10,6 +10,8 @@ import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
 import AddReview from './add-review';
 import ViewReviews from './view-reviews';
+import Spinner from '@/components/shared/Spinner';
+import { Progress } from '@/components/ui/progress';
 
 type Props = {
   productId: string;
@@ -37,6 +39,10 @@ const ProductDetails = ({ productId }: Props) => {
 
   // Calculate discounted price
   const discountedPrice = price - (price * discountPercent) / 100;
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="my-20">
@@ -117,13 +123,15 @@ const ProductDetails = ({ productId }: Props) => {
 
             <div className="flex items-center gap-2 mt-5">
               <StarRatings
-                rating={4.5}
+                rating={product?.avgRating}
                 starRatedColor="#E8B006"
                 name="rating"
                 starSpacing="1px"
                 starDimension="24px"
               />
-              <p className="text-[#6B7280] text-base">(4.0/128 reviews)</p>
+              <p className="text-[#6B7280] text-base">
+                ({product?.avgRating} / {product?.reviews?.length} reviews)
+              </p>
             </div>
 
             <h1 className="text-2xl text-[#212529] my-3">{product?.name}</h1>
@@ -242,16 +250,33 @@ const ProductDetails = ({ productId }: Props) => {
       <div className="lg:flex my-10 gap-4">
         {/* Average rating */}
         <div className="lg:w-4/12 bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
-          <h2 className="text-2xl mb-2">Average rating</h2>
-          <div className="flex items-center gap-2">
+          <h2 className="text-2xl mb-2">Average Rating</h2>
+          <div className="flex items-center gap-2 mt-5">
             <StarRatings
-              rating={4.5}
+              rating={product?.avgRating}
               starRatedColor="#E8B006"
               name="rating"
               starSpacing="1px"
-              starDimension="22px"
+              starDimension="24px"
             />
-            <p className="text-[#6B7280] text-base">(4.0/128 reviews)</p>
+            <p className="text-[#6B7280] text-base">
+              ({product?.avgRating} / {product?.reviews?.length} reviews)
+            </p>
+          </div>
+
+          <div className="mt-5 space-y-2">
+            {[5, 4, 3, 2, 1].map((star) => (
+              <div key={star} className="flex items-center gap-3">
+                <span className="w-4 text-sm font-medium text-gray-700">
+                  {star}
+                </span>
+                <Progress
+                  value={60}
+                  className="flex-1 h-1 bg-gray-200 rounded-full"
+                />
+                <span className="w-10 text-sm text-gray-600">{60}%</span>
+              </div>
+            ))}
           </div>
         </div>
 
