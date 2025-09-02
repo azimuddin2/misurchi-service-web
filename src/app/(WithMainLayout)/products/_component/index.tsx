@@ -8,6 +8,8 @@ import { MapPin, Minus, Plus, Send, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
+import AddReview from './add-review';
+import ViewReviews from './view-reviews';
 
 type Props = {
   productId: string;
@@ -235,6 +237,31 @@ const ProductDetails = ({ productId }: Props) => {
         </h5>
         <p className="mt-2 text-base text-gray-500">{product?.description}</p>
       </div>
+
+      {/* Review section */}
+      <div className="lg:flex my-10 gap-4">
+        {/* Average rating */}
+        <div className="lg:w-4/12 bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
+          <h2 className="text-2xl mb-2">Average rating</h2>
+          <div className="flex items-center gap-2">
+            <StarRatings
+              rating={4.5}
+              starRatedColor="#E8B006"
+              name="rating"
+              starSpacing="1px"
+              starDimension="22px"
+            />
+            <p className="text-[#6B7280] text-base">(4.0/128 reviews)</p>
+          </div>
+        </div>
+
+        {/* Add Review */}
+        <div className="lg:w-3/4">
+          <AddReview productId={productId} />
+        </div>
+      </div>
+
+      <ViewReviews productId={productId} />
     </div>
   );
 };
