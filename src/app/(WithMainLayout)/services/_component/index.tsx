@@ -11,6 +11,7 @@ import StarRatings from 'react-star-ratings';
 import AddReview from './add-review';
 import ViewReviews from './view-reviews';
 import { Progress } from '@/components/ui/progress';
+import Link from 'next/link';
 
 type Props = {
   serviceId: string;
@@ -197,10 +198,14 @@ const ServiceDetails = ({ serviceId }: Props) => {
           </div>
 
           <div>
-            <Button className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-6 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
-              <span className="uppercase text-sm font-semibold">Schedule</span>
-              <ArrowRight />
-            </Button>
+            <Link href={`/schedule/${service?._id}`}>
+              <Button className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-6 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
+                <span className="uppercase text-sm font-semibold">
+                  Schedule
+                </span>
+                <ArrowRight />
+              </Button>
+            </Link>
 
             <Button className="w-full text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
               <span className="uppercase text-sm font-semibold">Message</span>

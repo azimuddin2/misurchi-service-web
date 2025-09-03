@@ -14,6 +14,17 @@ const serviceApi = baseApi.injectEndpoints({
       invalidatesTags: ['Service'],
     }),
 
+    getServiceAvailability: builder.query<
+      TResponse<any>,
+      { serviceId: string; date: string }
+    >({
+      query: ({ serviceId, date }) => ({
+        url: `/services/availability?serviceId=${encodeURIComponent(serviceId)}&date=${date}`,
+        method: 'GET',
+      }),
+      providesTags: ['Service'],
+    }),
+
     getAllServices: builder.query<
       TResponse<TService[]>,
       {
@@ -159,4 +170,5 @@ export const {
   useUpdateServiceStatusMutation,
   useServiceHighlightStatusMutation,
   useDeleteServiceMutation,
+  useGetServiceAvailabilityQuery,
 } = serviceApi;
