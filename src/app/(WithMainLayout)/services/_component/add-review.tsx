@@ -52,7 +52,7 @@ const AddReview = ({ serviceId }: Props) => {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const reviewData: any = {
       user: user?.userId,
-      product: serviceId,
+      service: serviceId,
       rating,
       ...data,
     };

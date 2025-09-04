@@ -7,6 +7,14 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+.data-\[selected-single\=true\]\:bg-primary {
+  &[data-selected-single="true"] {
+    @apply bg-gradient-to-t from-green-500/70 to-green-800 text-white;
+    border-radius: 100%;
+  }
+}
+
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -122,6 +130,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

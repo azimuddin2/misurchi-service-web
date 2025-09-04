@@ -1,51 +1,66 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   useGetServiceAvailabilityQuery,
   useGetServiceByIdQuery,
 } from '@/redux/features/service/serviceApi';
-import { TService } from '@/types/service.type';
+import { TServiceSlots, TSlot } from '@/types/service.type';
+import Spinner from '@/components/shared/Spinner';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 type Props = {
   id: string;
 };
 
 const Schedule = ({ id }: Props) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const router = useRouter();
+
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date(),
+  );
   const [selectedSlot, setSelectedSlot] = useState<{
     serviceItemId: string;
     time: string;
   } | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: serviceData } = useGetServiceByIdQuery(id);
-  const service: TService | undefined = serviceData?.data;
-  const serviceId = service?.serviceId;
+  const serviceId = serviceData?.data?.serviceId;
+  const serviceName = serviceData?.data?.name;
 
-  const date = selectedDate.toISOString().split('T')[0];
+  // Format date in local timezone as YYYY-MM-DD
+  const formattedDate = selectedDate?.toLocaleDateString('en-CA') || '';
 
   const { data, isLoading, error, refetch } = useGetServiceAvailabilityQuery(
-    { serviceId: serviceId!, date },
+    { serviceId: serviceId!, date: formattedDate },
     { skip: !serviceId || !selectedDate },
   );
 
+  // Refetch when serviceId or selectedDate changes
   useEffect(() => {
     if (serviceId && selectedDate) refetch();
   }, [serviceId, selectedDate, refetch]);
 
   // Group services by duration
-  const durationGroups =
-    data?.data?.reduce(
-      (acc: Record<string, any[]>, serviceItem: any) => {
-        if (!acc[serviceItem.duration]) acc[serviceItem.duration] = [];
-        acc[serviceItem.duration].push(serviceItem);
-        return acc;
-      },
-      {} as Record<string, any[]>,
-    ) || {};
+  const durationGroups: Record<string, TServiceSlots[]> = useMemo(() => {
+    return (
+      data?.data?.reduce(
+        (acc: Record<string, TServiceSlots[]>, serviceItem: TServiceSlots) => {
+          if (!acc[serviceItem.duration]) acc[serviceItem.duration] = [];
+          acc[serviceItem.duration].push(serviceItem);
+          return acc;
+        },
+        {},
+      ) || {}
+    );
+  }, [data]);
 
   // Default duration selection
   useEffect(() => {
@@ -54,51 +69,89 @@ const Schedule = ({ id }: Props) => {
     }
   }, [durationGroups, selectedDuration]);
 
+  const handleProceed = () => {
+    if (
+      !selectedSlot ||
+      !selectedDuration ||
+      !selectedDate ||
+      !serviceId ||
+      !serviceName
+    ) {
+      toast.error('Please select a slot and duration before proceeding!');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const price =
+      durationGroups[selectedDuration].find(
+        (s) => s.serviceItemId === selectedSlot.serviceItemId,
+      )?.finalPrice ?? '0';
+
+    const bookingData = {
+      serviceId,
+      serviceName,
+      serviceItemId: selectedSlot.serviceItemId,
+      duration: selectedDuration,
+      slotTime: selectedSlot.time,
+      date: formattedDate,
+      price: price.toString(),
+    };
+
+    toast.success('Proceeding to checkout...');
+
+    // Navigate to booking page with query params
+    const queryString = new URLSearchParams(
+      bookingData as Record<string, string>,
+    ).toString();
+    router.push(`/booking?${queryString}`);
+    setIsSubmitting(false);
+  };
+
+  if (isLoading) return <Spinner />;
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Select a Date & Time Slot</h1>
+      <h1 className="text-2xl font-medium mb-4">Select a Date & Time Slot</h1>
 
       {/* Calendar */}
-
-      <div className="mb-6 mx-auto bg-white shadow rounded-xl p-6 w-full max-w-2xl">
+      <div className="mb-6 bg-white w-full lg:max-w-sm">
         <Calendar
           mode="single"
           selected={selectedDate}
           onSelect={setSelectedDate}
           initialFocus
-          showOutsideDays={true}
-          modifiersClassNames={{
-            selected:
-              'bg-green-600 text-white font-semibold shadow-lg rounded-full',
-            today: 'border-2 border-green-600 font-semibold rounded-full',
-          }}
+          showOutsideDays
           classNames={{
-            day: 'flex-1 aspect-square flex items-center justify-center rounded-full text-sm font-medium transition-all duration-200 hover:bg-green-100 cursor-pointer',
+            day: 'flex-1 aspect-square flex items-center justify-center rounded-md text-xs font-medium transition-all duration-200 hover:bg-green-100 cursor-pointer p-0 m-0',
             head_cell:
-              'flex-1 text-center text-gray-500 font-semibold text-sm h-10 flex items-center justify-center',
+              'flex-1 text-center text-gray-500 font-semibold text-base h-10 flex items-center justify-center',
             row: 'flex w-full mt-1',
             cell: 'flex-1 flex items-center justify-center',
             caption: 'text-center font-bold text-lg mb-4',
             nav_button: 'px-3 py-1 rounded-md hover:bg-green-100 transition',
           }}
-          className="w-full" // 👈 Add fixed height here
+          modifiersClassNames={{
+            // selected: '!bg-green-600 !text-white !rounded-md !shadow-md',
+            today: '!border-2 !border-green-600 !rounded-full !font-bold',
+          }}
+          className="w-full"
         />
       </div>
 
-      {/* Loading/Error */}
-      {isLoading && <p className="text-gray-500">Loading...</p>}
+      {/* Error */}
       {error && <p className="text-red-500">Failed to load availability</p>}
 
-      {/* Duration selector (cards instead of tabs) */}
-      <div className="flex gap-4 mb-6">
+      {/* Duration selector */}
+      <div className="lg:flex gap-4 mt-12">
         {Object.entries(durationGroups).map(([duration, services]) => {
           const price = services[0]?.finalPrice;
           return (
             <Card
               key={duration}
-              className={`flex-1 cursor-pointer transition ${
+              className={`flex-1 cursor-pointer rounded-lg transition mb-3 lg:mb-0 ${
                 selectedDuration === duration
-                  ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white shadow-lg'
+                  ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white shadow'
                   : 'bg-white hover:bg-gray-50'
               }`}
               onClick={() => setSelectedDuration(duration)}
@@ -124,21 +177,16 @@ const Schedule = ({ id }: Props) => {
       {selectedDuration &&
         durationGroups[selectedDuration]?.map((serviceItem) => (
           <div key={serviceItem.serviceItemId} className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">
-              {serviceItem.name} — {serviceItem.duration} ($
-              {serviceItem.finalPrice})
-            </h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              {serviceItem.slots.map((slot: any) => (
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 my-8">
+              {serviceItem.slots.map((slot: TSlot) => (
                 <Card
                   key={slot.time}
-                  className={`p-4 cursor-pointer ${
+                  className={`p-4 capitalize rounded ${
                     selectedSlot?.serviceItemId === serviceItem.serviceItemId &&
                     selectedSlot.time === slot.time
-                      ? 'border-2 border-blue-500'
+                      ? 'border-2 border-green-500'
                       : ''
-                  } ${slot.status !== 'available' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  } ${slot.status !== 'available' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   onClick={() =>
                     slot.status === 'available' &&
                     setSelectedSlot({
@@ -147,15 +195,21 @@ const Schedule = ({ id }: Props) => {
                     })
                   }
                 >
-                  <CardContent>
+                  <CardContent className="text-center">
                     <p>{slot.time}</p>
-                    <p>Status: {slot.status}</p>
                   </CardContent>
                 </Card>
               ))}
             </div>
           </div>
         ))}
+
+      {/* No slots message */}
+      {selectedDuration && durationGroups[selectedDuration]?.length === 0 && (
+        <p className="text-gray-500 mt-4">
+          No slots available for this duration.
+        </p>
+      )}
 
       {/* Selected Slot */}
       {selectedSlot && (
@@ -164,6 +218,17 @@ const Schedule = ({ id }: Props) => {
           {selectedSlot.serviceItemId})
         </div>
       )}
+
+      <Button
+        disabled={selectedSlot == null || isSubmitting}
+        onClick={handleProceed}
+        className="mt-6 w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-6 cursor-pointer text-sm shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500"
+      >
+        <span className="uppercase text-sm font-semibold">
+          {isSubmitting ? 'Processing...' : 'Proceed to Check out'}
+        </span>
+        <ArrowRight />
+      </Button>
     </div>
   );
 };

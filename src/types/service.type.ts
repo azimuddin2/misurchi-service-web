@@ -58,3 +58,17 @@ export type TService = {
   updatedAt: string;
   __v: number;
 };
+
+// Availability part
+export type TSlot = {
+  time: string;
+  status: 'available' | 'booked';
+};
+
+export type TServiceSlots = {
+  serviceItemId: string;
+  name: string;
+  duration: string;
+  finalPrice: string;
+  slots: TSlot[];
+};
