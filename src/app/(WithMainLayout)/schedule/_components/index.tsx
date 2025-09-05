@@ -33,6 +33,7 @@ const Schedule = ({ id }: Props) => {
 
   const { data: serviceData } = useGetServiceByIdQuery(id);
   const serviceId = serviceData?.data?.serviceId;
+  const service = serviceData?.data?._id;
   const serviceName = serviceData?.data?.name;
 
   // Format date in local timezone as YYYY-MM-DD
@@ -75,6 +76,7 @@ const Schedule = ({ id }: Props) => {
       !selectedDuration ||
       !selectedDate ||
       !serviceId ||
+      !service ||
       !serviceName
     ) {
       toast.error('Please select a slot and duration before proceeding!');
@@ -90,6 +92,7 @@ const Schedule = ({ id }: Props) => {
 
     const bookingData = {
       serviceId,
+      service,
       serviceName,
       serviceItemId: selectedSlot.serviceItemId,
       duration: selectedDuration,
@@ -98,7 +101,7 @@ const Schedule = ({ id }: Props) => {
       price: price.toString(),
     };
 
-    toast.success('Proceeding to checkout...');
+    // toast.success('Proceeding to checkout...');
 
     // Navigate to booking page with query params
     const queryString = new URLSearchParams(

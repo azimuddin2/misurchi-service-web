@@ -1,7 +1,5 @@
 'use client';
 
-import { AppButton } from '@/components/shared/app-button';
-import { ArrowRight } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import {
   Form,
@@ -15,18 +13,21 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { PaymentModal } from './payment-modal';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { bookingSchema } from './bookingValidation';
 
 const Booking = () => {
   const user = useAppSelector(selectCurrentUser);
   const searchParams = useSearchParams();
 
   const serviceId = searchParams.get('serviceId');
+  const service = searchParams.get('service');
   const serviceName = searchParams.get('serviceName');
-  const serviceItemId = searchParams.get('serviceItemId');
+  const duration = searchParams.get('duration');
   const date = searchParams.get('date');
   const time = searchParams.get('slotTime');
-  const duration = searchParams.get('duration');
-  const price = searchParams.get('price');
+  const price = Number(searchParams.get('price')) || 0;
 
   const formattedDate = date
     ? new Date(date).toLocaleDateString('en-GB', {
@@ -37,14 +38,29 @@ const Booking = () => {
     : '';
 
   const form = useForm({
-    // resolver: zodResolver(userSignupSchema),
+    resolver: zodResolver(bookingSchema),
+    defaultValues: {
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: '', // ✅ must be string
+      serviceName: serviceName || '',
+      duration: duration || '',
+      price: price.toString() || '', // string if your schema expects string
+      date: formattedDate || '',
+      time: time || '',
+      paymentType: 'full',
+    },
   });
 
-  const {
-    formState: { isSubmitting },
-  } = form;
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const modifyData = {
+      service,
+      ...data,
+    };
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {};
+    console.log('Booking submitted:', modifyData);
+    // Send to backend API here...
+  };
 
   return (
     <div className="shadow p-5 lg:p-10 rounded">
@@ -58,15 +74,12 @@ const Booking = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Full Name
-                  </FormLabel>
+                  <FormLabel>Full Name</FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       placeholder="Full Name"
-                      {...field}
-                      value={field.value || user?.name}
+                      {...field} // ✅ this is enough
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
@@ -82,15 +95,12 @@ const Booking = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="!text-gray-700 !text-base font-medium">
-                      Email Address
-                    </FormLabel>
+                    <FormLabel>Email Address</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter your email address"
                         {...field}
-                        value={field.value || user?.email}
+                        value={field.value || user?.email || ''}
                         disabled
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
@@ -106,15 +116,12 @@ const Booking = () => {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="!text-gray-700 !text-base font-medium">
-                      Phone Number
-                    </FormLabel>
+                    <FormLabel>Phone Number</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         placeholder="Enter your phone number"
-                        {...field}
-                        value={field.value || ''}
+                        {...field} // ✅ important
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
@@ -125,66 +132,53 @@ const Booking = () => {
             </div>
           </div>
 
-          {/* service booking info part */}
+          {/* booking info */}
           <div className="space-y-6">
-            {/* Service Name */}
             <FormField
               control={form.control}
               name="serviceName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Service Name
-                  </FormLabel>
+                  <FormLabel>Service Name</FormLabel>
                   <FormControl>
                     <Input
                       type="text"
-                      disabled
-                      placeholder="Enter service name"
                       {...field}
-                      value={field.value || serviceName}
+                      value={field.value || serviceName || ''}
+                      disabled
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Preferred Duration */}
               <FormField
                 control={form.control}
                 name="duration"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="!text-gray-700 !text-base font-medium">
-                      Preferred Duration
-                    </FormLabel>
+                    <FormLabel>Preferred Duration</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
-                        disabled
-                        placeholder="Enter preferred duration"
                         {...field}
-                        value={field.value || duration}
+                        value={field.value || duration || ''}
+                        disabled
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Price */}
               <FormField
                 control={form.control}
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="!text-gray-700 !text-base font-medium">
-                      Price
-                    </FormLabel>
+                    <FormLabel>Price</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
@@ -194,20 +188,16 @@ const Booking = () => {
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Appointment Date */}
               <FormField
                 control={form.control}
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="!text-gray-700 !text-base font-medium">
-                      Appointment Date
-                    </FormLabel>
+                    <FormLabel>Appointment Date</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
@@ -217,47 +207,40 @@ const Booking = () => {
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Appointment Time */}
               <FormField
                 control={form.control}
                 name="time"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="!text-gray-700 !text-base font-medium">
-                      Appointment Time
-                    </FormLabel>
+                    <FormLabel>Appointment Time</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         {...field}
-                        value={field.value || time}
+                        value={field.value || time || ''}
                         disabled
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
           </div>
 
-          {/* Submit Button */}
-          <AppButton
-            className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
-            content={
-              <div className="flex justify-center items-center space-x-2 font-semibold">
-                <p className="uppercase">
-                  {isSubmitting ? 'Processing...' : 'Continue'}
-                </p>
-                <ArrowRight />
-              </div>
-            }
+          {/* Payment Modal Trigger as Submit */}
+          <PaymentModal
+            price={price}
+            onConfirm={(paymentType) => {
+              form.handleSubmit((data) => {
+                // ✅ data will now contain form values
+                onSubmit({ ...data, paymentType });
+              })();
+            }}
           />
         </form>
       </Form>
