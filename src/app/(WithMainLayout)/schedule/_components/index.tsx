@@ -118,27 +118,29 @@ const Schedule = ({ id }: Props) => {
       <h1 className="text-2xl font-medium mb-4">Select a Date & Time Slot</h1>
 
       {/* Calendar */}
-      <div className="mb-6 bg-white w-full lg:max-w-sm">
+      <div className="mb-6 bg-white w-full shadow p-5 rounded-lg">
         <Calendar
           mode="single"
           selected={selectedDate}
           onSelect={setSelectedDate}
           initialFocus
           showOutsideDays
+          className="w-full hover:bg-none"
           classNames={{
-            day: 'flex-1 aspect-square flex items-center justify-center rounded-md text-xs font-medium transition-all duration-200 hover:bg-green-100 cursor-pointer p-0 m-0',
-            head_cell:
-              'flex-1 text-center text-gray-500 font-semibold text-base h-10 flex items-center justify-center',
-            row: 'flex w-full mt-1',
-            cell: 'flex-1 flex items-center justify-center',
-            caption: 'text-center font-bold text-lg mb-4',
-            nav_button: 'px-3 py-1 rounded-md hover:bg-green-100 transition',
+            months:
+              'flex w-full flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 flex-1',
+            month: 'space-y-4 w-full h-full flex flex-col',
+            table: 'w-full h-full border-collapse space-y-1',
+            head_row: 'flex w-full',
+            row: 'flex w-full mt-2 h-14 text-xl',
+            day: `
+      flex-1 h-9 lg:h-12 
+      rounded p-0 font-normal text-2xl 
+      flex items-center justify-center 
+      transition-all duration-200 
+     
+    `,
           }}
-          modifiersClassNames={{
-            // selected: '!bg-green-600 !text-white !rounded-md !shadow-md',
-            today: '!border-2 !border-green-600 !rounded-full !font-bold',
-          }}
-          className="w-full"
         />
       </div>
 
@@ -146,7 +148,7 @@ const Schedule = ({ id }: Props) => {
       {error && <p className="text-red-500">Failed to load availability</p>}
 
       {/* Duration selector */}
-      <div className="lg:flex gap-4 mt-12">
+      <div className="lg:flex gap-4 mt-8">
         {Object.entries(durationGroups).map(([duration, services]) => {
           const price = services[0]?.finalPrice;
           return (
@@ -177,6 +179,7 @@ const Schedule = ({ id }: Props) => {
       </div>
 
       {/* Slots for selected duration */}
+      {/* Slots */}
       {selectedDuration &&
         durationGroups[selectedDuration]?.map((serviceItem) => (
           <div key={serviceItem.serviceItemId} className="mb-6">
@@ -184,19 +187,25 @@ const Schedule = ({ id }: Props) => {
               {serviceItem.slots.map((slot: TSlot) => (
                 <Card
                   key={slot.time}
-                  className={`p-4 capitalize rounded ${
-                    selectedSlot?.serviceItemId === serviceItem.serviceItemId &&
-                    selectedSlot.time === slot.time
-                      ? 'border-2 border-green-500'
-                      : ''
-                  } ${slot.status !== 'available' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                  onClick={() =>
-                    slot.status === 'available' &&
-                    setSelectedSlot({
-                      serviceItemId: serviceItem.serviceItemId,
-                      time: slot.time,
-                    })
-                  }
+                  className={`
+                    p-4 capitalize rounded transition
+                    ${slot.status === 'booked' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white cursor-pointer hover:bg-green-50'}
+                    ${
+                      selectedSlot?.serviceItemId ===
+                        serviceItem.serviceItemId &&
+                      selectedSlot.time === slot.time
+                        ? 'border-2 border-green-500 bg-green-100'
+                        : ''
+                    }
+                  `}
+                  onClick={() => {
+                    if (slot.status === 'available') {
+                      setSelectedSlot({
+                        serviceItemId: serviceItem.serviceItemId,
+                        time: slot.time,
+                      });
+                    }
+                  }}
                 >
                   <CardContent className="text-center">
                     <p>{slot.time}</p>
