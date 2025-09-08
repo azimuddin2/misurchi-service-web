@@ -15,6 +15,9 @@ import {
   LayoutDashboard,
   SendToBack,
   Store,
+  FileText,
+  ClipboardListIcon,
+  NotepadText,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -116,10 +119,16 @@ export default function Header() {
                       <span>Dashboard</span>
                     </DropdownMenuItem>
                   </Link>
-                  <Link href="/user/my-order">
+                  <Link href="/my-order">
                     <DropdownMenuItem className="rounded-[5px] cursor-pointer">
                       <SendToBack />
                       <span>My Order</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/my-bookings">
+                    <DropdownMenuItem className="rounded-[5px] cursor-pointer">
+                      <NotepadText />
+                      <span>My Booking</span>
                     </DropdownMenuItem>
                   </Link>
                 </>

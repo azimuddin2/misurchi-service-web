@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, CalendarDaysIcon, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import noDataImg from '@/assets/images/no-data.jpg';
+import Image from 'next/image';
 
 type Props = {
   id: string;
@@ -163,52 +165,55 @@ const Schedule = ({ id }: Props) => {
       {/* Error */}
       {error && <p className="text-red-500">Failed to load availability</p>}
 
-      {/* Duration selector */}
-      <div className="lg:flex gap-4 mt-8">
-        {Object.entries(durationGroups).map(([duration, services]) => {
-          const price = services[0]?.finalPrice;
-          return (
-            <Card
-              key={duration}
-              className={`flex-1 cursor-pointer rounded-lg transition mb-3 lg:mb-0 ${
-                selectedDuration === duration
-                  ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white shadow'
-                  : 'bg-white hover:bg-gray-50'
-              }`}
-              onClick={() => setSelectedDuration(duration)}
-            >
-              <CardContent className="text-center">
-                <p className="text-2xl font-medium mb-1">{duration}</p>
-                <p
-                  className={
-                    selectedDuration === duration
-                      ? 'text-white text-lg'
-                      : 'text-gray-600 text-lg'
-                  }
-                >
-                  ${price}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      <div>
+        {data?.data.length > 0 ? (
+          <>
+            {/* Duration selector */}
+            <div className="lg:flex gap-4 mt-8">
+              {Object.entries(durationGroups).map(([duration, services]) => {
+                const price = services[0]?.finalPrice;
+                return (
+                  <Card
+                    key={duration}
+                    className={`flex-1 cursor-pointer rounded-lg transition mb-3 lg:mb-0 ${
+                      selectedDuration === duration
+                        ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white shadow'
+                        : 'bg-white hover:bg-gray-50'
+                    }`}
+                    onClick={() => setSelectedDuration(duration)}
+                  >
+                    <CardContent className="text-center">
+                      <p className="text-2xl font-medium mb-1">{duration}</p>
+                      <p
+                        className={
+                          selectedDuration === duration
+                            ? 'text-white text-lg'
+                            : 'text-gray-600 text-lg'
+                        }
+                      >
+                        ${price}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
 
-      {/* Available Time Slots Header */}
-      <p className="flex items-center gap-2 text-lg font-medium text-gray-700 mb-4 mt-8">
-        <Clock size={20} className="text-green-600" />
-        Available Time Slots
-      </p>
+            {/* Available Time Slots Header */}
+            <p className="flex items-center gap-2 text-lg font-medium text-gray-700 mb-4 mt-8">
+              <Clock size={20} className="text-green-600" />
+              Available Time Slots
+            </p>
 
-      {/* Slots for selected duration */}
-      {selectedDuration &&
-        durationGroups[selectedDuration]?.map((serviceItem) => (
-          <div key={serviceItem.serviceItemId} className="mb-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-              {serviceItem.slots.map((slot: TSlot) => (
-                <Card
-                  key={slot.time}
-                  className={`
+            {/* Slots for selected duration */}
+            {selectedDuration &&
+              durationGroups[selectedDuration]?.map((serviceItem) => (
+                <div key={serviceItem.serviceItemId} className="mb-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+                    {serviceItem.slots.map((slot: TSlot) => (
+                      <Card
+                        key={slot.time}
+                        className={`
                     p-4 capitalize rounded transition
                     ${slot.status === 'booked' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white cursor-pointer hover:bg-green-50'}
                     ${
@@ -219,23 +224,39 @@ const Schedule = ({ id }: Props) => {
                         : ''
                     }
                   `}
-                  onClick={() => {
-                    if (slot.status === 'available') {
-                      setSelectedSlot({
-                        serviceItemId: serviceItem.serviceItemId,
-                        time: slot.time,
-                      });
-                    }
-                  }}
-                >
-                  <CardContent className="text-center">
-                    <p>{slot.time}</p>
-                  </CardContent>
-                </Card>
+                        onClick={() => {
+                          if (slot.status === 'available') {
+                            setSelectedSlot({
+                              serviceItemId: serviceItem.serviceItemId,
+                              time: slot.time,
+                            });
+                          }
+                        }}
+                      >
+                        <CardContent className="text-center">
+                          <p>{slot.time}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
               ))}
-            </div>
+          </>
+        ) : (
+          <div>
+            <p className="text-gray-500 mt-4 text-center capitalize">
+              Service not available on this day
+            </p>
+            <Image
+              src={noDataImg}
+              alt="No Data"
+              width={100}
+              height={100}
+              className="mx-auto"
+            />
           </div>
-        ))}
+        )}
+      </div>
 
       {/* No slots message */}
       {selectedDuration && durationGroups[selectedDuration]?.length === 0 && (
