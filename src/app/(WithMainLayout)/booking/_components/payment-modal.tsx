@@ -10,16 +10,16 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { PaymentType } from '@/types/booking.type';
+import { TPaymentType } from '@/types/booking.type';
 import { ArrowRight } from 'lucide-react';
 
 interface PaymentModalProps {
   price: number;
-  onConfirm: (paymentType: PaymentType) => void;
+  onConfirm: (paymentType: TPaymentType) => void;
 }
 
 export function PaymentModal({ price, onConfirm }: PaymentModalProps) {
-  const [selected, setSelected] = useState<PaymentType>('full');
+  const [selected, setSelected] = useState<TPaymentType>('full');
 
   const handleContinue = () => {
     onConfirm(selected);

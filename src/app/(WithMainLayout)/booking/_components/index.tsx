@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Form,
   FormControl,
@@ -16,57 +16,71 @@ import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { PaymentModal } from './payment-modal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { bookingSchema } from './bookingValidation';
+import { toast } from 'sonner';
+import { useAddBookingMutation } from '@/redux/features/booking/bookingApi';
 
 const Booking = () => {
   const user = useAppSelector(selectCurrentUser);
   const searchParams = useSearchParams();
+  const router = useRouter();
 
-  const serviceId = searchParams.get('serviceId');
-  const service = searchParams.get('service');
-  const serviceName = searchParams.get('serviceName');
-  const duration = searchParams.get('duration');
-  const date = searchParams.get('date');
-  const time = searchParams.get('slotTime');
-  const price = Number(searchParams.get('price')) || 0;
-
-  const formattedDate = date
-    ? new Date(date).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      })
-    : '';
+  // ✅ Always provide fallback (never null)
+  const serviceId = searchParams.get('serviceId') ?? '';
+  const service = searchParams.get('service') ?? '';
+  const serviceName = searchParams.get('serviceName') ?? '';
+  const serviceItemId = searchParams.get('serviceItemId') ?? '';
+  const duration = searchParams.get('duration') ?? '';
+  const date = searchParams.get('date') ?? '';
+  const time = searchParams.get('slotTime') ?? '';
+  const price = Number(searchParams.get('price') ?? 0);
 
   const form = useForm({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: '', // ✅ must be string
-      serviceName: serviceName || '',
-      duration: duration || '',
-      price: price.toString() || '', // string if your schema expects string
-      date: formattedDate || '',
-      time: time || '',
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      phone: '',
+      serviceName,
+      duration,
+      price: price.toString(), // ✅ always a string in form state
+      date,
+      time,
       paymentType: 'full',
     },
   });
 
+  const [addBooking] = useAddBookingMutation();
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    const modifyData = {
+    const bookingData = {
       service,
+      serviceId,
+      serviceItemId,
+      date,
       ...data,
+      price: Number(data.price), // ✅ convert when sending
     };
 
-    console.log('Booking submitted:', modifyData);
-    // Send to backend API here...
+    console.log('Booking Data:', bookingData);
+
+    const toastId = toast.loading('Adding Booking...');
+
+    try {
+      const res = await addBooking(bookingData).unwrap();
+      toast.success(res.message || 'Booking added successfully');
+      router.push(`/schedule/${service}`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to add booking');
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   return (
     <div className="shadow p-5 lg:p-10 rounded">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* user info part */}
+          {/* User Info */}
           <div className="space-y-6">
             {/* Full Name */}
             <FormField
@@ -74,12 +88,14 @@ const Booking = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel className="!text-gray-700 !text-base font-medium">
+                    Full Name
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       placeholder="Full Name"
-                      {...field} // ✅ this is enough
+                      {...field}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
@@ -95,17 +111,17 @@ const Booking = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email Address</FormLabel>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Email Address
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="email"
                         {...field}
-                        value={field.value || user?.email || ''}
                         disabled
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -116,12 +132,14 @@ const Booking = () => {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Phone Number
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         placeholder="Enter your phone number"
-                        {...field} // ✅ important
+                        {...field}
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
@@ -132,19 +150,20 @@ const Booking = () => {
             </div>
           </div>
 
-          {/* booking info */}
+          {/* Booking Info */}
           <div className="space-y-6">
             <FormField
               control={form.control}
               name="serviceName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Service Name</FormLabel>
+                  <FormLabel className="!text-gray-700 !text-base font-medium">
+                    Service Name
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="text"
                       {...field}
-                      value={field.value || serviceName || ''}
                       disabled
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
@@ -159,12 +178,13 @@ const Booking = () => {
                 name="duration"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Preferred Duration</FormLabel>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Preferred Duration
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         {...field}
-                        value={field.value || duration || ''}
                         disabled
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
@@ -178,12 +198,13 @@ const Booking = () => {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price</FormLabel>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Price
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         {...field}
-                        value={field.value || price}
                         disabled
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
@@ -197,12 +218,13 @@ const Booking = () => {
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Appointment Date</FormLabel>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Appointment Date
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         {...field}
-                        value={field.value || formattedDate}
                         disabled
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
@@ -216,12 +238,13 @@ const Booking = () => {
                 name="time"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Appointment Time</FormLabel>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Appointment Time
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         {...field}
-                        value={field.value || time || ''}
                         disabled
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
@@ -237,7 +260,6 @@ const Booking = () => {
             price={price}
             onConfirm={(paymentType) => {
               form.handleSubmit((data) => {
-                // ✅ data will now contain form values
                 onSubmit({ ...data, paymentType });
               })();
             }}

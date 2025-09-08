@@ -10,7 +10,7 @@ import {
 import { TServiceSlots, TSlot } from '@/types/service.type';
 import Spinner from '@/components/shared/Spinner';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CalendarDaysIcon, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -30,6 +30,14 @@ const Schedule = ({ id }: Props) => {
   } | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formattedSelectedDate = selectedDate
+    ? selectedDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : '';
 
   const { data: serviceData } = useGetServiceByIdQuery(id);
   const serviceId = serviceData?.data?.serviceId;
@@ -114,11 +122,11 @@ const Schedule = ({ id }: Props) => {
   if (isLoading) return <Spinner />;
 
   return (
-    <div className="p-6">
+    <div className="p-3 lg:p-6">
       <h1 className="text-2xl font-medium mb-4">Select a Date & Time Slot</h1>
 
       {/* Calendar */}
-      <div className="mb-6 bg-white w-full shadow p-5 rounded-lg">
+      <div className="mb-6 bg-white w-full shadow p-1 lg:p-5 rounded-lg">
         <Calendar
           mode="single"
           selected={selectedDate}
@@ -143,6 +151,14 @@ const Schedule = ({ id }: Props) => {
           }}
         />
       </div>
+
+      {/* Selected Date */}
+      {selectedDate && (
+        <div className="flex lg:items-center gap-1 lg:gap-2 text-lg font-medium text-gray-700 mb-6">
+          <CalendarDaysIcon className="text-green-600 w-6 h-6" />
+          <span>Available Service Booking on {formattedSelectedDate}</span>
+        </div>
+      )}
 
       {/* Error */}
       {error && <p className="text-red-500">Failed to load availability</p>}
@@ -178,12 +194,17 @@ const Schedule = ({ id }: Props) => {
         })}
       </div>
 
+      {/* Available Time Slots Header */}
+      <p className="flex items-center gap-2 text-lg font-medium text-gray-700 mb-4 mt-8">
+        <Clock size={20} className="text-green-600" />
+        Available Time Slots
+      </p>
+
       {/* Slots for selected duration */}
-      {/* Slots */}
       {selectedDuration &&
         durationGroups[selectedDuration]?.map((serviceItem) => (
           <div key={serviceItem.serviceItemId} className="mb-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 my-8">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
               {serviceItem.slots.map((slot: TSlot) => (
                 <Card
                   key={slot.time}
@@ -225,7 +246,7 @@ const Schedule = ({ id }: Props) => {
 
       {/* Selected Slot */}
       {selectedSlot && (
-        <div className="mt-4 p-4 border rounded bg-blue-50 text-blue-800">
+        <div className="mt-4 p-4 border-l-4 border-green-500 rounded bg-green-50 text-green-800 font-medium">
           Selected: {selectedSlot.time} (Service ID:{' '}
           {selectedSlot.serviceItemId})
         </div>

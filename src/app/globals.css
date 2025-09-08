@@ -7,32 +7,12 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* Selected single day */
-.data-\[selected-single\=true\]\:bg-primary {
-  &[data-selected-single="true"] {
-    @apply bg-gradient-to-t from-green-500/70 to-green-800 text-white;
-    border-radius: 100%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
+.lg\:h-12 {
+  @media (width >=64rem) {
+    height: calc(var(--spacing) * 12);
+    background: none;
   }
 }
-
-/* Normal hover (keeps working) */
-.rdp-day:hover {
-  @apply bg-green-100 text-green-900;
-  width: 0;
-  height: 0;
-  background-color: none;
-}
-
-/* Prevent hover override on selected date */
-[data-selected-single="true"]:hover {
-  background: linear-gradient(to top, rgb(34 197 94 / 0.7), rgb(22 101 52));
-  color: white;
-}
-
-
 
 @custom-variant dark (&:is(.dark *));
 
