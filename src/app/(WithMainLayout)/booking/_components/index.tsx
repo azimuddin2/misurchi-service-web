@@ -68,7 +68,7 @@ const Booking = () => {
     try {
       const res = await addBooking(bookingData).unwrap();
       toast.success(res.message || 'Booking added successfully');
-      router.push(`/my-bookings`);
+      router.push(`/booking/${res.data?._id}`);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to add booking');
     } finally {

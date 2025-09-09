@@ -26,6 +26,15 @@ const bookingApi = baseApi.injectEndpoints({
       providesTags: ['Booking'],
     }),
 
+    getBookingById: builder.query<TResponse<TBooking>, string>({
+      query: (id) => ({
+        url: `/bookings/${id}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Booking'],
+    }),
+
     deleteBooking: builder.mutation<TResponse<TBooking>, string>({
       query: (id) => ({
         url: `/bookings/${id}`,
@@ -40,5 +49,6 @@ const bookingApi = baseApi.injectEndpoints({
 export const {
   useAddBookingMutation,
   useGetBookingsByEmailQuery,
+  useGetBookingByIdQuery,
   useDeleteBookingMutation,
 } = bookingApi;

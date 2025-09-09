@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const MyBookings = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -79,9 +80,11 @@ const MyBookings = () => {
       header: 'Action',
       cell: ({ row }) => (
         <div className="flex items-center space-x-3">
-          <Button className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer">
-            Pay
-          </Button>
+          <Link href={`/booking/${row.original._id}`}>
+            <Button className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer">
+              Pay
+            </Button>
+          </Link>
         </div>
       ),
     },
