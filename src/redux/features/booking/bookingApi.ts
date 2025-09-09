@@ -4,7 +4,7 @@ import { TBooking } from '@/types/booking.type';
 
 const bookingApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    addBooking: builder.mutation<TResponse<TBooking>, Partial<TBooking>>({
+    addBooking: builder.mutation<TResponse<TBooking>, Partial<any>>({
       query: (bookingData) => ({
         url: '/bookings',
         method: 'POST',
@@ -17,7 +17,7 @@ const bookingApi = baseApi.injectEndpoints({
       invalidatesTags: ['Booking'],
     }),
 
-    getBookingsByEmail: builder.query<TResponse<TBooking>, string>({
+    getBookingsByEmail: builder.query<TResponse<TBooking[]>, string>({
       query: (email) => ({
         url: `/bookings?email=${email}`,
         method: 'GET',

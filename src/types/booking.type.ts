@@ -1,3 +1,5 @@
+import { TService } from './service.type';
+
 export type TPaymentType = 'half' | 'full' | 'later';
 
 export type TBookingStatus =
@@ -10,7 +12,7 @@ export type TPaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
 export type TBooking = {
   _id: string;
   serviceId: string;
-  service: string;
+  service: TService;
   serviceItemId: string;
   name: string;
   email: string;
