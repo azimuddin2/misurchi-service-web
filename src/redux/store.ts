@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './features/auth/authSlice';
+import cartReducer from './features/cart/cartSlice';
 import languageReducer from './features/language/languageSlice';
 
 import {
@@ -20,12 +21,18 @@ const persistConfig = {
   storage,
 };
 
+const persistConfigCart = {
+  key: 'cart',
+  storage,
+};
+
 const persistConfigLanguage = {
   key: 'language',
   storage,
 };
 
 const persistedAuthReducer = persistReducer(persistConfig, authReducer);
+const persistedCartReducer = persistReducer(persistConfigCart, cartReducer);
 const persistedLanguageReducer = persistReducer(
   persistConfigLanguage,
   languageReducer,
@@ -36,6 +43,7 @@ export const makeStore = () => {
     reducer: {
       [baseApi.reducerPath]: baseApi.reducer, // ✅ Add baseApi.reducer
       auth: persistedAuthReducer,
+      cart: persistedCartReducer,
       language: persistedLanguageReducer,
     },
     middleware: (getDefaultMiddleware) =>

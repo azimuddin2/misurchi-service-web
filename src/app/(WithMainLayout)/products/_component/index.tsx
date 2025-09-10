@@ -12,6 +12,9 @@ import AddReview from './add-review';
 import ViewReviews from './view-reviews';
 import Spinner from '@/components/shared/Spinner';
 import { Progress } from '@/components/ui/progress';
+import { useAppDispatch } from '@/redux/hooks';
+import { addToCart } from '@/redux/features/cart/cartSlice';
+import { toast } from 'sonner';
 
 type Props = {
   productId: string;
@@ -39,6 +42,14 @@ const ProductDetails = ({ productId }: Props) => {
 
   // Calculate discounted price
   const discountedPrice = price - (price * discountPercent) / 100;
+
+  const dispatch = useAppDispatch();
+
+  const handleAddtoCart = (product?: TProduct) => {
+    if (!product) return; // guard clause
+    dispatch(addToCart(product));
+    toast.success('Product successfully added to cart.', { duration: 3000 });
+  };
 
   if (isLoading) {
     return <Spinner />;
@@ -223,7 +234,10 @@ const ProductDetails = ({ productId }: Props) => {
           </div>
 
           <div>
-            <Button className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-6 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
+            <Button
+              onClick={() => handleAddtoCart(product)}
+              className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-6 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+            >
               <ShoppingCart className="w-6 h-6" />
               <span className="uppercase text-sm font-semibold">
                 Add to cart

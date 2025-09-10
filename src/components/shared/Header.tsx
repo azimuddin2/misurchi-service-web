@@ -16,6 +16,7 @@ import {
   SendToBack,
   Store,
   NotepadText,
+  ShoppingCart,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -30,6 +31,8 @@ import { NavLink } from '../common/NavLink';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout, selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { selectCartItems } from '@/redux/features/cart/cartSlice';
+import { useRouter } from 'next/navigation';
 
 const TOP_NAV_LINKS = [
   { label: 'Services', href: '/services' },
@@ -46,9 +49,12 @@ const MAIN_NAV_LINKS = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
+
+  const cartItems = useAppSelector(selectCartItems);
+  const cartCount = cartItems.length;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -57,11 +63,21 @@ export default function Header() {
   const ICONS_LINKS = (
     <>
       <Link href="/notifications">
-        <Bell size={20} />
+        <Bell size={24} />
       </Link>
-      <Link href="/cart">
-        <ShoppingBag size={20} />
-      </Link>
+      {user?.role === 'user' && (
+        <li
+          className="relative cursor-pointer mr-5 lg:block hidden"
+          onClick={() => router.push('/cart')}
+        >
+          <ShoppingCart size={24} />
+          {cartCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {cartCount}
+            </span>
+          )}
+        </li>
+      )}
       <div>
         {user?.userId ? (
           <DropdownMenu>

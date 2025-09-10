@@ -68,6 +68,7 @@ export const baseApi = createApi({
   baseQuery: baseQueryWithRefreshToken,
   tagTypes: [
     'User',
+    'Cart',
     'Product',
     'Service',
     'Member',
