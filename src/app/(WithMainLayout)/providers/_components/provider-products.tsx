@@ -5,19 +5,16 @@ import FilterSidebar from '@/components/modules/products/filter-sidebar';
 import Spinner from '@/components/shared/Spinner';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllProductsByUserQuery } from '@/redux/features/product/productApi';
-import { IUser } from '@/types';
 import { TProduct } from '@/types/product.type';
 import { Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 type Props = {
-  user: IUser | undefined;
+  vendorId: string;
 };
 
-const ProviderProducts = ({ user }: Props) => {
-  const userId = user?._id as string;
-
+const ProviderProducts = ({ vendorId }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -30,7 +27,7 @@ const ProviderProducts = ({ user }: Props) => {
   const searchTerm = searchParams.get('searchTerm') || '';
 
   const { data, isLoading } = useGetAllProductsByUserQuery({
-    userId,
+    vendorId,
     page,
     limit,
     query: {

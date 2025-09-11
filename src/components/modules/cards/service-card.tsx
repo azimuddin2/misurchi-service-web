@@ -59,12 +59,14 @@ const ServiceCard = ({ service }: ServiceProps) => {
         <div className="flex justify-between items-center my-2">
           <div className="flex items-center gap-2">
             <Avatar className="w-10 h-10 border-none">
-              <AvatarImage src={service?.user?.image} />
+              <AvatarImage src={service?.vendor?.image} />
               <AvatarFallback className="bg-[#093954] text-white text-2xl">
-                {service?.user?.fullName?.slice(0, 1)}
+                {service?.vendor?.businessName?.slice(0, 1)}
               </AvatarFallback>
             </Avatar>
-            <span>{service?.user?.fullName?.slice(0, 12)}</span>
+            <span className="capitalize">
+              {service?.vendor?.businessName?.slice(0, 12)}
+            </span>
           </div>
 
           <div className="flex items-center">
@@ -89,7 +91,7 @@ const ServiceCard = ({ service }: ServiceProps) => {
         </div>
 
         <div>
-          <div className="flex items-center gap-2 mt-5">
+          <div className="flex items-center justify-between gap-2 mt-5">
             <StarRatings
               rating={service?.avgRating}
               starRatedColor="#E8B006"
@@ -98,12 +100,15 @@ const ServiceCard = ({ service }: ServiceProps) => {
               starDimension="24px"
             />
             <p className="text-[#6B7280] text-base">
-              ({service?.avgRating} / {service?.reviews?.length} reviews)
+              ({service?.avgRating?.toFixed(1)} / {service?.reviews?.length}{' '}
+              reviews)
             </p>
           </div>
           <p className="flex items-center mt-3">
             <MapPin className="text-[#6B7280] mr-1" />
-            <span className="text-[#6B7280]">{service?.user?.country}</span>
+            <span className="text-[#6B7280]">
+              {service?.vendor?.country} {service?.vendor?.state}
+            </span>
           </p>
         </div>
       </div>

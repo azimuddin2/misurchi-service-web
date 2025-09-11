@@ -31,7 +31,7 @@ export interface IUser {
 
 export type TVendorUser = {
   _id: string;
-  userId: string;
+  userId: IUser;
   businessName: string;
   email: string;
   phone: string;

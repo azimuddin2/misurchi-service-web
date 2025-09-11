@@ -15,6 +15,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAppDispatch } from '@/redux/hooks';
 import { addToCart } from '@/redux/features/cart/cartSlice';
 import { toast } from 'sonner';
+import { TReview } from '@/types/review.type';
 
 type Props = {
   productId: string;
@@ -22,7 +23,7 @@ type Props = {
 
 const ProductDetails = ({ productId }: Props) => {
   const [quantity, setQuantity] = useState<number>(1);
-  const { data, isLoading } = useGetProductByIdQuery(productId);
+  const { data, isLoading, refetch } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -42,6 +43,15 @@ const ProductDetails = ({ productId }: Props) => {
 
   // Calculate discounted price
   const discountedPrice = price - (price * discountPercent) / 100;
+
+  const totalReviews = product?.reviews?.length ?? 0;
+
+  const progress = [5, 4, 3, 2, 1].map((star) => {
+    const count =
+      product?.reviews?.filter((r: TReview) => r.rating === star).length ?? 0;
+    const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
+    return { star, count, percentage };
+  });
 
   const dispatch = useAppDispatch();
 
@@ -99,16 +109,19 @@ const ProductDetails = ({ productId }: Props) => {
           <div className="mt-12 hidden lg:block">
             <div className="flex items-center gap-3">
               <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
-                <AvatarImage src={product?.user?.image} />
+                <AvatarImage src={product?.vendor?.image} />
                 <AvatarFallback>
-                  {product?.user?.fullName?.slice(0, 1)}
+                  {product?.vendor?.businessName?.slice(0, 1)}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-lg">{product?.user?.fullName}</p>
+                <p className="text-lg">{product?.vendor?.businessName}</p>
                 <p className="flex items-center gap-1">
                   {' '}
-                  <MapPin /> <span>{product?.user?.country}</span>
+                  <MapPin />{' '}
+                  <span>
+                    {product?.vendor?.country} {product?.vendor.street}
+                  </span>
                 </p>
               </div>
             </div>
@@ -141,7 +154,8 @@ const ProductDetails = ({ productId }: Props) => {
                 starDimension="24px"
               />
               <p className="text-[#6B7280] text-base">
-                ({product?.avgRating} / {product?.reviews?.length} reviews)
+                ({product?.avgRating?.toFixed(1)} / {product?.reviews?.length}{' '}
+                reviews)
               </p>
             </div>
 
@@ -265,30 +279,39 @@ const ProductDetails = ({ productId }: Props) => {
         {/* Average rating */}
         <div className="lg:w-4/12 bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
           <h2 className="text-2xl mb-2">Average Rating</h2>
+
           <div className="flex items-center gap-2 mt-5">
-            <StarRatings
-              rating={product?.avgRating}
-              starRatedColor="#E8B006"
-              name="rating"
-              starSpacing="1px"
-              starDimension="24px"
-            />
+            {product ? (
+              <StarRatings
+                rating={Number(product.avgRating) || 0} // default to 0 if undefined
+                starRatedColor="#E8B006"
+                name={`rating-${product._id}`} // unique name
+                starSpacing="1px"
+                starDimension="24px"
+              />
+            ) : (
+              <div className="h-6 w-24 bg-gray-200 animate-pulse rounded"></div> // loading skeleton
+            )}
+
             <p className="text-[#6B7280] text-base">
-              ({product?.avgRating} / {product?.reviews?.length} reviews)
+              ({product?.avgRating?.toFixed(1) || 0} /{' '}
+              {product?.reviews?.length || 0} reviews)
             </p>
           </div>
 
           <div className="mt-5 space-y-2">
-            {[5, 4, 3, 2, 1].map((star) => (
+            {progress.map(({ star, percentage }) => (
               <div key={star} className="flex items-center gap-3">
                 <span className="w-4 text-sm font-medium text-gray-700">
                   {star}
                 </span>
                 <Progress
-                  value={60}
+                  value={percentage}
                   className="flex-1 h-1 bg-gray-200 rounded-full"
                 />
-                <span className="w-10 text-sm text-gray-600">{60}%</span>
+                <span className="w-10 text-sm text-gray-600">
+                  {percentage.toFixed(0)}%
+                </span>
               </div>
             ))}
           </div>
@@ -296,7 +319,7 @@ const ProductDetails = ({ productId }: Props) => {
 
         {/* Add Review */}
         <div className="lg:w-3/4">
-          <AddReview productId={productId} />
+          <AddReview productId={productId} refetch={refetch} />
         </div>
       </div>
 

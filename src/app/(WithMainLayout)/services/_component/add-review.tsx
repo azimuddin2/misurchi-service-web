@@ -22,6 +22,7 @@ import { z } from 'zod';
 
 type Props = {
   serviceId: string;
+  refetch: () => any;
 };
 
 const reviewSchema = z.object({
@@ -30,7 +31,7 @@ const reviewSchema = z.object({
     .min(20, 'Review must be at least 20 characters long'),
 });
 
-const AddReview = ({ serviceId }: Props) => {
+const AddReview = ({ serviceId, refetch }: Props) => {
   const user = useAppSelector(selectCurrentUser);
   const [rating, setRating] = useState<number>(0);
 
@@ -63,6 +64,7 @@ const AddReview = ({ serviceId }: Props) => {
       const res = await addReview(reviewData).unwrap();
       toast.success(res.message || 'Your review has been added!');
       reset();
+      refetch();
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to submit your review');
     } finally {

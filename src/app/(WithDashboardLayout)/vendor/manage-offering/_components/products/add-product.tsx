@@ -31,6 +31,7 @@ import { addProductSchema } from './addProductValidation';
 import { useAddProductMutation } from '@/redux/features/product/productApi';
 import { toast } from 'sonner';
 import { ProductStatus } from '@/constants/product';
+import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
 
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -46,6 +47,9 @@ const AddProduct = () => {
     formState: { isSubmitting },
   } = form;
 
+  const { data } = useGetVendorProfileQuery(user?.email as string);
+  const vendor = data?.data;
+
   const [addProduct] = useAddProductMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
@@ -55,7 +59,7 @@ const AddProduct = () => {
       .filter((color: string) => color !== '');
 
     const modifiedData = {
-      user: user?.userId,
+      vendor: vendor?._id,
       ...data,
       colors,
       quantity: Number(data.quantity),

@@ -1,4 +1,5 @@
-import { IUser } from './user.type';
+import { TReview } from './review.type';
+import { IUser, TVendorUser } from './user.type';
 
 export type TStatus = 'available' | 'unavailable';
 
@@ -34,7 +35,7 @@ export type TImage = {
 
 // Main ServiceData type
 export type TService = {
-  user: IUser;
+  vendor: TVendorUser;
   deleteKey?: string[];
   _id: string;
   serviceId: string;
@@ -50,7 +51,7 @@ export type TService = {
     weeklySchedule: Partial<Record<TWeekDay, TDaySchedule>>; // not all days required
   };
 
-  reviews?: string[]; // can store populated reviews
+  reviews?: TReview[]; // can store populated reviews
   avgRating?: number;
 
   isDeleted: boolean;

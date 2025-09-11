@@ -12,13 +12,14 @@ import AddReview from './add-review';
 import ViewReviews from './view-reviews';
 import { Progress } from '@/components/ui/progress';
 import Link from 'next/link';
+import { TReview } from '@/types/review.type';
 
 type Props = {
   serviceId: string;
 };
 
 const ServiceDetails = ({ serviceId }: Props) => {
-  const { data } = useGetServiceByIdQuery(serviceId);
+  const { data, refetch } = useGetServiceByIdQuery(serviceId);
   const service: TService | undefined = data?.data;
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -37,6 +38,15 @@ const ServiceDetails = ({ serviceId }: Props) => {
   // Convert discount to number
   const discountPercent = Number(discountStr.replace('%', ''));
   const discountedPrice = price - (price * discountPercent) / 100;
+
+  const totalReviews = service?.reviews?.length ?? 0;
+
+  const progress = [5, 4, 3, 2, 1].map((star) => {
+    const count =
+      service?.reviews?.filter((r: TReview) => r.rating === star).length ?? 0;
+    const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
+    return { star, count, percentage };
+  });
 
   return (
     <div className="my-20">
@@ -82,16 +92,19 @@ const ServiceDetails = ({ serviceId }: Props) => {
           <div className="mt-12 hidden lg:block">
             <div className="flex items-center gap-3">
               <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
-                <AvatarImage src={service?.user?.image} />
+                <AvatarImage src={service?.vendor?.image} />
                 <AvatarFallback>
-                  {service?.user?.fullName?.slice(0, 1)}
+                  {service?.vendor?.businessName?.slice(0, 1)}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-lg">{service?.user?.fullName}</p>
+                <p className="text-lg">{service?.vendor?.businessName}</p>
                 <p className="flex items-center gap-1">
                   {' '}
-                  <MapPin /> <span>{service?.user?.country}</span>
+                  <MapPin />{' '}
+                  <span>
+                    {service?.vendor?.country} {service?.vendor.state}
+                  </span>
                 </p>
               </div>
             </div>
@@ -126,7 +139,8 @@ const ServiceDetails = ({ serviceId }: Props) => {
                 starDimension="24px"
               />
               <p className="text-[#6B7280] text-base">
-                ({service?.avgRating} / {service?.reviews?.length} reviews)
+                ({service?.avgRating?.toFixed(1)} / {service?.reviews?.length}{' '}
+                reviews)
               </p>
             </div>
 
@@ -227,30 +241,39 @@ const ServiceDetails = ({ serviceId }: Props) => {
         {/* Average rating */}
         <div className="lg:w-4/12 bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
           <h2 className="text-2xl mb-2">Average Rating</h2>
+
           <div className="flex items-center gap-2 mt-5">
-            <StarRatings
-              rating={service?.avgRating}
-              starRatedColor="#E8B006"
-              name="rating"
-              starSpacing="1px"
-              starDimension="24px"
-            />
+            {service ? (
+              <StarRatings
+                rating={Number(service.avgRating) || 0} // default to 0 if undefined
+                starRatedColor="#E8B006"
+                name={`rating-${service._id}`} // unique name
+                starSpacing="1px"
+                starDimension="24px"
+              />
+            ) : (
+              <div className="h-6 w-24 bg-gray-200 animate-pulse rounded"></div> // loading skeleton
+            )}
+
             <p className="text-[#6B7280] text-base">
-              ({service?.avgRating} / {service?.reviews?.length} reviews)
+              ({service?.avgRating?.toFixed(1) || 0} /{' '}
+              {service?.reviews?.length || 0} reviews)
             </p>
           </div>
 
           <div className="mt-5 space-y-2">
-            {[5, 4, 3, 2, 1].map((star) => (
+            {progress.map(({ star, percentage }) => (
               <div key={star} className="flex items-center gap-3">
                 <span className="w-4 text-sm font-medium text-gray-700">
                   {star}
                 </span>
                 <Progress
-                  value={0}
+                  value={percentage}
                   className="flex-1 h-1 bg-gray-200 rounded-full"
                 />
-                <span className="w-10 text-sm text-gray-600">{0}%</span>
+                <span className="w-10 text-sm text-gray-600">
+                  {percentage.toFixed(0)}%
+                </span>
               </div>
             ))}
           </div>
@@ -258,7 +281,7 @@ const ServiceDetails = ({ serviceId }: Props) => {
 
         {/* Add Review */}
         <div className="lg:w-3/4">
-          <AddReview serviceId={serviceId} />
+          <AddReview serviceId={serviceId} refetch={refetch} />
         </div>
       </div>
 

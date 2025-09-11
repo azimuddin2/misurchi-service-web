@@ -1,8 +1,9 @@
-import { IUser } from './user.type';
+import { TReview } from './review.type';
+import { TVendorUser } from './user.type';
 
 export type TProduct = {
   _id: string;
-  user: IUser;
+  vendor: TVendorUser;
   name: string;
   productCode: string;
   images: TImage[];
@@ -15,7 +16,7 @@ export type TProduct = {
   status: 'Available' | 'Out of Stock' | 'TBC' | 'Discontinued';
   highlightStatus: string;
   description: string;
-  reviews?: string[]; // can store populated reviews
+  reviews?: TReview[]; // can store populated reviews
   avgRating?: number;
   isDeleted: boolean;
   createdAt: string;

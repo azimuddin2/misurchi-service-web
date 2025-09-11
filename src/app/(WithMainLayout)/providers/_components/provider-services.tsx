@@ -3,19 +3,16 @@ import FilterSidebar from '@/components/modules/services/filter-sidebar';
 import Spinner from '@/components/shared/Spinner';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllServicesByUserQuery } from '@/redux/features/service/serviceApi';
-import { IUser } from '@/types';
 import { TService } from '@/types/service.type';
 import { Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 type Props = {
-  user: IUser | undefined;
+  vendorId: string;
 };
 
-const ProviderServices = ({ user }: Props) => {
-  const userId = user?._id as string;
-
+const ProviderServices = ({ vendorId }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -28,7 +25,7 @@ const ProviderServices = ({ user }: Props) => {
   const searchTerm = searchParams.get('searchTerm') || '';
 
   const { data, isLoading } = useGetAllServicesByUserQuery({
-    userId,
+    vendorId,
     page,
     limit,
     query: {

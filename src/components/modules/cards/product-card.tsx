@@ -60,12 +60,14 @@ const ProductCard = ({ product }: ProductProps) => {
         <div className="flex justify-between items-center my-2">
           <div className="flex items-center gap-2">
             <Avatar className="w-10 h-10 border-none">
-              <AvatarImage src={product?.user?.image} />
+              <AvatarImage src={product?.vendor?.image} />
               <AvatarFallback className="bg-[#093954] text-white text-xl">
-                {product?.user?.fullName?.slice(0, 1)}
+                {product?.vendor?.businessName?.slice(0, 1)}
               </AvatarFallback>
             </Avatar>
-            <span>{product?.user?.fullName?.slice(0, 12)}</span>
+            <span className="capitalize">
+              {product?.vendor?.businessName?.slice(0, 12)}
+            </span>
           </div>
 
           <div className="flex items-center">
@@ -90,7 +92,7 @@ const ProductCard = ({ product }: ProductProps) => {
         </div>
 
         <div>
-          <div className="flex items-center gap-2 mt-5">
+          <div className="flex items-center justify-between gap-2 mt-5">
             <StarRatings
               rating={product?.avgRating}
               starRatedColor="#E8B006"
@@ -99,12 +101,15 @@ const ProductCard = ({ product }: ProductProps) => {
               starDimension="24px"
             />
             <p className="text-[#6B7280] text-base">
-              ({product?.avgRating} / {product?.reviews?.length} reviews)
+              ({product?.avgRating?.toFixed(1)} / {product?.reviews?.length}{' '}
+              reviews)
             </p>
           </div>
           <p className="flex items-center mt-3">
             <MapPin className="text-[#6B7280] mr-1" />
-            <span className="text-[#6B7280]">{product?.user?.country}</span>
+            <span className="text-[#6B7280]">
+              {product?.vendor?.country}, {product.vendor.state}
+            </span>
           </p>
         </div>
       </div>

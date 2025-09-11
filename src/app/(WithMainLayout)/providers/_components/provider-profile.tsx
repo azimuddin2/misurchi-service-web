@@ -25,6 +25,7 @@ import ProviderServices from './provider-services';
 import { useGetVendorUserByIdQuery } from '@/redux/features/user/userApi';
 import { IUser, TVendorUser } from '@/types';
 import { format } from 'date-fns';
+import Spinner from '@/components/shared/Spinner';
 
 type Props = {
   providerId: string;
@@ -34,7 +35,11 @@ const ProviderProfile = ({ providerId }: Props) => {
   const { data, isLoading } = useGetVendorUserByIdQuery(providerId);
   const vendorUser: TVendorUser | undefined = data?.data;
 
-  const user = vendorUser?.userId as IUser | undefined;
+  const vendorId = vendorUser?._id as string;
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div>
@@ -66,7 +71,7 @@ const ProviderProfile = ({ providerId }: Props) => {
                     <h1 className="text-2xl font-bold">
                       {vendorUser?.businessName}
                     </h1>
-                    {user?.isVerified === true && (
+                    {vendorUser?.userId.isVerified === true && (
                       <Verified className="h-5 w-5 text-blue-500 fill-blue-100" />
                     )}
                   </div>
@@ -202,7 +207,7 @@ const ProviderProfile = ({ providerId }: Props) => {
                     <Mail className="h-5 w-5 text-gray-500" />
                     <div className="flex items-center gap-2">
                       <p className="text-base text-gray-500">Email</p>
-                      {user?.isVerified ? (
+                      {vendorUser?.userId?.isVerified ? (
                         <div className="flex items-center gap-2">
                           <span className="text-base font-medium text-green-600">
                             Verified
@@ -280,11 +285,11 @@ const ProviderProfile = ({ providerId }: Props) => {
 
           {/* Content Panels */}
           <TabsContent value="products" className="mt-2">
-            <ProviderProducts user={user} />
+            <ProviderProducts vendorId={vendorId} />
           </TabsContent>
 
           <TabsContent value="services" className="mt-2">
-            <ProviderServices user={user} />
+            <ProviderServices vendorId={vendorId} />
           </TabsContent>
         </Tabs>
       </div>

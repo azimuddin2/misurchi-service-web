@@ -1,4 +1,5 @@
 import { TService } from './service.type';
+import { TVendorUser } from './user.type';
 
 export type TPaymentType = 'half' | 'full' | 'later';
 
@@ -11,6 +12,7 @@ export type TPaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
 
 export type TBooking = {
   _id: string;
+  vendor: TVendorUser;
   serviceId: string;
   service: TService;
   serviceItemId: string;

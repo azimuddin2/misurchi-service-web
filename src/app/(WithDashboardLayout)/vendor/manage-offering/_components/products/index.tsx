@@ -37,6 +37,7 @@ import {
 } from '@/redux/features/product/productApi';
 import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
+import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
 
 const statusOptions = [
   { label: 'Available', key: 'Available' },
@@ -52,7 +53,6 @@ const highlightstatusOptions = [
 
 const ManageProducts = () => {
   const user = useAppSelector(selectCurrentUser);
-  const userId = user?.userId as string;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -75,8 +75,11 @@ const ManageProducts = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
+  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
+  const vendorId = vendorData?.data?._id as string;
+
   const { data, isLoading, refetch } = useGetAllProductsByUserQuery({
-    userId,
+    vendorId,
     page,
     limit,
     query: {
