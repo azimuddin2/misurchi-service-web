@@ -345,7 +345,7 @@ const ManageServices = () => {
                 <Eye
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/listings/view-listing/${row.original._id}`,
+                      `/${user?.role}/manage-offering/view-service/${row.original._id}`,
                     )
                   }
                   size={20}

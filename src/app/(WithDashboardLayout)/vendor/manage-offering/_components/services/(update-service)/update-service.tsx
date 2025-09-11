@@ -102,7 +102,6 @@ const UpdateService = ({ serviceId }: Props) => {
     const files: File[] = serviceData?.imageFiles || [];
 
     const modifiedData = {
-      user: user?.userId,
       ...serviceData,
     };
 

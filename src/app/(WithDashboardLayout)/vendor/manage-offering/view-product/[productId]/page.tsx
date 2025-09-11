@@ -1,4 +1,3 @@
-import React from 'react';
 import ViewProduct from '../../_components/products/view-product';
 
 const ViewProductPage = ({ params }: { params: { productId: string } }) => {

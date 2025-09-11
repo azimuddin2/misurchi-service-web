@@ -111,7 +111,6 @@ const UpdateProduct = ({ productId }: Props) => {
       .filter((color: string) => color !== '');
 
     const modifiedData = {
-      user: user?.userId,
       ...data,
       colors,
       quantity: Number(data.quantity),

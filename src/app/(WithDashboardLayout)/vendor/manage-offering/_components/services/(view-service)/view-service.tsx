@@ -1,60 +1,53 @@
 'use client';
 
-import { useGetProductByIdQuery } from '@/redux/features/product/productApi';
-import { TProduct } from '@/types/product.type';
+import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
+import { TService } from '@/types/service.type';
 import { Edit } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
-import Spinner from '@/components/shared/Spinner';
 import { Progress } from '@/components/ui/progress';
-import { useAppSelector } from '@/redux/hooks';
-import { TReview } from '@/types/review.type';
-import ViewReviews from '@/app/(WithMainLayout)/products/_component/view-reviews';
-import { AppButton } from '@/components/shared/app-button';
 import Link from 'next/link';
+import { TReview } from '@/types/review.type';
+import ViewReviews from '@/app/(WithMainLayout)/services/_component/view-reviews';
+import { AppButton } from '@/components/shared/app-button';
+import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 type Props = {
-  productId: string;
+  serviceId: string;
 };
 
-const ViewProduct = ({ productId }: Props) => {
+const ViewService = ({ serviceId }: Props) => {
   const user = useAppSelector(selectCurrentUser);
-
-  const { data, isLoading } = useGetProductByIdQuery(productId);
-  const product: TProduct | undefined = data?.data;
+  const { data } = useGetServiceByIdQuery(serviceId);
+  const service: TService | undefined = data?.data;
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // When data is loaded, set the first image as default
   useEffect(() => {
-    if (product?.images?.length) {
-      setSelectedImage(product.images[0].url);
+    if (service?.images?.length) {
+      setSelectedImage(service.images[0].url);
     }
-  }, [product]);
+  }, [service]);
 
-  const price = Number(product?.price || 0);
-  const discountStr = product?.discountPrice || '0%';
+  const firstPricing = service?.savedServices?.[0];
+  const price = Number(firstPricing?.price || 0);
+  const discountStr = firstPricing?.discount || '0%';
 
-  // Remove the '%' and convert to number
+  // Convert discount to number
   const discountPercent = Number(discountStr.replace('%', ''));
-
-  // Calculate discounted price
   const discountedPrice = price - (price * discountPercent) / 100;
 
-  const totalReviews = product?.reviews?.length ?? 0;
+  const totalReviews = service?.reviews?.length ?? 0;
 
   const progress = [5, 4, 3, 2, 1].map((star) => {
     const count =
-      product?.reviews?.filter((r: TReview) => r.rating === star).length ?? 0;
+      service?.reviews?.filter((r: TReview) => r.rating === star).length ?? 0;
     const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
     return { star, count, percentage };
   });
-
-  if (isLoading) {
-    return <Spinner />;
-  }
 
   return (
     <div className="my-20">
@@ -74,7 +67,7 @@ const ViewProduct = ({ productId }: Props) => {
           </div>
           {/* Thumbnails */}
           <div className="gap-3 mt-12 flex justify-start flex-wrap">
-            {product?.images?.map((image, index) => (
+            {service?.images?.map((image, index) => (
               <button
                 key={index}
                 type="button"
@@ -102,28 +95,30 @@ const ViewProduct = ({ productId }: Props) => {
           {/* Product first part */}
           <div className="mb-6">
             <h2>
-              {product?.discountPrice && (
-                <span className="bg-[#FCE9EACC] text-[#5F1011] p-3 rounded font-semibold uppercase">
-                  Special Offer
-                </span>
-              )}
+              {service?.savedServices?.[0]?.discount &&
+                service.savedServices[0].discount !== 'none' &&
+                service.savedServices[0].discount.trim() !== '' && (
+                  <span className="bg-[#FCE9EACC] text-[#5F1011] p-3 rounded font-semibold uppercase">
+                    Special Offer
+                  </span>
+                )}
             </h2>
 
             <div className="flex items-center gap-2 mt-5">
               <StarRatings
-                rating={product?.avgRating}
+                rating={service?.avgRating}
                 starRatedColor="#E8B006"
                 name="rating"
                 starSpacing="1px"
                 starDimension="24px"
               />
               <p className="text-[#6B7280] text-base">
-                ({product?.avgRating?.toFixed(1)} / {product?.reviews?.length}{' '}
+                ({service?.avgRating?.toFixed(1)} / {service?.reviews?.length}{' '}
                 reviews)
               </p>
             </div>
 
-            <h1 className="text-2xl text-[#212529] my-3">{product?.name}</h1>
+            <h1 className="text-2xl text-[#212529] my-3">{service?.name}</h1>
 
             <div>
               {/* Original Price */}
@@ -131,22 +126,25 @@ const ViewProduct = ({ productId }: Props) => {
                 <p
                   className={`text-xl font-medium ${
                     discountPercent > 0
-                      ? 'text-gray-500 line-through pr-3'
+                      ? 'text-gray-500 line-through'
                       : 'text-gray-800'
                   }`}
                 >
                   ${price.toFixed(2)}
                 </p>
-                {product?.discountPrice && (
-                  <span className="text-sm font-semibold text-[#E12728] uppercase italic">
-                    {product?.discountPrice} Off
-                  </span>
-                )}
+
+                {service?.savedServices?.[0]?.discount &&
+                  service.savedServices[0].discount !== 'none' &&
+                  service.savedServices[0].discount.trim() !== '' && (
+                    <p className="px-3 py-1 text-sm font-semibold text-[#E12728] uppercase italic">
+                      {service.savedServices[0].discount} Off
+                    </p>
+                  )}
               </div>
 
               {/* Discounted Price */}
               {discountPercent > 0 && (
-                <p className="text-2xl font-semibold text-gray-800 mt-1">
+                <p className="text-xl font-semibold text-gray-800">
                   ${discountedPrice.toFixed(2)}
                 </p>
               )}
@@ -156,56 +154,47 @@ const ViewProduct = ({ productId }: Props) => {
           {/* Product second part  */}
           <div>
             <div className="my-2 font-medium flex justify-between items-center p-5 border-t">
-              <span>Product Code</span>
-              <span className="font-medium">{product?.productCode}</span>
+              <span>Service Id</span>
+              <span className="font-medium">{service?.serviceId}</span>
             </div>
 
             <div className="my-2 font-medium flex justify-between items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5">
-              <span>Product Type</span>
-              <span className="font-medium">{product?.productType}</span>
+              <span>Service Type</span>
+              <span className="font-medium">{service?.type}</span>
             </div>
 
-            <div className="my-2 font-medium flex justify-between items-center p-5">
-              <span>Size</span>
-              <span className="font-medium">{product?.size}</span>
-            </div>
+            <div className="my-2 font-medium">
+              {service?.savedServices?.map((item, index) => {
+                const bgClass =
+                  index % 2 === 0
+                    ? 'my-2 font-medium p-5'
+                    : 'my-2 font-medium bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5';
 
-            <div className="my-2 font-medium flex justify-between items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5">
-              <span>Product Colors</span>
-              <div className="flex gap-2 flex-wrap">
-                {product?.colors?.map((color: string, index: number) => (
-                  <span
-                    key={index}
-                    className="rounded-full text-sm font-medium border capitalize"
-                    style={{ backgroundColor: color, color: '#fff' }}
-                  >
-                    {color}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Quantity & Stock */}
-            <div className="my-2 font-medium flex justify-between items-center p-5">
-              <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
-                Quantity: {product?.quantity}
-              </p>
-              <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
-                Status: {product?.status}
-              </p>
+                return (
+                  <div key={item.id} className={`${bgClass}`}>
+                    {/* Right side: details inline */}
+                    <div className="lg:flex justify-around items-center gap-6">
+                      <p>Duration: {item.duration}</p>
+                      <p>Price: ${item.price}</p>
+                      <p>Discount: {item.discount} </p>
+                      <p>Final Price: ${item.finalPrice}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex items-end justify-end">
+          <div>
             <AppButton
               className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white"
               content={
                 <Link
-                  href={`/${user?.role}/manage-offering/update-product/${product?._id}`}
+                  href={`/${user?.role}/manage-offering/update-service/${service?._id}`}
                   className="flex justify-center items-center space-x-1 font-semibold"
                 >
                   <span className="uppercase text-sm font-semibold">
-                    Edit Product
+                    Edit Service
                   </span>
                   <Edit />
                 </Link>
@@ -220,21 +209,20 @@ const ViewProduct = ({ productId }: Props) => {
         <h5 className="text-lg font-medium uppercase border-b py-1">
           Description
         </h5>
-        <p className="mt-2 text-base text-gray-500">{product?.description}</p>
+        <p className="mt-2 text-base text-gray-500">{service?.description}</p>
       </div>
 
-      {/* Review section */}
-      <div className=" my-10 gap-4">
+      <div className="my-10">
         {/* Average rating */}
         <div className="w-full bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
           <h2 className="text-2xl mb-2">Average Rating</h2>
 
           <div className="flex items-center gap-2 mt-5">
-            {product ? (
+            {service ? (
               <StarRatings
-                rating={Number(product.avgRating) || 0} // default to 0 if undefined
+                rating={Number(service.avgRating) || 0} // default to 0 if undefined
                 starRatedColor="#E8B006"
-                name={`rating-${product._id}`} // unique name
+                name={`rating-${service._id}`} // unique name
                 starSpacing="1px"
                 starDimension="24px"
               />
@@ -243,8 +231,8 @@ const ViewProduct = ({ productId }: Props) => {
             )}
 
             <p className="text-[#6B7280] text-base">
-              ({product?.avgRating?.toFixed(1) || 0} /{' '}
-              {product?.reviews?.length || 0} reviews)
+              ({service?.avgRating?.toFixed(1) || 0} /{' '}
+              {service?.reviews?.length || 0} reviews)
             </p>
           </div>
 
@@ -267,9 +255,9 @@ const ViewProduct = ({ productId }: Props) => {
         </div>
       </div>
 
-      <ViewReviews productId={productId} />
+      <ViewReviews serviceId={serviceId} />
     </div>
   );
 };
 
-export default ViewProduct;
+export default ViewService;
