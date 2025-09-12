@@ -1,6 +1,6 @@
 export type TTask = {
   _id: string;
-  user: string;
+  vendor: string;
   title: string;
   description: string;
   date: string;

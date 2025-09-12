@@ -17,13 +17,13 @@ const memberApi = baseApi.injectEndpoints({
     getAllMembers: builder.query<
       TResponse<TMember[]>,
       {
-        userId: string;
+        vendorId: string;
         page?: number | string;
         limit?: number | string;
         query?: Record<string, string | string[] | undefined>;
       }
     >({
-      query: ({ userId, page = 1, limit = 10, query }) => {
+      query: ({ vendorId, page = 1, limit = 10, query }) => {
         const params = new URLSearchParams();
 
         if (query?.searchTerm) {
@@ -36,7 +36,7 @@ const memberApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/team-members?user=${userId}&page=${page}&limit=${limit}&${params.toString()}`,
+          url: `/team-members?vendor=${vendorId}&page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };

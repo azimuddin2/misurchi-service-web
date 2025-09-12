@@ -18,6 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { bookingSchema } from './bookingValidation';
 import { toast } from 'sonner';
 import { useAddBookingMutation } from '@/redux/features/booking/bookingApi';
+import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
 
 const Booking = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -49,10 +50,14 @@ const Booking = () => {
     },
   });
 
+  const { data } = useGetServiceByIdQuery(service);
+  const vendor = data?.data?.vendor._id;
+
   const [addBooking] = useAddBookingMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const bookingData = {
+      vendor,
       service,
       serviceId,
       serviceItemId,

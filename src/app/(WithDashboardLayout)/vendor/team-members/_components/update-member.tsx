@@ -70,18 +70,20 @@ const UpdateMember = ({ memberId }: Props) => {
     },
   });
 
+  // whenever `member` changes, reset the form values
   useEffect(() => {
     if (member) {
       form.reset({
-        name: member.name || '',
-        email: member.email || '',
-        role: member.role || '',
-        speciality: member.speciality || '',
-        timeZone: member.timeZone || '',
-        workHours: member.workHours || '',
+        name: member.name ?? '',
+        email: member.email ?? '',
+        role: member.role ?? '',
+        speciality: member.speciality ?? '',
+        timeZone: member.timeZone ?? '',
+        workHours: member.workHours ?? '',
         assignTask: '',
-        phone: member.phone || '',
+        phone: member.phone ?? '',
       });
+
       setTasks(member.assignTask || []);
       setImagePreview(member.image ? [member.image] : []);
     }
@@ -105,7 +107,6 @@ const UpdateMember = ({ memberId }: Props) => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const modifiedData = {
-      user: user?.userId,
       ...data,
       assignTask: tasks,
     };
@@ -117,7 +118,7 @@ const UpdateMember = ({ memberId }: Props) => {
       formData.append('image', file); //✅Append multiple images
     });
 
-    const toastId = toast.loading('Adding Team Member...');
+    const toastId = toast.loading('Updating Team Member...');
 
     try {
       const res = await updateMember({
@@ -125,10 +126,10 @@ const UpdateMember = ({ memberId }: Props) => {
         body: formData,
       }).unwrap();
 
-      toast.success(res.message || 'Product added successfully');
+      toast.success(res.message || 'Member updated successfully');
       router.push(`/vendor/team-members`);
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to add product');
+      toast.error(error?.data?.message || 'Failed to update member');
     } finally {
       toast.dismiss(toastId);
     }
@@ -160,7 +161,6 @@ const UpdateMember = ({ memberId }: Props) => {
           </div>
 
           {/* data input fields */}
-
           <div>
             {/* Name */}
             <FormField
@@ -176,7 +176,6 @@ const UpdateMember = ({ memberId }: Props) => {
                       type="text"
                       placeholder="Enter Name"
                       {...field}
-                      value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
@@ -199,7 +198,6 @@ const UpdateMember = ({ memberId }: Props) => {
                       type="email"
                       placeholder="Enter email"
                       {...field}
-                      value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                     />
                   </FormControl>
@@ -251,7 +249,6 @@ const UpdateMember = ({ memberId }: Props) => {
                         type="text"
                         placeholder="Enter Speciality"
                         {...field}
-                        value={field.value || ''}
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
@@ -332,7 +329,6 @@ const UpdateMember = ({ memberId }: Props) => {
                         type="text"
                         placeholder="Enter Task"
                         {...field}
-                        value={field.value || ''}
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
@@ -388,7 +384,7 @@ const UpdateMember = ({ memberId }: Props) => {
                   <FormControl>
                     <PhoneInput
                       // @ts-ignore
-                      value={field.value || ''}
+                      value={field.value}
                       onChange={field.onChange}
                       international
                       defaultCountry="US"
@@ -406,7 +402,7 @@ const UpdateMember = ({ memberId }: Props) => {
               className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
               content={
                 <div className="flex justify-center items-center space-x-2 font-semibold">
-                  <p>{isSubmitting ? 'Updateing...' : 'Update'}</p>
+                  <p>{isSubmitting ? 'Updating...' : 'Update'}</p>
                   <ArrowRight />
                 </div>
               }

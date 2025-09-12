@@ -34,6 +34,7 @@ import { roleOptions } from '@/constants/teamMemberRoles';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import { addMemberSchema } from './addMemberValidation';
 import { useAddMemberMutation } from '@/redux/features/member/memberApi';
+import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
 
 const AddMember = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -62,11 +63,14 @@ const AddMember = () => {
     setTasks((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
+  const vendorId = vendorData?.data?._id as string;
+
   const [addMember] = useAddMemberMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const modifiedData = {
-      user: user?.userId,
+      vendor: vendorId,
       ...data,
       assignTask: tasks,
     };

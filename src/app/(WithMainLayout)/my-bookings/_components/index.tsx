@@ -40,7 +40,9 @@ const MyBookings = () => {
                 Service Name: {row.original.serviceName}
               </p>
               <p className="truncate">ServiceId: {service?.serviceId}</p>
-              <p className="truncate">Provider: {'Azim Vendor'}</p>
+              <p className="truncate">
+                Provider: {row?.original?.vendor?.businessName}
+              </p>
             </div>
           </div>
         );

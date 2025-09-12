@@ -22,6 +22,7 @@ import { useAddServiceMutation } from '@/redux/features/service/serviceApi';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
+import { useRouter } from 'next/navigation';
 
 const steps = [
   {
@@ -46,6 +47,7 @@ const steps = [
 
 export function AddService() {
   const user = useAppSelector(selectCurrentUser);
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [serviceData, setServiceData] = useState<any>({});
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -103,7 +105,7 @@ export function AddService() {
       const res = await addService(formData).unwrap();
       console.log(res);
       toast.success(res.message || 'Service added successfully');
-      // router.push(`/vendor/manage-offering/view-product/${res.data?._id}`);
+      router.push(`/vendor/manage-offering/view-service/${res.data?._id}`);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to add service');
     } finally {

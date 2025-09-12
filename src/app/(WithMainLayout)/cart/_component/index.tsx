@@ -58,7 +58,7 @@ const Cart = () => {
     setSelectAll(newSelectAll);
     setCartState(
       cartState.map((item) =>
-        item.user?._id === activeVendor
+        item.vendor?._id === activeVendor
           ? { ...item, selected: newSelectAll }
           : item,
       ),
@@ -78,7 +78,7 @@ const Cart = () => {
       setActiveVendor(vendorId);
       setCartState(
         cartState.map((item) =>
-          item.user?._id === vendorId
+          item.vendor?._id === vendorId
             ? item._id === id
               ? { ...item, selected: true }
               : { ...item, selected: false }
@@ -129,10 +129,10 @@ const Cart = () => {
   // Group by seller
   const groupedBySeller = cartState.reduce(
     (acc, item) => {
-      const sellerId = item.user?._id || 'unknown';
+      const sellerId = item.vendor?._id || 'unknown';
       if (!acc[sellerId]) {
         acc[sellerId] = {
-          sellerName: item.user?.fullName || 'Unknown',
+          sellerName: item.vendor?.businessName || 'Unknown',
           items: [] as CartItem[],
         };
       }
@@ -141,6 +141,27 @@ const Cart = () => {
     },
     {} as Record<string, { sellerName: string; items: CartItem[] }>,
   );
+
+  // ✅ If cart is empty
+  if (cartItems.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <Image
+          src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+          alt="Empty Cart"
+          width={140}
+          height={140}
+          className="mb-4 opacity-80"
+        />
+        <h2 className="text-lg font-semibold text-gray-700">
+          Your cart is empty
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Looks like you haven’t added anything to your cart yet.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 sm:p-6">

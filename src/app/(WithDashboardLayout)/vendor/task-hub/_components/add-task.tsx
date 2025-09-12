@@ -38,13 +38,13 @@ import { useAddTaskMutation } from '@/redux/features/task/taskApi';
 import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { taskSchema } from './taskValidation';
+import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
 
 const AddTask = () => {
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>('');
 
   const user = useAppSelector(selectCurrentUser);
-  const userId = user?.userId as string;
   const router = useRouter();
 
   // Generate times every 30 minutes for one day, starting at midnight
@@ -67,8 +67,11 @@ const AddTask = () => {
     formState: { isSubmitting },
   } = form;
 
-  const { data, isLoading, refetch } = useGetAllMembersQuery({
-    userId,
+  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
+  const vendorId = vendorData?.data?._id as string;
+
+  const { data, refetch } = useGetAllMembersQuery({
+    vendorId,
   });
 
   const members = data?.data || [];
@@ -86,9 +89,13 @@ const AddTask = () => {
     }
 
     const taskData = {
-      user: user?.userId,
       ...data,
-      date: date instanceof Date ? date.toISOString().split('T')[0] : date,
+      date:
+        date instanceof Date
+          ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+              date.getDate(),
+            ).padStart(2, '0')}`
+          : date,
       time,
     };
 

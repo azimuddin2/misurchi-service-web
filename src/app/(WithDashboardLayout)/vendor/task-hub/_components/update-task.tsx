@@ -43,6 +43,7 @@ import { TTask } from '@/types/task.type';
 import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
 import Link from 'next/link';
 import { taskSchema } from './taskValidation';
+import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
 
 type Props = {
   taskId: string;
@@ -53,11 +54,13 @@ const UpdateTask = ({ taskId }: Props) => {
   const [time, setTime] = useState<string>('');
 
   const user = useAppSelector(selectCurrentUser);
-  const userId = user?.userId as string;
   const router = useRouter();
 
+  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
+  const vendorId = vendorData?.data?._id as string;
+
   const { data: membersData } = useGetAllMembersQuery({
-    userId,
+    vendorId,
   });
 
   const members = membersData?.data || [];
@@ -129,7 +132,12 @@ const UpdateTask = ({ taskId }: Props) => {
 
     const taskData = {
       ...data,
-      date: date instanceof Date ? date.toISOString().split('T')[0] : date,
+      date:
+        date instanceof Date
+          ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+              date.getDate(),
+            ).padStart(2, '0')}`
+          : date,
       time,
     };
 

@@ -20,13 +20,13 @@ const taskApi = baseApi.injectEndpoints({
     getAllTasks: builder.query<
       TResponse<TTask[]>,
       {
-        userId: string;
+        vendorId: string;
         page?: number | string;
         limit?: number | string;
         query?: Record<string, string | string[] | undefined>;
       }
     >({
-      query: ({ userId, page = 1, limit = 10, query }) => {
+      query: ({ vendorId, page = 1, limit = 10, query }) => {
         const params = new URLSearchParams();
 
         if (query?.searchTerm) {
@@ -39,7 +39,7 @@ const taskApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/tasks?user=${userId}&page=${page}&limit=${limit}&${params.toString()}`,
+          url: `/tasks?vendor=${vendorId}&page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };

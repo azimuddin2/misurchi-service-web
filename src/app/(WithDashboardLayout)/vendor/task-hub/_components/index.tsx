@@ -35,6 +35,7 @@ import {
   useGetAllTasksQuery,
   useUpdateTaskStatusMutation,
 } from '@/redux/features/task/taskApi';
+import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
 
 const statusOptions = [
   { label: 'To-Do', key: 'To-Do' },
@@ -47,7 +48,6 @@ const statusOptions = [
 
 const ManageTaskHub = () => {
   const user = useAppSelector(selectCurrentUser);
-  const userId = user?.userId as string;
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -70,8 +70,11 @@ const ManageTaskHub = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
+  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
+  const vendorId = vendorData?.data?._id as string;
+
   const { data, isLoading, refetch } = useGetAllTasksQuery({
-    userId,
+    vendorId,
     page,
     limit,
     query: {
@@ -211,7 +214,7 @@ const ManageTaskHub = () => {
       header: 'Estimated Completion Date/Time',
       cell: ({ row }) => (
         <div>
-          <p>{format(new Date(row.original.createdAt), 'dd MMM, yyyy')}</p>
+          <p>{format(new Date(row.original.date), 'dd MMM, yyyy')}</p>
           <p>{row.original.time}</p>
         </div>
       ),
