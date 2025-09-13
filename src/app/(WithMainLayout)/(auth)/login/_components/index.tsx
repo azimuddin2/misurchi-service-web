@@ -28,6 +28,7 @@ import { useLoginMutation } from '@/redux/features/auth/authApi';
 import { setUser, TUser } from '@/redux/features/auth/authSlice';
 import { verifyToken } from '@/utils/verifyToken';
 import { toast } from 'sonner';
+import Cookies from 'js-cookie';
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -58,16 +59,23 @@ const LoginForm = () => {
         return;
       }
 
+      // Decode/verify token
       const user = verifyToken(accessToken) as TUser;
       if (!user) {
         toast.error('Invalid access token.');
         return;
       }
 
+      // Update Redux state
       dispatch(setUser({ user, token: accessToken }));
+
+      // ✅ Persist token in cookie for client-side access
+      Cookies.set('accessToken', accessToken, { expires: 1, sameSite: 'lax' });
+
       toast.success(response.message || 'Login successful');
       form.reset();
 
+      // Redirect to intended page or home
       router.push(redirect || '/');
     } catch (error: any) {
       const message =

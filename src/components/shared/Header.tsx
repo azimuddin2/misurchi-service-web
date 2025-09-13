@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   Bell,
-  ShoppingBag,
   User,
   Menu,
   X,
@@ -32,7 +31,9 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout, selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { selectCartItems } from '@/redux/features/cart/cartSlice';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { protectedRoutes } from '@/constants';
+import Cookies from 'js-cookie';
 
 const TOP_NAV_LINKS = [
   { label: 'Services', href: '/services' },
@@ -50,6 +51,7 @@ const MAIN_NAV_LINKS = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
 
@@ -57,7 +59,16 @@ export default function Header() {
   const cartCount = cartItems.length;
 
   const handleLogout = () => {
+    // 1. Clear redux user state
     dispatch(logout());
+
+    // 2. Remove cookie from client
+    Cookies.remove('accessToken');
+
+    // 3. Redirect if user is on protected routes
+    if (protectedRoutes.some((route) => pathname.match(route))) {
+      router.push('/');
+    }
   };
 
   const ICONS_LINKS = (
@@ -65,10 +76,22 @@ export default function Header() {
       <Link href="/notifications">
         <Bell size={24} />
       </Link>
-      {user?.role === 'user' && (
+      {user?.role === 'user' ? (
         <li
           className="relative cursor-pointer mr-5 lg:block hidden"
           onClick={() => router.push('/cart')}
+        >
+          <ShoppingCart size={24} />
+          {cartCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-green-700 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {cartCount}
+            </span>
+          )}
+        </li>
+      ) : (
+        <li
+          className="relative cursor-pointer mr-5 lg:block hidden"
+          onClick={() => router.push('/login')}
         >
           <ShoppingCart size={24} />
           {cartCount > 0 && (
@@ -127,7 +150,7 @@ export default function Header() {
 
               {user?.role === 'user' && (
                 <>
-                  <Link href="/my-order">
+                  <Link href="/my-orders">
                     <DropdownMenuItem className="rounded-[5px] cursor-pointer">
                       <SendToBack />
                       <span>My Order</span>

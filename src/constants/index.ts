@@ -1,7 +1,11 @@
 export const protectedRoutes = [
-  '/login',
-  '/admin',
-  '/admin/:page',
+  '/cart',
+  '/my-orders',
+  '/my-bookings',
+  '/schedule/:path*',
+  '/booking',
+  '/vendor',
+  '/vendor/:page*',
   '/user',
   '/user/:page',
 ];
