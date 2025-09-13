@@ -20,6 +20,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { protectedRoutes } from '@/constants';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout, selectCurrentUser } from '@/redux/features/auth/authSlice';
+import Cookies from 'js-cookie';
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -31,8 +32,13 @@ export function NavUser() {
   const pathname = usePathname();
 
   const handleLogout = () => {
+    // 1. Clear redux user state
     dispatch(logout());
 
+    // 2. Remove cookie from client
+    Cookies.remove('accessToken');
+
+    // 3. Redirect if user is on protected routes
     if (protectedRoutes.some((route) => pathname.match(route))) {
       router.push('/');
     }

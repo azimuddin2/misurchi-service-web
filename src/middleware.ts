@@ -28,7 +28,7 @@ export const middleware = async (request: NextRequest) => {
     } else {
       return NextResponse.redirect(
         new URL(
-          `http://localhost:3000/login?redirectPath${pathname}`,
+          `/login?redirectPath=${encodeURIComponent(request.nextUrl.pathname + request.nextUrl.search)}`,
           request.url,
         ),
       );

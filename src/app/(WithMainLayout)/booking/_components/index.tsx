@@ -51,7 +51,7 @@ const Booking = () => {
   });
 
   const { data } = useGetServiceByIdQuery(service);
-  const vendor = data?.data?.vendor._id;
+  const vendor = data?.data?.vendor?._id;
 
   const [addBooking] = useAddBookingMutation();
 

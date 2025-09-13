@@ -76,7 +76,7 @@ const LoginForm = () => {
       form.reset();
 
       // Redirect to intended page or home
-      router.push(redirect || '/');
+      router.push(redirect ? decodeURIComponent(redirect) : '/');
     } catch (error: any) {
       const message =
         error?.data?.message ||
