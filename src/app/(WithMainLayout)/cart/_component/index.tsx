@@ -19,6 +19,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Minus, Plus, Store, Trash2 } from 'lucide-react';
 import { TProduct } from '@/types/product.type';
 import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirmationModal';
+import { useRouter } from 'next/navigation';
+import { setCheckoutData } from '@/redux/features/checkout/checkoutSlice';
 
 type CartItem = TProduct & { cartQuantity: number; selected?: boolean };
 
@@ -33,6 +35,7 @@ const parseDiscount = (price: number, discountStr?: string) => {
 const Cart = () => {
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(selectCartItems) as CartItem[];
+  const router = useRouter();
 
   const [cartState, setCartState] = useState<CartItem[]>([]);
   const [activeVendor, setActiveVendor] = useState<string | null>(null);
@@ -50,7 +53,7 @@ const Cart = () => {
     setSelectAll(false);
   }, [cartItems]);
 
-  // Toggle select all (only for active vendor)
+  //✅ Toggle select all (only for active vendor)
   const handleSelectAll = () => {
     if (!activeVendor) return;
     const newSelectAll = !selectAll;
@@ -65,7 +68,7 @@ const Cart = () => {
     );
   };
 
-  // Toggle individual item selection
+  //✅ Toggle individual item selection
   const toggleItemSelection = (id: string, vendorId: string) => {
     if (!activeVendor || vendorId === activeVendor) {
       setActiveVendor(vendorId);
@@ -89,7 +92,7 @@ const Cart = () => {
     }
   };
 
-  // Handle delete confirmation
+  //✅ Handle delete confirmation
   const handleDeleteConfirm = () => {
     if (!selectedId) return;
     dispatch(removeFromCart(selectedId));
@@ -99,7 +102,7 @@ const Cart = () => {
     setCartState(cartState.filter((item) => item._id !== selectedId));
   };
 
-  // Calculate totals
+  //✅ Calculate totals
   const calculateSummary = (items: CartItem[]) => {
     let subtotal = 0,
       discount = 0,
@@ -126,7 +129,7 @@ const Cart = () => {
 
   const totals = calculateSummary(cartState);
 
-  // Group by seller
+  //✅ Group by seller
   const groupedBySeller = cartState.reduce(
     (acc, item) => {
       const sellerId = item.vendor?._id || 'unknown';
@@ -141,6 +144,48 @@ const Cart = () => {
     },
     {} as Record<string, { sellerName: string; items: CartItem[] }>,
   );
+
+  // ✅ Proceed to checkout handler
+  const handleProceedToCheckout = () => {
+    const selectedItems = cartState.filter((item) => item.selected);
+    if (selectedItems.length === 0) {
+      alert('Please select items before proceeding.');
+      return;
+    }
+
+    const products = selectedItems.map((item) => {
+      const { discountedPrice } = parseDiscount(
+        item.price,
+        typeof item.discountPrice === 'string' ? item.discountPrice : undefined,
+      );
+
+      return {
+        productName: item.name,
+        image: item.images[0].url,
+        product: item._id,
+        quantity: item.cartQuantity,
+        price: discountedPrice,
+        discount: item.price - discountedPrice,
+      };
+    });
+
+    const totalPrice = products.reduce(
+      (sum, p) => sum + p.quantity * p.price,
+      0,
+    );
+
+    const payload = {
+      products,
+      vendor: selectedItems[0].vendor?._id,
+      totalPrice,
+    };
+
+    // ✅ Save to Redux
+    dispatch(setCheckoutData(payload));
+
+    // ✅ Navigate to shipping page
+    router.push(`/shipping-address`);
+  };
 
   // ✅ If cart is empty
   if (cartItems.length === 0) {
@@ -227,7 +272,7 @@ const Cart = () => {
                       {discountPercent > 0 && (
                         <>
                           <p className="text-base line-through text-gray-400">
-                            ${item.price}
+                            ${item.price.toFixed(2)}
                           </p>
                           <span className="text-sm text-red-600 font-semibold italic">
                             {discountPercent}% OFF
@@ -317,7 +362,11 @@ const Cart = () => {
           <span>$ {totals.total.toFixed(2)}</span>
         </div>
 
-        <Button className="w-full mt-3 text-gray-50 rounded bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer p-4 text-sm">
+        <Button
+          disabled={cartState.filter((item) => item.selected).length === 0}
+          onClick={handleProceedToCheckout}
+          className="w-full mt-3 text-gray-50 rounded bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer p-4 text-sm"
+        >
           PROCEED TO CHECKOUT (
           {cartState.filter((item) => item.selected).length})
         </Button>

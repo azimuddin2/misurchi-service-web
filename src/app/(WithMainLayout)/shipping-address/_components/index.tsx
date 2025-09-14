@@ -18,36 +18,45 @@ import { toast } from 'sonner';
 import { useAddBookingMutation } from '@/redux/features/booking/bookingApi';
 import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
 import CountryStateCitySelector from './country-state-city-selector';
+import { useEffect, useState } from 'react';
+import { AppButton } from '@/components/shared/app-button';
+import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 const ShippingAddress = () => {
   const user = useAppSelector(selectCurrentUser);
-  const searchParams = useSearchParams();
   const router = useRouter();
 
-  // ✅ Always provide fallback (never null)
-  // const serviceId = searchParams.get('serviceId') ?? '';
-  // const service = searchParams.get('service') ?? '';
-  // const serviceName = searchParams.get('serviceName') ?? '';
-  // const serviceItemId = searchParams.get('serviceItemId') ?? '';
-  // const duration = searchParams.get('duration') ?? '';
-  // const date = searchParams.get('date') ?? '';
-  // const time = searchParams.get('slotTime') ?? '';
-  // const price = Number(searchParams.get('price') ?? 0);
+  const searchParams = useSearchParams();
+  const items = searchParams.get('items');
+  const [checkoutPayload, setCheckoutPayload] = useState<any>(null);
+
+  useEffect(() => {
+    if (items) {
+      try {
+        setCheckoutPayload(JSON.parse(items));
+      } catch (error) {
+        console.error('Invalid checkout data', error);
+      }
+    }
+  }, [items]);
+
+  console.log(checkoutPayload);
 
   const form = useForm({
     // resolver: zodResolver(bookingSchema),
-    // defaultValues: {
-    //     name: user?.name ?? '',
-    //     email: user?.email ?? '',
-    //     phone: '',
-    //     serviceName,
-    //     duration,
-    //     price: price.toString(), // ✅ always a string in form state
-    //     date,
-    //     time,
-    //     paymentType: 'full',
-    // },
+    defaultValues: {
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: '',
+      description: '',
+      zipCode: '',
+    },
   });
+
+  const {
+    formState: { isSubmitting },
+  } = form;
 
   const { register, setValue, control } = form;
 
@@ -57,16 +66,26 @@ const ShippingAddress = () => {
   const [addBooking] = useAddBookingMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    // const bookingData = {
-    //     vendor,
-    //     service,
-    //     serviceId,
-    //     serviceItemId,
-    //     date,
-    //     ...data,
-    //     price: Number(data.price), // ✅ convert when sending
-    // };
-    // console.log('Booking Data:', bookingData);
+    if (!checkoutPayload) return alert('No order data found!');
+
+    const orderPayload = {
+      customerName: data.name,
+      customerEmail: user?.email,
+      customerPhone: data.phone,
+      totalPrice: checkoutPayload.totalPrice,
+      vendor: checkoutPayload.vendor,
+      products: checkoutPayload.products,
+      billingDetails: {
+        country: data.country,
+        state: data.state,
+        city: data.city,
+        zipCode: data.zipCode,
+        address: data.description,
+      },
+    };
+
+    console.log('Final Order Payload:', orderPayload);
+
     // const toastId = toast.loading('Adding Booking...');
     // try {
     //     const res = await addBooking(bookingData).unwrap();
@@ -99,7 +118,7 @@ const ShippingAddress = () => {
                       <Input
                         type="text"
                         placeholder="Full Name"
-                        {...field}
+                        {...(field || user?.name)}
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
@@ -203,6 +222,17 @@ const ShippingAddress = () => {
                   <FormMessage />
                 </FormItem>
               )}
+            />
+
+            {/* Submit Button */}
+            <AppButton
+              className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
+              content={
+                <div className="flex justify-center items-center space-x-2 font-semibold">
+                  <p>{isSubmitting ? 'Place Order...' : 'Place Order'}</p>
+                  <ArrowRight />
+                </div>
+              }
             />
           </form>
         </Form>
