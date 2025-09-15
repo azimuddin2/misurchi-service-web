@@ -11,25 +11,24 @@ import {
 } from '@/components/ui/form';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { useAddBookingMutation } from '@/redux/features/booking/bookingApi';
 import CountryStateCitySelector from './country-state-city-selector';
 import { AppButton } from '@/components/shared/app-button';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { Product } from '@/redux/features/checkout/checkoutSlice';
-import { orderSchema } from './orderValidation';
+import { useAddOrderMutation } from '@/redux/features/order/orderApi';
+import { clearCart } from '@/redux/features/cart/cartSlice';
 
 const ShippingAddress = () => {
   const user = useAppSelector(selectCurrentUser);
+  const dispatch = useAppDispatch();
   const checkoutPayload = useAppSelector((state) => state.checkout);
   const router = useRouter();
 
   const form = useForm({
-    resolver: zodResolver(orderSchema),
     defaultValues: {
       name: user?.name || '',
       email: user?.email,
@@ -45,7 +44,7 @@ const ShippingAddress = () => {
 
   const { register, setValue, control } = form;
 
-  const [addBooking] = useAddBookingMutation();
+  const [addOrder] = useAddOrderMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     if (!checkoutPayload) return alert('No order data found!');
@@ -67,18 +66,19 @@ const ShippingAddress = () => {
       },
     };
 
-    console.log('Final Order Payload:', orderPayload);
+    // console.log('Final Order Payload:', orderPayload);
 
-    // const toastId = toast.loading('Adding Booking...');
-    // try {
-    //     const res = await addBooking(bookingData).unwrap();
-    //     toast.success(res.message || 'Booking added successfully');
-    //     router.push(`/booking/${res.data?._id}`);
-    // } catch (error: any) {
-    //     toast.error(error?.data?.message || 'Failed to add booking');
-    // } finally {
-    //     toast.dismiss(toastId);
-    // }
+    const toastId = toast.loading('Processing your order...');
+    try {
+      const res = await addOrder(orderPayload).unwrap();
+      toast.success(res.message || 'Product order successfully');
+      dispatch(clearCart());
+      router.push(`/my-orders`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to add booking');
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   return (
@@ -143,6 +143,7 @@ const ShippingAddress = () => {
                       </FormLabel>
                       <FormControl>
                         <Input
+                          required
                           type="text"
                           placeholder="Enter your phone number"
                           {...field}
@@ -174,6 +175,7 @@ const ShippingAddress = () => {
                     Zip Code
                   </FormLabel>
                   <Input
+                    required
                     type="text"
                     placeholder="Type Zip Code"
                     {...field}
@@ -196,6 +198,7 @@ const ShippingAddress = () => {
                   </FormLabel>
                   <FormControl>
                     <textarea
+                      required
                       {...field}
                       rows={8}
                       className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"

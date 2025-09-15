@@ -114,6 +114,7 @@ export default function CountryStateCitySelector({
                   field.onChange(val);
                   setSelectedCountry(val);
                 }}
+                required
               >
                 <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
                   <SelectValue placeholder="Select Country" />

@@ -1,16 +1,40 @@
+export type TOrderStatus =
+  | 'pending'
+  | 'shipped'
+  | 'cancelled'
+  | 'delivered'
+  | 'return';
+
 export type TOrderProduct = {
-  _id: string;
-  orderId: string; // Unique order ID
-  userId: string; // User ID (MongoDB)
-  customerName: string; // Customer full name
-  customerEmail: string; // Customer email
-  cancelDate: string; // Cancel date (if any)
-  deliveryStatus: string; // e.g., "shipped", "pending", "delivered", "cancelled"
-  refund: string; // e.g., "full amount", "partial amount", "none"
-  status: string; // e.g., "approved", "rejected",
-  productId: string; // refer product
-  quantity: number; // Quantity ordered
-  price: number; // Product price
+  name: string;
+  image: string;
+  product: string;
+  quantity: number;
+  price: number;
+  discount: number;
+};
+
+export type TOrder = {
+  products: TOrderProduct[];
+  vendor: string;
+  buyer: string;
+
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+
+  totalPrice: number;
+
+  status: TOrderStatus;
+  isPaid: boolean;
+  billingDetails: {
+    country: string;
+    city?: string;
+    state: string;
+    zipCode: string;
+    address: string;
+  };
+  isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
   __v: number;
