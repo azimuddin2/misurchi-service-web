@@ -13,6 +13,7 @@ const roleBasedPrivateRoutes = {
     /^\/my-bookings/,
     /^\/schedule(\/.*)?$/,
     /^\/booking(\/.*)?$/,
+    /^\/shipping-address(\/.*)?$/,
   ],
   vendor: [/^\/vendor/],
 };
@@ -52,6 +53,7 @@ export const config = {
     '/my-bookings',
     '/schedule/:path*',
     '/booking',
+    '/shipping-address',
     '/vendor',
     '/vendor/:page*',
     '/user',

@@ -160,7 +160,7 @@ const Cart = () => {
       );
 
       return {
-        productName: item.name,
+        name: item.name,
         image: item.images[0].url,
         product: item._id,
         quantity: item.cartQuantity,

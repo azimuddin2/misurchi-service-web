@@ -1,8 +1,7 @@
-// redux/features/checkout/checkoutSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface Product {
-  productName: string;
+export interface Product {
+  name: string;
   image: string;
   product: string;
   quantity: number;

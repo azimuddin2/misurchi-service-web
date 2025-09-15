@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   Form,
   FormControl,
@@ -16,40 +16,25 @@ import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { useAddBookingMutation } from '@/redux/features/booking/bookingApi';
-import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
 import CountryStateCitySelector from './country-state-city-selector';
-import { useEffect, useState } from 'react';
 import { AppButton } from '@/components/shared/app-button';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import { Product } from '@/redux/features/checkout/checkoutSlice';
+import { orderSchema } from './orderValidation';
 
 const ShippingAddress = () => {
   const user = useAppSelector(selectCurrentUser);
+  const checkoutPayload = useAppSelector((state) => state.checkout);
   const router = useRouter();
 
-  const searchParams = useSearchParams();
-  const items = searchParams.get('items');
-  const [checkoutPayload, setCheckoutPayload] = useState<any>(null);
-
-  useEffect(() => {
-    if (items) {
-      try {
-        setCheckoutPayload(JSON.parse(items));
-      } catch (error) {
-        console.error('Invalid checkout data', error);
-      }
-    }
-  }, [items]);
-
-  console.log(checkoutPayload);
-
   const form = useForm({
-    // resolver: zodResolver(bookingSchema),
+    resolver: zodResolver(orderSchema),
     defaultValues: {
       name: user?.name || '',
-      email: user?.email || '',
+      email: user?.email,
       phone: '',
-      description: '',
+      address: '',
       zipCode: '',
     },
   });
@@ -60,15 +45,13 @@ const ShippingAddress = () => {
 
   const { register, setValue, control } = form;
 
-  // const { data } = useGetServiceByIdQuery(service);
-  // const vendor = data?.data?.vendor._id;
-
   const [addBooking] = useAddBookingMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     if (!checkoutPayload) return alert('No order data found!');
 
     const orderPayload = {
+      buyer: user?.userId,
       customerName: data.name,
       customerEmail: user?.email,
       customerPhone: data.phone,
@@ -80,7 +63,7 @@ const ShippingAddress = () => {
         state: data.state,
         city: data.city,
         zipCode: data.zipCode,
-        address: data.description,
+        address: data.address,
       },
     };
 
@@ -205,7 +188,7 @@ const ShippingAddress = () => {
             {/* Description */}
             <FormField
               control={form.control}
-              name="description"
+              name="address"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium lg:mt-5">
@@ -239,7 +222,36 @@ const ShippingAddress = () => {
       </div>
 
       <div className="p-4 border rounded-md shadow-sm h-fit">
-        Total Order Summary
+        <h2 className="text-center text-xl font-medium mb-2">
+          Total Order Summary
+        </h2>
+        <div>
+          {checkoutPayload?.products?.map((product: Product) => (
+            <div
+              key={product.name}
+              className=" justify-between mb-3 border p-3 rounded bg-gray-50"
+            >
+              <Image
+                src={product.image}
+                alt={product.name}
+                width={50}
+                height={50}
+              />
+              <h1 className="font-medium mt-1">{product.name}</h1>
+              <h4>Quantity: {product.quantity}</h4>
+              <h3>Price: {product.price}</h3>
+              <h3>Total Price: {product.price * product.quantity}</h3>
+            </div>
+          ))}
+        </div>
+        <div className="text-right">
+          <h2 className="font-semiblod text-lg">
+            Items: {checkoutPayload.products.length}
+          </h2>
+          <p className="font-semibold text-xl">
+            Final Total Price: ${checkoutPayload.totalPrice}
+          </p>
+        </div>
       </div>
     </div>
   );
