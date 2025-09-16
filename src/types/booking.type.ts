@@ -8,6 +8,7 @@ export type TBookingStatus =
   | 'confirmed'
   | 'cancelled'
   | 'completed';
+
 export type TPaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
 
 export type TBooking = {

@@ -3,7 +3,7 @@ import { RootState } from '../../store';
 import { TProduct } from '@/types/product.type';
 
 interface CartItem extends TProduct {
-  cartQuantity: number; // ✅ clearer than reusing product.quantity
+  cartQuantity: number; // ✅ separate from product stock
 }
 
 interface CartState {
@@ -16,9 +16,10 @@ const initialState: CartState = {
   total: 0,
 };
 
+// ✅ Ensure numeric price before calculation
 const calculateTotal = (items: CartItem[]) =>
   items.reduce((acc, item) => {
-    const price = item.discountPrice ?? item.price; // ✅ prefer discount
+    const price = Number(item.discountPrice ?? item.price); // 👈 Convert to number
     return acc + price * item.cartQuantity;
   }, 0);
 

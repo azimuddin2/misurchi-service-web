@@ -1,9 +1,9 @@
-import React from 'react';
+import MyOrders from './_components';
 
 const MyOrdersPage = () => {
   return (
     <div>
-      <h1>My Orders Page</h1>
+      <MyOrders />
     </div>
   );
 };

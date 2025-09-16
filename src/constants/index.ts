@@ -8,5 +8,5 @@ export const protectedRoutes = [
   '/vendor',
   '/vendor/:page*',
   '/user',
-  '/user/:page',
+  '/user/:page*',
 ];

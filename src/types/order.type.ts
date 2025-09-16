@@ -1,9 +1,9 @@
-export type TOrderStatus =
-  | 'pending'
-  | 'shipped'
-  | 'cancelled'
-  | 'delivered'
-  | 'return';
+import { TUser } from '@/redux/features/auth/authSlice';
+import { TVendorUser } from './user.type';
+
+export type TOrderStatus = 'pending' | 'shipped' | 'delivered';
+
+export type TOrderRequest = 'cancelled' | 'return';
 
 export type TOrderProduct = {
   name: string;
@@ -15,9 +15,10 @@ export type TOrderProduct = {
 };
 
 export type TOrder = {
+  _id: string;
   products: TOrderProduct[];
-  vendor: string;
-  buyer: string;
+  vendor: TVendorUser;
+  buyer: TUser;
 
   customerName: string;
   customerEmail: string;
@@ -26,6 +27,7 @@ export type TOrder = {
   totalPrice: number;
 
   status: TOrderStatus;
+  request: TOrderRequest;
   isPaid: boolean;
   billingDetails: {
     country: string;

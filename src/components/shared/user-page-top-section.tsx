@@ -9,7 +9,10 @@ import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { toast } from 'sonner';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, LogOut } from 'lucide-react';
+import { logout } from '@/redux/features/auth/authSlice';
+import Cookies from 'js-cookie';
+import { protectedRoutes } from '@/constants';
 
 const navLinks = [
   {
@@ -19,13 +22,13 @@ const navLinks = [
   },
   {
     _id: 2,
-    title: 'Order List',
-    href: '/user/order-list',
+    title: 'My Request Field',
+    href: '/user/request',
   },
   {
     _id: 3,
-    title: 'My Bid History',
-    href: '/user/bid-history',
+    title: 'Message',
+    href: '/user/message',
   },
   {
     _id: 4,
@@ -39,15 +42,20 @@ const UserPagesTopSection = () => {
   const currentPath = pathName?.split('/')[2];
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const pathname = usePathname();
 
-  // const handleLogout = () => {
-  //     const res = dispatch(logout());
-  //     if (res?.type == "auth/logout") {
-  //         toast.success("Logout Successfully");
-  //         router.refresh();
-  //         router.push("/sign-in");
-  //     }
-  // };
+  const handleLogout = () => {
+    // 1. Clear redux user state
+    dispatch(logout());
+
+    // 2. Remove cookie from client
+    Cookies.remove('accessToken');
+
+    // 3. Redirect if user is on protected routes
+    if (protectedRoutes.some((route) => pathname.match(route))) {
+      router.push('/');
+    }
+  };
 
   return (
     <div className="relative max-h-[240px]">
@@ -71,26 +79,27 @@ const UserPagesTopSection = () => {
             <Link href={navLink.href} key={navLink._id}>
               <Button
                 className={cn(
-                  'rounded border-r-3 border-b-3 capitalize md:min-w-40 md:py-5 cursor-pointer group text-black sm:m-2 m-1 text-[10px] md:text-sm px-2 md:px-3 py-0 md:h-9 h-7 flex items-center gap-1 font-medium',
+                  'font-medium uppercase rounded border-r-3 border-b-3 md:min-w-40 md:py-5 cursor-pointer group text-black sm:m-2 m-1 text-[10px] md:text-sm px-5 md:px-3 py-0 md:h-9 h-7 flex items-center gap-1',
                   currentPath === navLink?.href?.split('/')[2]
-                    ? 'bg-gradient-to-t from-green-500/70 to-green-800 text-white border-gray-800 shadow-sm shadow-gray-500'
+                    ? 'bg-gradient-to-t from-green-500/70 to-green-700 text-white border-gray-800 shadow-sm shadow-gray-500'
                     : 'bg-white hover:bg-white/30 hover:text-white border-gray-800',
                 )}
               >
                 {navLink.title}
-                <ArrowRight className="md:size-4 size-3" />
+                <ArrowRight className="md:size-4 size-2" />
               </Button>
             </Link>
           ))}
 
           <Button
+            onClick={handleLogout}
             className={cn(
-              'rounded border-r-3 border-b-3 uppercase md:min-w-40 md:py-5 cursor-pointer group bg-white text-black sm:m-2 m-1 text-[10px] md:text-sm px-2 md:px-3 py-0 md:h-9 h-7 flex items-center gap-1 hover:bg-white/30 hover:text-white',
+              'rounded border-r-3 border-b-3 uppercase md:min-w-40 md:py-5 cursor-pointer group bg-white text-red-500 sm:m-2 m-1 text-[10px] md:text-sm px-2 md:px-3 py-0 md:h-9 h-7 flex items-center gap-1 hover:bg-white/30 hover:text-white',
               'border-gray-800',
             )}
           >
-            Logout
-            <ArrowRight className="md:size-4 size-3" />
+            <LogOut className="md:size-4 size-3" />
+            Log out
           </Button>
         </div>
       </div>

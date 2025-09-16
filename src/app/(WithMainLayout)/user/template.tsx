@@ -3,9 +3,9 @@ import { ReactNode } from 'react';
 
 const UserTemplate = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="xl:space-y-16 space-y-8">
+    <div className="xl:space-y-12 space-y-8">
       <UserPagesTopSection></UserPagesTopSection>
-      <div className="md:pb-16 pb-8">{children}</div>
+      <div className="container mx-auto">{children}</div>
     </div>
   );
 };
