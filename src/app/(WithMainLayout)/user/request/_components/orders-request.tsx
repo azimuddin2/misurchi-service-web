@@ -12,7 +12,7 @@ import { useGetOrdersByEmailQuery } from '@/redux/features/order/orderApi';
 import { TOrder } from '@/types/order.type';
 import { Badge } from '@/components/ui/badge';
 
-const MyOrders = () => {
+const OrdersRequest = () => {
   const user = useAppSelector(selectCurrentUser);
   const email = user?.email as string;
 
@@ -64,35 +64,6 @@ const MyOrders = () => {
       ),
     },
     {
-      accessorKey: 'customerName',
-      header: 'Customer',
-      cell: ({ row }) => (
-        <div>
-          <p className="text-base font-semibold">{row.original.customerName}</p>
-          <p className="text-sm text-gray-500">{row.original.customerEmail}</p>
-          <p className="text-sm text-gray-500">{row.original.customerPhone}</p>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'createdAt',
-      header: 'Date',
-      cell: ({ row }) => (
-        <span className="text-base">
-          {format(new Date(row.original.createdAt), 'dd MMM, yyyy hh:mm a')}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'totalPrice',
-      header: 'SubTotal',
-      cell: ({ row }) => (
-        <span className="font-semibold text-green-600">
-          ${row.original.totalPrice}
-        </span>
-      ),
-    },
-    {
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => {
@@ -133,16 +104,43 @@ const MyOrders = () => {
       },
     },
     {
-      accessorKey: 'action',
-      header: 'Action',
+      accessorKey: 'createdAt',
+      header: 'Date',
+      cell: ({ row }) => (
+        <span className="text-base">
+          {format(new Date(row.original.createdAt), 'dd MMM, yyyy hh:mm a')}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'totalPrice',
+      header: 'SubTotal',
+      cell: ({ row }) => (
+        <span className="font-semibold text-green-600">
+          ${row.original.totalPrice}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'request',
+      header: 'Request',
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          {!row.original.isPaid === true && (
+          {row.original.status === 'pending' ? (
             <Button
               size="sm"
-              className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer"
+              variant={'outline'}
+              className="border border-red-400 rounded text-red-500 capitalize hover:text-red-600 cursor-pointer"
             >
-              Pay
+              Cancelled
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant={'outline'}
+              className="capitalize rounded cursor-pointer"
+            >
+              Return
             </Button>
           )}
         </div>
@@ -156,10 +154,10 @@ const MyOrders = () => {
 
   return (
     <div className="container mx-auto my-10 p-3">
-      <h1 className="text-xl mb-3">My Orders</h1>
+      {/* <h1 className="text-xl mb-3">My Orders</h1> */}
       <MSWTable columns={columns} data={orders || []} />
     </div>
   );
 };
 
-export default MyOrders;
+export default OrdersRequest;

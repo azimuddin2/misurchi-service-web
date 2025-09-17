@@ -1,9 +1,9 @@
-import React from 'react';
+import MyRequest from './_components';
 
 const RequestPage = () => {
   return (
     <div>
-      <h2>RequestPage</h2>
+      <MyRequest />
     </div>
   );
 };
