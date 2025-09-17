@@ -18,8 +18,8 @@ import { AppButton } from '@/components/shared/app-button';
 import { useChangePasswordMutation } from '@/redux/features/auth/authApi';
 import { TResponse } from '@/types';
 import { toast } from 'sonner';
-import { changePasswordSchema } from './changePasswordValidation';
 import { TChangePassword } from '@/types/auth.type';
+import { changePasswordSchema } from './changePasswordValidation';
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState(false);

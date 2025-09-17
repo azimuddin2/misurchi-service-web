@@ -37,7 +37,7 @@ import {
 } from '@/redux/features/service/serviceApi';
 import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
-import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const statusOptions = [
   { label: 'available', key: 'available' },

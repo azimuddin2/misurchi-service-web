@@ -31,15 +31,16 @@ import bannerImg from '@/assets/images/banner.png';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { useEffect, useState } from 'react';
-import {
-  useGetVendorProfileQuery,
-  useUpdateVendorProfileMutation,
-} from '@/redux/features/user/userApi';
+
 import { TVendorUser } from '@/types';
 import Spinner from '@/components/shared/Spinner';
 import CountryStateCitySelector from '@/components/ui/core/country-state-city-selector';
 import MSWImageUploader from '@/components/ui/core/MSWImageUploader';
 import ImagePreviewer from '@/components/ui/core/MSWImageUploader/ImagePreviewer';
+import {
+  useGetVendorProfileQuery,
+  useUpdateVendorProfileMutation,
+} from '@/redux/features/vendor/vendorApi';
 
 const VendorProfile = () => {
   const user = useAppSelector(selectCurrentUser);

@@ -35,7 +35,7 @@ import {
   useGetAllTasksQuery,
   useUpdateTaskStatusMutation,
 } from '@/redux/features/task/taskApi';
-import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const statusOptions = [
   { label: 'To-Do', key: 'To-Do' },

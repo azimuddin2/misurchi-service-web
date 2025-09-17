@@ -28,7 +28,7 @@ import {
   useGetAllMembersQuery,
 } from '@/redux/features/member/memberApi';
 import { TMember } from '@/types/member.type';
-import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const ManageTeamMembers = () => {
   const user = useAppSelector(selectCurrentUser);

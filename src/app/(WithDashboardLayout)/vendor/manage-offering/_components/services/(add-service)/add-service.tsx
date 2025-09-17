@@ -21,8 +21,8 @@ import { toast } from 'sonner';
 import { useAddServiceMutation } from '@/redux/features/service/serviceApi';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
 import { useRouter } from 'next/navigation';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const steps = [
   {

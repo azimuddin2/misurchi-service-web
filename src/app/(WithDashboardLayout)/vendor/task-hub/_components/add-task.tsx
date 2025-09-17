@@ -38,7 +38,7 @@ import { useAddTaskMutation } from '@/redux/features/task/taskApi';
 import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { taskSchema } from './taskValidation';
-import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const AddTask = () => {
   const [date, setDate] = useState<Date>();

@@ -31,7 +31,7 @@ import { addProductSchema } from './addProductValidation';
 import { useAddProductMutation } from '@/redux/features/product/productApi';
 import { toast } from 'sonner';
 import { ProductStatus } from '@/constants/product';
-import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);

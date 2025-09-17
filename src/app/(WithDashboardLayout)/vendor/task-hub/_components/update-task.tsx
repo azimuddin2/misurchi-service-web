@@ -43,7 +43,7 @@ import { TTask } from '@/types/task.type';
 import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
 import Link from 'next/link';
 import { taskSchema } from './taskValidation';
-import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 type Props = {
   taskId: string;

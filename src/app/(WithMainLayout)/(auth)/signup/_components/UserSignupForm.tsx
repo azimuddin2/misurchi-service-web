@@ -182,7 +182,7 @@ const UserSignupForm = () => {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="Enter business email address"
+                      placeholder="Enter email address"
                       {...field}
                       value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 border-none rounded-sm"

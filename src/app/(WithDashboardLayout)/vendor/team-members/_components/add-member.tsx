@@ -34,7 +34,7 @@ import { roleOptions } from '@/constants/teamMemberRoles';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import { addMemberSchema } from './addMemberValidation';
 import { useAddMemberMutation } from '@/redux/features/member/memberApi';
-import { useGetVendorProfileQuery } from '@/redux/features/user/userApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const AddMember = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
