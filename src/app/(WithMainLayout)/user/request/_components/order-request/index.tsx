@@ -13,25 +13,36 @@ import { TOrder } from '@/types/order.type';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import CancelledModal from './cancelled-modal';
+import ReturnModal from '../booking-request/return-modal';
 
 const OrdersRequest = () => {
   const user = useAppSelector(selectCurrentUser);
   const email = user?.email as string;
 
-  const [selectedOrder, setSelectedOrder] = useState<TOrder | null>(null);
-  const [isModalOpen, setModalOpen] = useState(false);
-  console.log(selectedOrder);
+  const [selectedCancelOrder, setSelectedCancelOrder] = useState<TOrder | null>(
+    null,
+  );
+  const [selectedReturnOrder, setSelectedReturnOrder] = useState<TOrder | null>(
+    null,
+  );
+  const [isCancelModalOpen, setCancelModalOpen] = useState(false);
+  const [isReturnModalOpen, setReturnModalOpen] = useState(false);
 
   const { data, isLoading } = useGetOrdersByEmailQuery(email);
   const orders = data?.data ?? [];
 
   const handleConfirmCancel = () => {
-    if (!selectedOrder) return;
+    if (!selectedCancelOrder) return;
+    console.log('Order cancelled:', selectedCancelOrder._id);
+    setCancelModalOpen(false);
+    setSelectedCancelOrder(null);
+  };
 
-    console.log('Order cancelled:', selectedOrder._id);
-
-    setModalOpen(false);
-    setSelectedOrder(null);
+  const handleConfirmReturn = () => {
+    if (!selectedReturnOrder) return;
+    console.log('Order returned:', selectedReturnOrder._id);
+    setReturnModalOpen(false);
+    setSelectedReturnOrder(null);
   };
 
   const columns: ColumnDef<TOrder>[] = [
@@ -132,7 +143,7 @@ const OrdersRequest = () => {
       header: 'SubTotal',
       cell: ({ row }) => (
         <span className="font-semibold text-green-600">
-          ${row.original.totalPrice}
+          ${row.original.totalPrice.toFixed(2)}
         </span>
       ),
     },
@@ -147,8 +158,8 @@ const OrdersRequest = () => {
               variant="outline"
               className="border border-red-400 rounded text-red-500 capitalize hover:text-red-600 cursor-pointer"
               onClick={() => {
-                setSelectedOrder(row.original);
-                setModalOpen(true);
+                setSelectedCancelOrder(row.original);
+                setCancelModalOpen(true);
               }}
             >
               Cancel
@@ -156,8 +167,12 @@ const OrdersRequest = () => {
           ) : (
             <Button
               size="sm"
-              variant={'outline'}
-              className="capitalize rounded cursor-pointer"
+              variant="outline"
+              className="capitalize rounded cursor-pointer border-green-500 text-green-500 hover:text-green-600"
+              onClick={() => {
+                setSelectedReturnOrder(row.original);
+                setReturnModalOpen(true);
+              }}
             >
               Return
             </Button>
@@ -174,13 +189,20 @@ const OrdersRequest = () => {
   return (
     <div className="container mx-auto my-10 p-3">
       <MSWTable columns={columns} data={orders || []} />
-
       {/* Single Cancel Modal */}
       <CancelledModal
-        selectedOrder={selectedOrder}
-        isOpen={isModalOpen}
-        onOpenChange={setModalOpen}
+        selectedOrder={selectedCancelOrder}
+        isOpen={isCancelModalOpen}
+        onOpenChange={setCancelModalOpen}
         onConfirm={handleConfirmCancel}
+      />
+
+      {/* Single Return Modal */}
+      <ReturnModal
+        selectedOrder={selectedReturnOrder}
+        isOpen={isReturnModalOpen}
+        onOpenChange={setReturnModalOpen}
+        onConfirm={handleConfirmReturn}
       />
     </div>
   );

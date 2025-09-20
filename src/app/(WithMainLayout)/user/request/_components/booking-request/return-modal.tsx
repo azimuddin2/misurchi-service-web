@@ -23,6 +23,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
+import MSWImageUploader from '@/components/ui/core/MSWImageUploader';
+import ImagePreviewer from '@/components/ui/core/MSWImageUploader/ImagePreviewer';
 
 interface CancelModalProps {
   selectedOrder: TOrder | null;
@@ -32,18 +34,21 @@ interface CancelModalProps {
 }
 
 const cancellationSchema = z.object({
-  reason: z.string().min(1, 'Cancellation reason is required'),
+  reason: z.string().min(1, 'Return reason is required'),
 });
 
 type FormValues = z.infer<typeof cancellationSchema>;
 
-const CancelledModal = ({
+const ReturnModal = ({
   selectedOrder,
   isOpen,
   onOpenChange,
   onConfirm,
 }: CancelModalProps) => {
   const [accept, setAccept] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[] | []>([]);
+  const [imagePreview, setImagePreview] = useState<string[] | []>([]);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(cancellationSchema),
     defaultValues: {
@@ -58,22 +63,26 @@ const CancelledModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg rounded-lg">
+      <DialogContent className="sm:max-w-xl rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-center font-semibold text-xl">
-            Cancellation Policy
+            Return Policy
           </DialogTitle>
           <DialogDescription asChild>
             <div>
-              <span className="text-base font-medium">Cancellation:</span>
+              <span className="text-base font-medium">Returns:</span>
               <div className="mt-2 space-y-1">
                 <span className="flex items-center text-sm">
                   <CheckCircle size={16} className="text-green-500 mr-2" />
-                  Full refund if cancelled before shipping.
+                  Returns accepted within 7 days of delivery.
+                </span>
+                <span className="flex items-center text-sm">
+                  <CheckCircle size={16} className="text-green-500 mr-2" />A 20%
+                  restocking fee will apply.
                 </span>
                 <span className="flex items-center text-sm">
                   <CheckCircle size={16} className="text-green-500 mr-2" />
-                  After product shipping, orders cannot be cancelled.
+                  Items must be in original condition and unused.
                 </span>
               </div>
             </div>
@@ -85,13 +94,37 @@ const CancelledModal = ({
             onSubmit={form.handleSubmit(onSubmit)}
             className="mt-4 space-y-4"
           >
+            {/* Images part */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center">
+                <p className="text-primary font-medium text-base mb-3">
+                  Upload Photos for evidence
+                </p>
+              </div>
+              <div className="flex gap-4 ">
+                <MSWImageUploader
+                  setImageFiles={setImageFiles}
+                  setImagePreview={setImagePreview}
+                  label="Upload Photos"
+                  className="w-full lg:w-fit mt-0"
+                />
+                <ImagePreviewer
+                  className="flex flex-wrap gap-4"
+                  setImageFiles={setImageFiles}
+                  imagePreview={imagePreview}
+                  setImagePreview={setImagePreview}
+                />
+              </div>
+            </div>
+
+            {/* Return Reason*/}
             <FormField
               control={form.control}
               name="reason"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Cancellation Reason
+                    Return Reason
                   </FormLabel>
                   <FormControl>
                     <textarea
@@ -140,4 +173,4 @@ const CancelledModal = ({
   );
 };
 
-export default CancelledModal;
+export default ReturnModal;

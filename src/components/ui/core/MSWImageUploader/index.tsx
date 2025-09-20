@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction } from 'react';
 import { Input } from '../../input';
-import { ImageUp } from 'lucide-react';
+import uploadIcon from '@/assets/icons/upload-icon.png';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type TImageUploaderProps = {
   label?: string;
@@ -51,8 +52,14 @@ const MSWImageUploader = ({
         className="w-full h-36 md:size-36 flex items-center justify-center border-2 border-dashed border-gray-300 cursor-pointer text-center text-sm text-gray-500 hover:bg-gray-50 transition rounded-lg"
       >
         <p className="text-center">
-          <ImageUp size={30} className="text-primary mx-auto mb-2" />
-          <span>{label}</span>
+          <Image
+            src={uploadIcon || '/placeholder.png'}
+            alt={'upload'}
+            width={50}
+            height={50}
+            className="mx-auto mb-2"
+          />
+          <span className="font-medium">{label}</span>
         </p>
       </label>
     </div>
