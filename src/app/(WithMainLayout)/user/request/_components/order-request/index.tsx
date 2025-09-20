@@ -11,13 +11,28 @@ import { Button } from '@/components/ui/button';
 import { useGetOrdersByEmailQuery } from '@/redux/features/order/orderApi';
 import { TOrder } from '@/types/order.type';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+import CancelledModal from './cancelled-modal';
 
 const OrdersRequest = () => {
   const user = useAppSelector(selectCurrentUser);
   const email = user?.email as string;
 
+  const [selectedOrder, setSelectedOrder] = useState<TOrder | null>(null);
+  const [isModalOpen, setModalOpen] = useState(false);
+  console.log(selectedOrder);
+
   const { data, isLoading } = useGetOrdersByEmailQuery(email);
   const orders = data?.data ?? [];
+
+  const handleConfirmCancel = () => {
+    if (!selectedOrder) return;
+
+    console.log('Order cancelled:', selectedOrder._id);
+
+    setModalOpen(false);
+    setSelectedOrder(null);
+  };
 
   const columns: ColumnDef<TOrder>[] = [
     {
@@ -129,10 +144,14 @@ const OrdersRequest = () => {
           {row.original.status === 'pending' ? (
             <Button
               size="sm"
-              variant={'outline'}
+              variant="outline"
               className="border border-red-400 rounded text-red-500 capitalize hover:text-red-600 cursor-pointer"
+              onClick={() => {
+                setSelectedOrder(row.original);
+                setModalOpen(true);
+              }}
             >
-              Cancelled
+              Cancel
             </Button>
           ) : (
             <Button
@@ -154,8 +173,15 @@ const OrdersRequest = () => {
 
   return (
     <div className="container mx-auto my-10 p-3">
-      {/* <h1 className="text-xl mb-3">My Orders</h1> */}
       <MSWTable columns={columns} data={orders || []} />
+
+      {/* Single Cancel Modal */}
+      <CancelledModal
+        selectedOrder={selectedOrder}
+        isOpen={isModalOpen}
+        onOpenChange={setModalOpen}
+        onConfirm={handleConfirmCancel}
+      />
     </div>
   );
 };

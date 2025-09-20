@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import OrdersRequest from './orders-request';
-import BookingsRequest from './bookings-request';
+import OrdersRequest from './order-request';
+import BookingsRequest from './booking-request';
 
 const MyRequest = () => {
   return (
