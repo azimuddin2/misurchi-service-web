@@ -35,6 +35,19 @@ const orderApi = baseApi.injectEndpoints({
       providesTags: ['Order'],
     }),
 
+    requestOrder: builder.mutation<
+      TResponse<TOrder>, // Response type
+      { id: string; body: FormData } // Arg type
+    >({
+      query: ({ id, body }) => ({
+        url: `/orders/${id}`,
+        method: 'PATCH',
+        body,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Order'],
+    }),
+
     deleteOrder: builder.mutation<TResponse<TOrder>, string>({
       query: (id) => ({
         url: `/orders/${id}`,
@@ -50,5 +63,6 @@ export const {
   useAddOrderMutation,
   useGetOrdersByEmailQuery,
   useGetOrderByIdQuery,
+  useRequestOrderMutation,
   useDeleteOrderMutation,
 } = orderApi;

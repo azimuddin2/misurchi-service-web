@@ -23,6 +23,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useRequestOrderMutation } from '@/redux/features/order/orderApi';
+import { toast } from 'sonner';
 
 interface CancelModalProps {
   selectedOrder: TOrder | null;
@@ -51,9 +53,45 @@ const CancelledModal = ({
     },
   });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    onConfirm(data.reason); // Pass reason to parent
-    onOpenChange(false);
+  const [requestOrder] = useRequestOrderMutation();
+
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    if (!selectedOrder?._id) {
+      toast.error('No order selected.');
+      return;
+    }
+
+    // Trigger any parent handler
+    onConfirm(data.reason);
+
+    // Prepare form data for backend
+    const modifiedData = {
+      ...data,
+      type: 'cancelled',
+    };
+
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(modifiedData));
+
+    const toastId = toast.loading('Updating order request...');
+
+    try {
+      const res = await requestOrder({
+        id: selectedOrder._id,
+        body: formData,
+      }).unwrap();
+
+      toast.success(
+        `Your ${modifiedData.type === 'return' ? 'return' : 'cancellation'} request for order #${selectedOrder?._id} has been submitted successfully!`,
+      );
+    } catch (error: any) {
+      const errorMsg =
+        error?.data?.message || 'Failed to update order request.';
+      toast.error(errorMsg);
+    } finally {
+      toast.dismiss(toastId);
+      onOpenChange(false);
+    }
   };
 
   return (
