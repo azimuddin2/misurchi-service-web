@@ -1,39 +1,50 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
+import Spinner from '@/components/shared/Spinner';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import MSWPagination from '@/components/ui/core/MSWPagination';
+import { MSWTable } from '@/components/ui/core/MSWTable';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Image from 'next/image';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RxUpdate } from 'react-icons/rx';
-import { TOrderProduct } from '@/types/order.type';
-import { format, parseISO } from 'date-fns';
-import { useCallback, useEffect, useState } from 'react';
-import { useAppSelector } from '@/redux/hooks';
-import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
-import { MSWTable } from '@/components/ui/core/MSWTable';
-import MSWPagination from '@/components/ui/core/MSWPagination';
-import { useGetProductByIdQuery } from '@/redux/features/product/productApi';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import {
+  useGetAllOrdersByUserQuery,
+  useUpdateOrderStatusMutation,
+} from '@/redux/features/order/orderApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
+import { useAppSelector } from '@/redux/hooks';
+import { TOrder } from '@/types/order.type';
+import { ColumnDef } from '@tanstack/react-table';
+import { format, parseISO } from 'date-fns';
+import {
+  CheckCircle,
+  ChevronDown,
+  Funnel,
+  Search,
+  XCircle,
+} from 'lucide-react';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useCallback, useEffect, useState } from 'react';
+import { RxUpdate } from 'react-icons/rx';
+import { toast } from 'sonner';
 
-// TODO: Backend data load
-import ordersProductData from '@/../../public/data/activity-center.json';
+const statusOptions = [
+  { label: 'Pending', key: 'pending' },
+  { label: 'Shipped', key: 'shipped' },
+  { label: 'Delivered', key: 'delivered' },
+];
 
 const ManageOrderProducts = () => {
   const user = useAppSelector(selectCurrentUser);
-  const userId = user?.userId as string;
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [search, setSearch] = useState<string>(
     searchParams.get('searchTerm') || '',
@@ -49,23 +60,23 @@ const ManageOrderProducts = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  // const { data, isLoading, refetch } = useGetAllProductsQuery({
-  //     userId,
-  //     page,
-  //     limit,
-  //     query: {
-  //         searchTerm,
-  //         createdAt,
-  //     },
-  // });
+  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
+  const vendorId = vendorData?.data?._id as string;
 
-  // const products = data?.data || [];
-  const meta = { totalPage: 1 };
+  const { data, isLoading, refetch } = useGetAllOrdersByUserQuery({
+    vendorId,
+    page,
+    limit,
+    query: {
+      searchTerm,
+      createdAt,
+    },
+  });
 
-  const id = ordersProductData.orderProducts.map((o) => o.productId);
-  const { data: productsData } = useGetProductByIdQuery(id);
+  const products = data?.data || [];
+  const meta = data?.meta || { totalPage: 1 };
 
-  console.log(productsData);
+  const [updateOrderStatus] = useUpdateOrderStatusMutation();
 
   // search & createdAt date filtering part
   const updateSearchParams = useCallback(
@@ -106,103 +117,229 @@ const ManageOrderProducts = () => {
     }
   }, [searchParams]);
 
-  const columns: ColumnDef<TOrderProduct>[] = [
+  const handleStatusUpdate = async (orderId: string, status: string) => {
+    const toastId = toast.loading('Updating status...');
+
+    const updateStatus = { status };
+
+    try {
+      const res = await updateOrderStatus({
+        id: orderId,
+        status: updateStatus,
+      }).unwrap();
+
+      toast.success(res.message || 'Status updated successfully');
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Status update failed');
+    } finally {
+      toast.dismiss(toastId);
+    }
+  };
+
+  const handleVendorApproval = async (orderId: string, approved: boolean) => {
+    // try {
+    //   const res = await updateOrderRequestStatus({
+    //     orderId,
+    //     vendorApproved: approved,
+    //   }).unwrap(); // RTK Query or your API call
+    //   toast.success(
+    //     `Request ${approved ? "approved" : "rejected"} successfully`
+    //   );
+    //   // Refetch or update state
+    //   refetchOrders();
+    // } catch (err: any) {
+    //   toast.error(err?.data?.message || "Failed to update request");
+    // }
+  };
+
+  const columns: ColumnDef<TOrder>[] = [
     {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
+      accessorKey: 'products',
+      header: 'Product',
+      cell: ({ row }) => {
+        const products = row.original.products || [];
+
+        return (
+          <div className="lg:flex flex-col gap-2 w-fit">
+            {products.map((p) => (
+              <div key={p.product} className="flex items-center gap-3">
+                <Image
+                  src={p.image || '/placeholder.png'}
+                  alt={p.name}
+                  width={64}
+                  height={64}
+                  className="lg:w-24 lg:h-24 object-cover rounded border"
+                />
+                <div>
+                  <p>{}</p>
+                  <p className="text-base font-medium">{p.name}</p>
+                  <p className="text-sm text-gray-500">
+                    Quantity: {p.quantity}
+                  </p>
+                  <p className="text-sm text-gray-500">Price: ${p.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'buyer',
+      header: 'Buyer Info',
       cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => {
-            setSelectedIds((prev) =>
-              value
-                ? [...prev, row.original._id]
-                : prev.filter((id) => id !== row.original._id),
-            );
-            row.toggleSelected(!!value);
-          }}
-          aria-label="Select row"
-        />
+        <div>
+          <p className="text-base font-semibold">
+            {row.original.buyer?.fullName}
+          </p>
+          <p className="text-sm text-gray-500">{row.original.buyer?.email}</p>
+          <p className="text-sm text-gray-500">{row.original.buyer?.phone}</p>
+        </div>
       ),
     },
-    // {
-    //     accessorKey: 'name',
-    //     header: 'Product Name',
-    //     cell: ({ row }) => {
-    //         const { images, name } = row.original;
-    //         const imageUrl = images?.[0]?.url || '/placeholder.png';
-    //         return (
-    //             <div className="flex items-start space-x-3">
-    //                 <Image
-    //                     src={imageUrl}
-    //                     alt={name}
-    //                     width={100}
-    //                     height={100}
-    //                     className="w-14 h-14 rounded-sm object-cover border"
-    //                 />
-    //                 <span className="truncate">{name}</span>
-    //             </div>
-    //         );
-    //     },
-    // },
-    {
-      accessorKey: 'price',
-      header: 'Price',
-      cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
-    },
-    // {
-    //     accessorKey: 'status',
-    //     header: 'Status',
-    //     cell: ({ row }) => {
-    //         const status = row.original.status;
-    //         const statusTextColorMap: Record<string, string> = {
-    //             Available: 'text-[#165940]',
-    //             'Out of Stock': 'text-[#E12728]',
-    //             TBC: 'text-[#0078BF]',
-    //             Discontinued: 'text-[#6B5103]',
-    //         };
-    //         const statusColor = statusTextColorMap[status] || 'text-gray-700';
-    //         return (
-    //             <DropdownMenu>
-    //                 <DropdownMenuTrigger
-    //                     className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
-    //                 >
-    //                     <RxUpdate className="w-4 h-4" />
-    //                     {status}
-    //                 </DropdownMenuTrigger>
-    //                 <DropdownMenuContent className="w-44">
-    //                     {statusOptions.map((option) => (
-    //                         <DropdownMenuItem
-    //                             key={option.key}
-    //                             onClick={() =>
-    //                                 handleStatusUpdate(row.original._id, option.key)
-    //                             }
-    //                             className="capitalize px-3 py-2 hover:bg-gray-100"
-    //                         >
-    //                             {option.label}
-    //                         </DropdownMenuItem>
-    //                     ))}
-    //                 </DropdownMenuContent>
-    //             </DropdownMenu>
-    //         );
-    //     },
-    // },
     {
       accessorKey: 'createdAt',
       header: 'Date',
-      cell: ({ row }) =>
-        format(new Date(row.original.createdAt), 'dd MMM, yyyy'),
+      cell: ({ row }) => (
+        <span className="text-base">
+          {format(new Date(row.original.createdAt), 'dd MMM, yyyy hh:mm a')}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'totalPrice',
+      header: 'Total Price',
+      cell: ({ row }) => (
+        <span className="font-semibold text-gray-600">
+          ${row.original.totalPrice.toFixed(2)}
+        </span>
+      ),
+    },
+
+    {
+      accessorKey: 'status',
+      header: 'Delivery Status',
+      cell: ({ row }) => {
+        const status = row.original.status;
+
+        const statusTextColorMap: Record<string, string> = {
+          pending: 'text-yellow-600 border-yellow-600',
+          shipped: 'text-blue-600 border-blue-600',
+          delivered: 'text-green-600 border-green-600',
+        };
+
+        const statusColor = statusTextColorMap[status] || 'text-gray-700';
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
+            >
+              {status}
+              <ChevronDown className="w-4 h-4" />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-44">
+              {statusOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.key}
+                  disabled={option.key === status} // ✅ disable if current status
+                  onClick={() =>
+                    option.key !== status && // ✅ only allow change if different
+                    handleStatusUpdate(row.original._id, option.key)
+                  }
+                  className={`capitalize px-3 py-2 ${
+                    option.key === status
+                      ? 'opacity-50 cursor-not-allowed' // ✅ style for disabled
+                      : 'hover:bg-gray-100'
+                  }`}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+
+    {
+      accessorKey: 'request',
+      header: 'Request',
+      cell: ({ row }) => {
+        const request = row.original.request || {};
+        const vendorApproved = request.vendorApproved;
+        const requestType = request.type ?? 'none';
+
+        // Current user
+        const user = useAppSelector(selectCurrentUser);
+        const isVendor = user?.role === 'vendor';
+        const isBuyer = user?.role === 'buyer';
+
+        return (
+          <div className="flex flex-col gap-2">
+            {/* Case 1: No request submitted */}
+            {requestType === 'none' && (
+              <span className="text-gray-400 text-sm italic">
+                No request submitted
+              </span>
+            )}
+
+            {/* Case 2: Request submitted → Vendor must act */}
+            {requestType !== 'none' && (
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-green-500 text-green-600 hover:bg-green-50 rounded"
+                  onClick={() => handleVendorApproval(row.original._id, true)}
+                >
+                  Approve
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-500 text-red-600 hover:bg-green-50 rounded"
+                  onClick={() => handleVendorApproval(row.original._id, false)}
+                >
+                  Reject
+                </Button>
+              </div>
+            )}
+
+            {/* Case 3: Vendor already acted */}
+            {requestType !== 'none' && vendorApproved === true && (
+              <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
+                <CheckCircle className="w-4 h-4" />
+                Approved ({requestType})
+              </span>
+            )}
+
+            {requestType !== 'none' && vendorApproved === false && (
+              <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
+                <XCircle className="w-4 h-4" />
+                Rejected ({requestType})
+              </span>
+            )}
+
+            {/* Case 4: Request submitted by buyer but vendor not yet acted */}
+            {requestType !== 'none' &&
+              isBuyer &&
+              vendorApproved === undefined && (
+                <span className="text-yellow-600 font-medium text-sm">
+                  Pending Vendor Approval
+                </span>
+              )}
+          </div>
+        );
+      },
     },
   ];
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div>
@@ -239,14 +376,11 @@ const ManageOrderProducts = () => {
 
       {/* Header */}
       <div className="flex justify-between items-center mt-10 mb-2">
-        <h2 className="text-xl font-medium">Products</h2>
+        <h2 className="text-xl font-medium">Manage Order Products</h2>
       </div>
 
       {/* Table & Pagination */}
-      <MSWTable
-        columns={columns}
-        data={ordersProductData.orderProducts || []}
-      />
+      <MSWTable columns={columns} data={products || []} />
       <MSWPagination totalPage={meta?.totalPage} />
     </div>
   );

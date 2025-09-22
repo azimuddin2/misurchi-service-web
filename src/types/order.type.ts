@@ -1,5 +1,4 @@
-import { TUser } from '@/redux/features/auth/authSlice';
-import { TVendorUser } from './user.type';
+import { IUser, TVendorUser } from './user.type';
 
 export type TImage = {
   url: string;
@@ -31,7 +30,7 @@ export type TOrder = {
   _id: string;
   products: TOrderProduct[];
   vendor: TVendorUser;
-  buyer: TUser;
+  buyer: IUser;
 
   customerName: string;
   customerEmail: string;

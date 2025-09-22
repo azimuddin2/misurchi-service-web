@@ -48,14 +48,13 @@ const OrdersRequest = () => {
   const columns: ColumnDef<TOrder>[] = [
     {
       accessorKey: 'products',
-      header: 'Products',
+      header: 'Product',
       cell: ({ row }) => {
         const products = row.original.products || [];
-        const visible = products.slice(0, 2);
 
         return (
           <div className="lg:flex flex-col gap-2 w-fit">
-            {visible.map((p) => (
+            {products.map((p) => (
               <div key={p.product} className="flex items-center gap-3">
                 <Image
                   src={p.image || '/placeholder.png'}

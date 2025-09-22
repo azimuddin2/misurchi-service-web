@@ -9,8 +9,6 @@ import { TBooking } from '@/types/booking.type';
 import Image from 'next/image';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 
 const BookingsRequest = () => {
   const user = useAppSelector(selectCurrentUser);
