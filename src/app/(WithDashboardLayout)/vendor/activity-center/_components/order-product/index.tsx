@@ -1,7 +1,6 @@
 'use client';
 
 import Spinner from '@/components/shared/Spinner';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
@@ -15,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import {
   useGetAllOrdersByUserQuery,
+  useUpdateOrderRequestMutation,
   useUpdateOrderStatusMutation,
 } from '@/redux/features/order/orderApi';
 import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
@@ -22,18 +22,16 @@ import { useAppSelector } from '@/redux/hooks';
 import { TOrder } from '@/types/order.type';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
-import {
-  CheckCircle,
-  ChevronDown,
-  Funnel,
-  Search,
-  XCircle,
-} from 'lucide-react';
+import { CheckCircle, ChevronDown, Search, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
-import { RxUpdate } from 'react-icons/rx';
 import { toast } from 'sonner';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const statusOptions = [
   { label: 'Pending', key: 'pending' },
@@ -77,6 +75,7 @@ const ManageOrderProducts = () => {
   const meta = data?.meta || { totalPage: 1 };
 
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
+  const [updateOrderRequest] = useUpdateOrderRequestMutation();
 
   // search & createdAt date filtering part
   const updateSearchParams = useCallback(
@@ -138,19 +137,21 @@ const ManageOrderProducts = () => {
   };
 
   const handleVendorApproval = async (orderId: string, approved: boolean) => {
-    // try {
-    //   const res = await updateOrderRequestStatus({
-    //     orderId,
-    //     vendorApproved: approved,
-    //   }).unwrap(); // RTK Query or your API call
-    //   toast.success(
-    //     `Request ${approved ? "approved" : "rejected"} successfully`
-    //   );
-    //   // Refetch or update state
-    //   refetchOrders();
-    // } catch (err: any) {
-    //   toast.error(err?.data?.message || "Failed to update request");
-    // }
+    const toastId = toast.loading('Updating status...');
+
+    try {
+      const res = await updateOrderRequest({
+        id: orderId,
+        vendorApproved: approved,
+      }).unwrap();
+
+      toast.success(res.message || 'Status updated successfully');
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Status update failed');
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   const columns: ColumnDef<TOrder>[] = [
@@ -266,7 +267,7 @@ const ManageOrderProducts = () => {
 
     {
       accessorKey: 'request',
-      header: 'Request',
+      header: 'Request Action',
       cell: ({ row }) => {
         const request = row.original.request || {};
         const vendorApproved = request.vendorApproved;
@@ -286,25 +287,70 @@ const ManageOrderProducts = () => {
               </span>
             )}
 
-            {/* Case 2: Request submitted → Vendor must act */}
-            {requestType !== 'none' && (
+            {/* Case 2: Vendor must act */}
+            {requestType !== 'none' && isVendor && (
               <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-green-500 text-green-600 hover:bg-green-50 rounded"
-                  onClick={() => handleVendorApproval(row.original._id, true)}
-                >
-                  Approve
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-500 text-red-600 hover:bg-green-50 rounded"
-                  onClick={() => handleVendorApproval(row.original._id, false)}
-                >
-                  Reject
-                </Button>
+                {/* Approve button with Popover */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded"
+                      disabled={vendorApproved === true}
+                    >
+                      Approve
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56">
+                    <p className="text-sm font-medium mb-2">
+                      Confirm approval for this request?
+                    </p>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-green-600 rounded text-green-600 cursor-pointer hover:bg-white hover:text-green-700"
+                        onClick={() =>
+                          handleVendorApproval(row.original._id, true)
+                        }
+                      >
+                        Yes, Approve
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Reject button with Popover */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
+                      disabled={vendorApproved === false}
+                    >
+                      Reject
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56">
+                    <p className="text-sm font-medium mb-2">
+                      Confirm rejection for this request?
+                    </p>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-red-500 rounded text-red-500 cursor-pointer bg-white hover:bg-white hover:text-red-700"
+                        onClick={() =>
+                          handleVendorApproval(row.original._id, false)
+                        }
+                      >
+                        Yes, Reject
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             )}
 
@@ -323,7 +369,7 @@ const ManageOrderProducts = () => {
               </span>
             )}
 
-            {/* Case 4: Request submitted by buyer but vendor not yet acted */}
+            {/* Case 4: Buyer sees pending */}
             {requestType !== 'none' &&
               isBuyer &&
               vendorApproved === undefined && (

@@ -78,6 +78,7 @@ const orderApi = baseApi.injectEndpoints({
       invalidatesTags: ['Order'],
     }),
 
+    // ✅ Update order delivery status
     updateOrderStatus: builder.mutation<
       TResponse<TOrder>,
       { id: string; status: { status: string } }
@@ -86,6 +87,20 @@ const orderApi = baseApi.injectEndpoints({
         url: `/orders/update-status/${id}`,
         method: 'PUT',
         body: status,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Order'],
+    }),
+
+    // ✅ Update order request vendor approval
+    updateOrderRequest: builder.mutation<
+      TResponse<TOrder>,
+      { id: string; vendorApproved: boolean }
+    >({
+      query: ({ id, vendorApproved }) => ({
+        url: `/orders/update-request/${id}`,
+        method: 'PUT',
+        body: { vendorApproved }, // ensure Boolean
         credentials: 'include',
       }),
       invalidatesTags: ['Order'],
@@ -109,5 +124,6 @@ export const {
   useGetOrderByIdQuery,
   useRequestOrderMutation,
   useUpdateOrderStatusMutation,
+  useUpdateOrderRequestMutation,
   useDeleteOrderMutation,
 } = orderApi;
