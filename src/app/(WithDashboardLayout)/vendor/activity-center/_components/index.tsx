@@ -30,7 +30,7 @@ const ActivityCenter = () => {
     data-[state=active]:before:opacity-40
     data-[state=active]:before:content-['']"
         >
-          Products
+          Order Products
         </TabsTrigger>
 
         {/* Services Tab */}
@@ -52,7 +52,7 @@ const ActivityCenter = () => {
     data-[state=active]:before:opacity-40
     data-[state=active]:before:content-['']"
         >
-          Services
+          Booking Services
         </TabsTrigger>
       </TabsList>
 

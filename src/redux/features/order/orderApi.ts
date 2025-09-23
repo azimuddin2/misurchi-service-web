@@ -38,6 +38,10 @@ const orderApi = baseApi.injectEndpoints({
           params.append('createdAt', date.toISOString());
         }
 
+        if (query?.requestType) {
+          params.append('requestType', query.requestType.toString());
+        }
+
         return {
           url: `/orders?vendor=${vendorId}&page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',

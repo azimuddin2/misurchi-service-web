@@ -22,7 +22,13 @@ import { useAppSelector } from '@/redux/hooks';
 import { TOrder } from '@/types/order.type';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
-import { CheckCircle, ChevronDown, Search, XCircle } from 'lucide-react';
+import {
+  ArrowRightFromLine,
+  CheckCircle,
+  ChevronDown,
+  Search,
+  XCircle,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -32,6 +38,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const statusOptions = [
   { label: 'Pending', key: 'pending' },
@@ -191,7 +198,7 @@ const ManageOrderProducts = () => {
       header: 'Buyer Info',
       cell: ({ row }) => (
         <div>
-          <p className="text-base font-semibold">
+          <p className="text-base font-medium">
             {row.original.buyer?.fullName}
           </p>
           <p className="text-sm text-gray-500">{row.original.buyer?.email}</p>
@@ -397,7 +404,7 @@ const ManageOrderProducts = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products..."
-            className="border px-4 py-5 pr-12 rounded w-full"
+            className="border px-4 p-5 pr-12 rounded w-full"
           />
           <button
             onClick={handleSearch}
@@ -421,8 +428,45 @@ const ManageOrderProducts = () => {
       </div>
 
       {/* Header */}
-      <div className="flex justify-between items-center mt-10 mb-2">
+      <div className="lg:flex justify-between items-center mt-6 mb-2">
         <h2 className="text-xl font-medium">Manage Order Products</h2>
+
+        <div>
+          <Tabs className="w-full max-w-6xl mx-auto">
+            <TabsList
+              style={{ background: 'none' }}
+              className="flex rounded-md w-full py-6 lg:max-w-6xl gap-1 mx-auto lg:gap-3 shadow-none"
+            >
+              {/* Cancellation Tab */}
+              <TabsTrigger
+                value="cancellation"
+                onClick={() =>
+                  router.push(
+                    `/${user?.role}/activity-center/order-cancellation`,
+                  )
+                }
+                className="relative w-full cursor-pointer text-[#165940] text-base
+    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200"
+              >
+                Cancellation Request
+                <ArrowRightFromLine />
+              </TabsTrigger>
+
+              {/* Services Tab */}
+              <TabsTrigger
+                value="return-request"
+                onClick={() =>
+                  router.push(`/${user?.role}/activity-center/order-return`)
+                }
+                className="relative w-full cursor-pointer text-[#165940] text-base
+    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200"
+              >
+                Return Request
+                <ArrowRightFromLine />
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
       {/* Table & Pagination */}
