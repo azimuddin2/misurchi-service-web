@@ -13,7 +13,7 @@ import { TOrder } from '@/types/order.type';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import CancelledModal from './cancelled-modal';
-import ReturnModal from '../booking-request/return-modal';
+import ReturnModal from './return-modal';
 
 const OrdersRequest = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -224,7 +224,8 @@ const OrdersRequest = () => {
   }
 
   return (
-    <div className="container mx-auto my-10 p-3">
+    <div className="container mx-auto my-5 p-3">
+      <h1 className="text-xl mb-3">My Orders</h1>
       <MSWTable columns={columns} data={orders || []} />
       {/* Single Cancel Modal */}
       <CancelledModal

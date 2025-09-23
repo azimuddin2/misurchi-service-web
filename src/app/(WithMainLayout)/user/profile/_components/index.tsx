@@ -14,7 +14,6 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { AppButton } from '@/components/shared/app-button';
 import { PhoneInput } from '@/components/ui/core/phone-input';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import bannerImg from '@/assets/images/banner.png';
@@ -29,6 +28,7 @@ import {
   useGetUserProfileQuery,
   useUpdateUserProfileMutation,
 } from '@/redux/features/user/userApi';
+import LocationMap from '@/components/shared/location-map';
 
 const UserProfilePage = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -47,6 +47,7 @@ const UserProfilePage = () => {
       lastName: '',
       email: '',
       phone: '',
+      location: '',
     },
   });
 
@@ -246,7 +247,7 @@ const UserProfilePage = () => {
           {/* Location */}
           <FormField
             control={form.control}
-            name="firstName"
+            name="location"
             render={({ field }) => (
               <FormItem className="lg:mb-0 mb-5">
                 <FormLabel className="!text-gray-700 !text-base font-medium">
@@ -262,7 +263,7 @@ const UserProfilePage = () => {
                       value={field.value || ''}
                       className="bg-[#f5f5f5] py-6 pr-10 border-none rounded-sm"
                     />
-                    {/* Icon (Right side) */}
+                    {/* Icon */}
                     <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                   </div>
                 </FormControl>
@@ -271,25 +272,8 @@ const UserProfilePage = () => {
             )}
           />
 
-          <div className="mt-8 h-full rounded-lg overflow-hidden">
-            <div
-              style={{
-                width: '100%',
-              }}
-            >
-              <iframe
-                width="100%"
-                height="400"
-                frameBorder="0"
-                scrolling="no"
-                src="https://maps.google.com/maps?width=100%25&amp;height=400&amp;hl=en&amp;q=123A,%20Washington,%20UK+(Soft%20Technology)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-              >
-                <a href="https://www.gps.ie/collections/sports-gps/">
-                  Cycling gps
-                </a>
-              </iframe>
-            </div>
-          </div>
+          {/* Google Map Preview */}
+          <LocationMap location={form.watch('location')} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
             {/* Submit Button */}

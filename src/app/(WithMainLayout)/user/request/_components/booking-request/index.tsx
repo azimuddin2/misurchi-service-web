@@ -9,13 +9,34 @@ import { TBooking } from '@/types/booking.type';
 import Image from 'next/image';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { format } from 'date-fns';
+import { CalendarClock, CalendarX } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useState } from 'react';
+import CancelModal from './cancel-modal';
 
 const BookingsRequest = () => {
   const user = useAppSelector(selectCurrentUser);
   const email = user?.email as string;
 
+  const [selectedCancelBooking, setSelectedCancelBooking] =
+    useState<TBooking | null>(null);
+  const [isCancelModalOpen, setCancelModalOpen] = useState(false);
+
   const { data, isLoading } = useGetBookingsByEmailQuery(email);
   const bookings = data?.data ?? [];
+
+  const handleConfirmCancel = () => {
+    if (!selectedCancelBooking) return;
+    console.log('Order cancelled:', selectedCancelBooking._id);
+    setCancelModalOpen(false);
+    setSelectedCancelBooking(null);
+  };
 
   const columns: ColumnDef<TBooking>[] = [
     {
@@ -75,28 +96,66 @@ const BookingsRequest = () => {
       header: 'Price',
       cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
     },
-    // {
-    //     accessorKey: 'action',
-    //     header: 'Action',
-    //     cell: ({ row }) => (
-    //         <div className="flex items-center space-x-3">
-    //             <Link href={`/booking/${row.original._id}`}>
-    //                 <Button className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer">
-    //                     Pay
-    //                 </Button>
-    //             </Link>
-    //         </div>
-    //     ),
-    // },
+    {
+      accessorKey: 'action',
+      header: 'Action',
+      cell: ({ row }) => (
+        <div className="flex items-center space-x-3">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  className="text-green-500 capitalize hover:text-green-600 rounded-full bg-green-100 hover:bg-green-200 h-10 w-10 cursor-pointer"
+                  onClick={() => {
+                    // setSelectedCancelOrder(row.original);
+                    // setCancelModalOpen(true);
+                  }}
+                >
+                  <CalendarClock className="text-green-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="uppercase">Reschedule</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  className="text-red-500 capitalize hover:text-red-600 rounded-full bg-red-100 hover:bg-red-200 h-10 w-10 cursor-pointer"
+                  onClick={() => {
+                    setSelectedCancelBooking(row.original);
+                    setCancelModalOpen(true);
+                  }}
+                >
+                  <CalendarX className="text-red-500 text-lg" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="uppercase">Cancel</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      ),
+    },
   ];
 
   if (isLoading) {
     return <Spinner />;
   }
   return (
-    <div className="container mx-auto my-10 p-3">
+    <div className="container mx-auto my-5 p-3">
       <h1 className="text-xl mb-3">My Bookings</h1>
       <MSWTable columns={columns} data={bookings || []} />
+
+      {/* Single Cancel Modal */}
+      <CancelModal
+        selectedBooking={selectedCancelBooking}
+        isOpen={isCancelModalOpen}
+        onOpenChange={setCancelModalOpen}
+        onConfirm={handleConfirmCancel}
+      />
     </div>
   );
 };
