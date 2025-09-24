@@ -8,7 +8,6 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { TOrder } from '@/types/order.type';
 import { CheckCircle } from 'lucide-react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import {
@@ -23,9 +22,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useRequestOrderMutation } from '@/redux/features/order/orderApi';
 import { toast } from 'sonner';
 import { TBooking } from '@/types/booking.type';
+import { useUpdateBookingRequestMutation } from '@/redux/features/booking/bookingApi';
 
 interface CancelModalProps {
   selectedBooking: TBooking | null;
@@ -54,7 +53,7 @@ const CancelModal = ({
     },
   });
 
-  const [requestOrder] = useRequestOrderMutation();
+  const [updateBookingRequest] = useUpdateBookingRequestMutation();
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     if (!selectedBooking?._id) {
@@ -62,32 +61,33 @@ const CancelModal = ({
       return;
     }
 
-    // Trigger any parent handler
+    // Trigger any parent handler (optional)
     onConfirm(data.reason);
 
-    // Prepare form data for backend
-    const modifiedData = {
-      ...data,
-      type: 'cancelled',
+    // Prepare request payload
+    const modifiedData: Partial<TBooking> = {
+      request: {
+        type: 'cancel', // or 'reschedule' if needed
+        reason: data.reason,
+      },
     };
 
-    const formData = new FormData();
-    formData.append('data', JSON.stringify(modifiedData));
-
-    const toastId = toast.loading('Updating order request...');
+    const toastId = toast.loading('Updating booking request...');
 
     try {
-      const res = await requestOrder({
+      // Call the mutation
+      await updateBookingRequest({
         id: selectedBooking._id,
-        body: formData,
+        data: modifiedData,
       }).unwrap();
 
       toast.success(
-        `Your ${modifiedData.type === 'return' ? 'return' : 'cancellation'} request for order #${selectedBooking?._id} has been submitted successfully!`,
+        `Your cancellation request for order #${selectedBooking._id} has been submitted successfully!`,
       );
+      form.reset();
     } catch (error: any) {
       const errorMsg =
-        error?.data?.message || 'Failed to update order request.';
+        error?.data?.message || 'Failed to update booking request.';
       toast.error(errorMsg);
     } finally {
       toast.dismiss(toastId);

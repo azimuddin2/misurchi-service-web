@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useState } from 'react';
 import CancelModal from './cancel-modal';
+import RescheduleModal from './reschedule-modal';
 
 const BookingsRequest = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -26,16 +27,28 @@ const BookingsRequest = () => {
 
   const [selectedCancelBooking, setSelectedCancelBooking] =
     useState<TBooking | null>(null);
+
+  const [selectedRescheduleBooking, setSelectedRescheduleBooking] =
+    useState<TBooking | null>(null);
+
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
+  const [isRescheduleModalOpen, setRescheduleModalOpen] = useState(false);
 
   const { data, isLoading } = useGetBookingsByEmailQuery(email);
   const bookings = data?.data ?? [];
 
   const handleConfirmCancel = () => {
     if (!selectedCancelBooking) return;
-    console.log('Order cancelled:', selectedCancelBooking._id);
+    console.log('Booking cancelled:', selectedCancelBooking._id);
     setCancelModalOpen(false);
     setSelectedCancelBooking(null);
+  };
+
+  const handleConfirmReschedule = () => {
+    if (!selectedRescheduleBooking) return;
+    console.log('Booking Reschedule:', selectedRescheduleBooking._id);
+    setRescheduleModalOpen(false);
+    setSelectedRescheduleBooking(null);
   };
 
   const columns: ColumnDef<TBooking>[] = [
@@ -108,8 +121,8 @@ const BookingsRequest = () => {
                   size="sm"
                   className="text-green-500 capitalize hover:text-green-600 rounded-full bg-green-100 hover:bg-green-200 h-10 w-10 cursor-pointer"
                   onClick={() => {
-                    // setSelectedCancelOrder(row.original);
-                    // setCancelModalOpen(true);
+                    setSelectedRescheduleBooking(row.original);
+                    setRescheduleModalOpen(true);
                   }}
                 >
                   <CalendarClock className="text-green-600" />
@@ -155,6 +168,14 @@ const BookingsRequest = () => {
         isOpen={isCancelModalOpen}
         onOpenChange={setCancelModalOpen}
         onConfirm={handleConfirmCancel}
+      />
+
+      {/* Single Reschedule Modal */}
+      <RescheduleModal
+        selectedBooking={selectedRescheduleBooking}
+        isOpen={isRescheduleModalOpen}
+        onOpenChange={setRescheduleModalOpen}
+        onConfirm={handleConfirmReschedule}
       />
     </div>
   );

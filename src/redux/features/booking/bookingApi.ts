@@ -35,6 +35,22 @@ const bookingApi = baseApi.injectEndpoints({
       providesTags: ['Booking'],
     }),
 
+    updateBookingRequest: builder.mutation<
+      TResponse<TBooking>,
+      { id: string; data: Partial<TBooking> }
+    >({
+      query: ({ id, data }) => ({
+        url: `/bookings/${id}`,
+        method: 'PATCH',
+        body: data,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+
     deleteBooking: builder.mutation<TResponse<TBooking>, string>({
       query: (id) => ({
         url: `/bookings/${id}`,
@@ -51,4 +67,5 @@ export const {
   useGetBookingsByEmailQuery,
   useGetBookingByIdQuery,
   useDeleteBookingMutation,
+  useUpdateBookingRequestMutation,
 } = bookingApi;

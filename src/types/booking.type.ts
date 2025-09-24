@@ -10,6 +10,16 @@ export type TBookingStatus =
   | 'completed';
 
 export type TPaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
+export type TBookingRequestType = 'none' | 'cancel' | 'reschedule';
+
+export interface IBookingRequest {
+  type?: TBookingRequestType;
+  reason?: string;
+  newDate?: string;
+  newTime?: string;
+  vendorApproved?: boolean;
+  updatedAt?: Date;
+}
 
 export type TBooking = {
   _id: string;
@@ -28,6 +38,10 @@ export type TBooking = {
   status: TBookingStatus;
   paymentType: TPaymentType;
   paymentStatus: TPaymentStatus;
+
+  // Request field for cancel/reschedule
+  request?: IBookingRequest;
+
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
