@@ -17,9 +17,43 @@ const bookingApi = baseApi.injectEndpoints({
       invalidatesTags: ['Booking'],
     }),
 
+    getAllBookingsByUser: builder.query<
+      TResponse<TBooking[]>,
+      {
+        vendorId: string;
+        page?: number | string;
+        limit?: number | string;
+        query?: Record<string, string | string[] | undefined>;
+      }
+    >({
+      query: ({ vendorId, page = 1, limit = 10, query }) => {
+        const params = new URLSearchParams();
+
+        if (query?.searchTerm) {
+          params.append('searchTerm', query.searchTerm.toString());
+        }
+
+        if (query?.createdAt) {
+          const date = new Date(query.createdAt.toString().slice(0, 10));
+          params.append('createdAt', date.toISOString());
+        }
+
+        if (query?.requestType) {
+          params.append('requestType', query.requestType.toString());
+        }
+
+        return {
+          url: `/bookings?vendor=${vendorId}&page=${page}&limit=${limit}&${params.toString()}`,
+          method: 'GET',
+          credentials: 'include',
+        };
+      },
+      providesTags: ['Booking'],
+    }),
+
     getBookingsByEmail: builder.query<TResponse<TBooking[]>, string>({
       query: (email) => ({
-        url: `/bookings?email=${email}`,
+        url: `/bookings/user?email=${email}`,
         method: 'GET',
         credentials: 'include',
       }),
@@ -64,6 +98,7 @@ const bookingApi = baseApi.injectEndpoints({
 
 export const {
   useAddBookingMutation,
+  useGetAllBookingsByUserQuery,
   useGetBookingsByEmailQuery,
   useGetBookingByIdQuery,
   useDeleteBookingMutation,

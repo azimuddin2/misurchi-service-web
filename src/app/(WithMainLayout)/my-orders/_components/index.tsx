@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { useGetOrdersByEmailQuery } from '@/redux/features/order/orderApi';
 import { TOrder } from '@/types/order.type';
 import { Badge } from '@/components/ui/badge';
+import { useCreateCheckoutSessionMutation } from '@/redux/features/payment/paymentApi';
+import { toast } from 'sonner';
 
 const MyOrders = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -18,6 +20,30 @@ const MyOrders = () => {
 
   const { data, isLoading } = useGetOrdersByEmailQuery(email);
   const orders = data?.data ?? [];
+
+  const [createCheckoutSession] = useCreateCheckoutSessionMutation();
+
+  const handleCheckout = async () => {
+    try {
+      const payload = {
+        user: '689f1527ce742b32bb432932',
+        vendor: '68a2bf8ecaa3a51e25460eea',
+        modelType: 'Order',
+        reference: '68d16c8f2fc7a4dee1715ba4',
+        price: '762.45',
+      };
+
+      const response = await createCheckoutSession(payload).unwrap();
+
+      if (response.success && response.data) {
+        window.location.href = response.data; // redirect to Stripe Checkout
+      } else {
+        toast.error(response.message || 'Failed to start payment.');
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Something went wrong.');
+    }
+  };
 
   const columns: ColumnDef<TOrder>[] = [
     {
@@ -139,6 +165,8 @@ const MyOrders = () => {
         <div className="flex items-center gap-2">
           {!row.original.isPaid === true && (
             <Button
+              onClick={handleCheckout}
+              disabled={isLoading}
               size="sm"
               className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer"
             >

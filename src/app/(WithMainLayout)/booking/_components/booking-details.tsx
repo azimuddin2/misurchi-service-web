@@ -8,6 +8,9 @@ import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Spinner from '@/components/shared/Spinner';
+import { useCreateCheckoutSessionMutation } from '@/redux/features/payment/paymentApi';
+import { TBooking } from '@/types/booking.type';
+import { toast } from 'sonner';
 
 type Props = {
   bookingId: string;
@@ -15,6 +18,30 @@ type Props = {
 
 const BookingDetails = ({ bookingId }: Props) => {
   const { data, isLoading } = useGetBookingByIdQuery(bookingId);
+
+  const [createCheckoutSession] = useCreateCheckoutSessionMutation();
+
+  const handleCheckout = async () => {
+    try {
+      const payload = {
+        user: '689f1527ce742b32bb432932',
+        vendor: '68a2bf8ecaa3a51e25460eea',
+        modelType: 'Booking',
+        reference: '68c82901a6a41d0eb70496b2',
+        price: '350',
+      };
+
+      const response = await createCheckoutSession(payload).unwrap();
+
+      if (response.success && response.data) {
+        window.location.href = response.data; // redirect to Stripe Checkout
+      } else {
+        toast.error(response.message || 'Failed to start payment.');
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Something went wrong.');
+    }
+  };
 
   if (isLoading) {
     return <Spinner />;
@@ -142,7 +169,11 @@ const BookingDetails = ({ bookingId }: Props) => {
             </div>
 
             {booking.paymentStatus === 'pending' && (
-              <Button className="w-1/4 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-5 cursor-pointer mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 text-base">
+              <Button
+                onClick={handleCheckout}
+                disabled={isLoading}
+                className="w-1/4 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-5 cursor-pointer mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 text-base"
+              >
                 Pay Now
               </Button>
             )}

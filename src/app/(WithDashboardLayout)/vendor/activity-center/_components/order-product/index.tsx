@@ -78,7 +78,7 @@ const ManageOrderProducts = () => {
     },
   });
 
-  const products = data?.data || [];
+  const orders = data?.data || [];
   const meta = data?.meta || { totalPage: 1 };
 
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
@@ -470,7 +470,7 @@ const ManageOrderProducts = () => {
       </div>
 
       {/* Table & Pagination */}
-      <MSWTable columns={columns} data={products || []} />
+      <MSWTable columns={columns} data={orders || []} />
       <MSWPagination totalPage={meta?.totalPage} />
     </div>
   );
