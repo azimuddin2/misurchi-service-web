@@ -11,7 +11,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { TOrder } from '@/types/order.type';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
-import { ArrowRightFromLine, Search } from 'lucide-react';
+import { FolderSymlink, Search } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -274,7 +274,7 @@ const CancellationRequest = () => {
     font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200"
               >
                 Cancellation Request
-                <ArrowRightFromLine />
+                <FolderSymlink />
               </TabsTrigger>
 
               {/* Services Tab */}
@@ -287,7 +287,7 @@ const CancellationRequest = () => {
     font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200"
               >
                 Return Request
-                <ArrowRightFromLine />
+                <FolderSymlink />
               </TabsTrigger>
             </TabsList>
           </Tabs>

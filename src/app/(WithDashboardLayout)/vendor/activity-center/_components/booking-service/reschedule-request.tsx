@@ -1,33 +1,23 @@
 'use client';
 
 import Spinner from '@/components/shared/Spinner';
+import MSWPagination from '@/components/ui/core/MSWPagination';
+import { MSWTable } from '@/components/ui/core/MSWTable';
+import { Input } from '@/components/ui/input';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useAppSelector } from '@/redux/hooks';
 import { ColumnDef } from '@tanstack/react-table';
-import { TBooking } from '@/types/booking.type';
-import Image from 'next/image';
-import { MSWTable } from '@/components/ui/core/MSWTable';
 import { format, parseISO } from 'date-fns';
-import { CheckCircle, FolderSymlink, Search, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useCallback, useEffect, useState } from 'react';
+import { FolderSymlink, Search } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
-import {
-  useGetAllBookingsByUserQuery,
-  useUpdateBookingRequestApprovalMutation,
-} from '@/redux/features/booking/bookingApi';
-import { Input } from '@/components/ui/input';
-import MSWPagination from '@/components/ui/core/MSWPagination';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { toast } from 'sonner';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGetAllBookingsByUserQuery } from '@/redux/features/booking/bookingApi';
+import { TBooking } from '@/types/booking.type';
 
-const ManageBookingServices = () => {
+const RescheduleRequest = () => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -49,13 +39,14 @@ const ManageBookingServices = () => {
   const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
   const vendorId = vendorData?.data?._id as string;
 
-  const { data, isLoading, refetch } = useGetAllBookingsByUserQuery({
+  const { data, isLoading } = useGetAllBookingsByUserQuery({
     vendorId,
     page,
     limit,
     query: {
       searchTerm,
       createdAt,
+      requestType: 'reschedule',
     },
   });
 
@@ -100,27 +91,6 @@ const ManageBookingServices = () => {
       setSelectedDate(undefined);
     }
   }, [searchParams]);
-
-  const [updateBookingRequestApproval] =
-    useUpdateBookingRequestApprovalMutation();
-
-  const handleVendorApproval = async (bookingId: string, approved: boolean) => {
-    const toastId = toast.loading('Updating status...');
-
-    try {
-      const res = await updateBookingRequestApproval({
-        id: bookingId,
-        vendorApproved: approved,
-      }).unwrap();
-
-      toast.success(res.message || 'Status updated successfully');
-      refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Status update failed');
-    } finally {
-      toast.dismiss(toastId);
-    }
-  };
 
   const columns: ColumnDef<TBooking>[] = [
     {
@@ -189,122 +159,51 @@ const ManageBookingServices = () => {
     },
     {
       accessorKey: 'request',
-      header: 'Request Action',
+      header: 'Request',
       cell: ({ row }) => {
         const request = row.original.request || {};
         const vendorApproved = request.vendorApproved;
         const requestType = request.type ?? 'none';
 
-        // Current user
         const user = useAppSelector(selectCurrentUser);
-        const isVendor = user?.role === 'vendor';
         const isBuyer = user?.role === 'buyer';
 
+        // Status text and color
+        let statusText = '';
+        let statusColor = '';
+
+        if (requestType === 'none') {
+          statusText = 'No request submitted';
+          statusColor = 'text-gray-400';
+        } else if (vendorApproved === true) {
+          statusText = `Status: Approved (${requestType})`;
+          statusColor = 'text-green-600';
+        } else if (vendorApproved === false) {
+          statusText = `Status: Rejected (${requestType})`;
+          statusColor = 'text-red-600';
+        } else if (vendorApproved === undefined && isBuyer) {
+          statusText = `Status: Pending (${requestType})`;
+          statusColor = 'text-yellow-600';
+        }
+
         return (
-          <div className="flex flex-col gap-2">
-            {/* Case 1: No request submitted */}
-            {requestType === 'none' && (
-              <span className="text-gray-400 text-sm italic">
-                No request submitted
-              </span>
+          <div className="flex flex-col gap-1 w-44">
+            {request.updatedAt && (
+              <p>
+                Cancel date:{' '}
+                {format(new Date(request.updatedAt), 'dd MMM, yyyy')}
+              </p>
             )}
 
-            {/* Case 2: Vendor must act */}
-            {requestType !== 'none' && isVendor && (
-              <div className="flex items-center gap-2">
-                {/* Approve button with Popover */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded"
-                      disabled={vendorApproved === true}
-                    >
-                      Approve
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56">
-                    <p className="text-sm font-medium mb-2">
-                      Confirm approval for this request?
-                    </p>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-green-600 rounded text-green-600 cursor-pointer hover:bg-white hover:text-green-700"
-                        onClick={() =>
-                          handleVendorApproval(row.original._id, true)
-                        }
-                      >
-                        Yes, Approve
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+            <p className={`font-medium ${statusColor} text-base`}>
+              {statusText}
+            </p>
 
-                {/* Reject button with Popover */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
-                      disabled={vendorApproved === false}
-                    >
-                      Reject
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56">
-                    <p className="text-sm font-medium mb-2">
-                      Confirm rejection for this request?
-                    </p>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-red-500 rounded text-red-500 cursor-pointer bg-white hover:bg-white hover:text-red-700"
-                        onClick={() =>
-                          handleVendorApproval(row.original._id, false)
-                        }
-                      >
-                        Yes, Reject
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
+            {request.reason && (
+              <p className="text-gray-500 break-words whitespace-normal text-sm">
+                <span className="font-medium">Reason:</span> {request.reason}
+              </p>
             )}
-
-            {/* Case 3: Vendor already acted */}
-            {requestType !== 'none' && vendorApproved === true && (
-              <>
-                <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
-                  Vendor <CheckCircle className="w-4 h-4" />
-                  Approved ({requestType})
-                </span>
-                <span className="text-sm">Buyer Request ({requestType})</span>
-              </>
-            )}
-
-            {requestType !== 'none' && vendorApproved === false && (
-              <>
-                <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
-                  Vendor <XCircle className="w-4 h-4" />
-                  Rejected ({requestType})
-                </span>
-                <span className="text-sm">Buyer Request ({requestType})</span>
-              </>
-            )}
-
-            {/* Case 4: Buyer sees pending */}
-            {requestType !== 'none' &&
-              isBuyer &&
-              vendorApproved === undefined && (
-                <span className="text-yellow-600 font-medium text-sm">
-                  Pending Vendor Approval
-                </span>
-              )}
           </div>
         );
       },
@@ -318,7 +217,7 @@ const ManageBookingServices = () => {
   return (
     <div>
       {/* Search + Date Filter Section */}
-      <div className="flex flex-col lg:justify-between lg:flex-row gap-4 mt-5">
+      <div className="flex flex-col lg:justify-between lg:flex-row gap-4 mb-5">
         <div className="relative w-full lg:w-3/5">
           <Input
             type="text"
@@ -350,7 +249,7 @@ const ManageBookingServices = () => {
 
       {/* Header */}
       <div className="lg:flex justify-between items-center mt-6 mb-2">
-        <h2 className="text-xl font-medium">Manage Booking Service</h2>
+        <h2 className="text-xl font-medium my-2">Reschedule Booking Request</h2>
 
         <div>
           <Tabs className="w-full max-w-6xl mx-auto">
@@ -397,4 +296,4 @@ const ManageBookingServices = () => {
   );
 };
 
-export default ManageBookingServices;
+export default RescheduleRequest;

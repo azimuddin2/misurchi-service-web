@@ -1,4 +1,4 @@
-import CancellationRequest from '../_components/order-product/cancellation-request';
+import CancellationRequest from '../../_components/order-product/cancellation-request';
 
 const OrderCancellationPage = () => {
   return (

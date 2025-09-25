@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import {
   useGetAllOrdersByUserQuery,
-  useUpdateOrderRequestMutation,
+  useOrderApprovedRequestMutation,
   useUpdateOrderStatusMutation,
 } from '@/redux/features/order/orderApi';
 import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
@@ -26,6 +26,7 @@ import {
   ArrowRightFromLine,
   CheckCircle,
   ChevronDown,
+  FolderSymlink,
   Search,
   XCircle,
 } from 'lucide-react';
@@ -82,7 +83,7 @@ const ManageOrderProducts = () => {
   const meta = data?.meta || { totalPage: 1 };
 
   const [updateOrderStatus] = useUpdateOrderStatusMutation();
-  const [updateOrderRequest] = useUpdateOrderRequestMutation();
+  const [orderApprovedRequest] = useOrderApprovedRequestMutation();
 
   // search & createdAt date filtering part
   const updateSearchParams = useCallback(
@@ -107,7 +108,7 @@ const ManageOrderProducts = () => {
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
     updateSearchParams({
-      createdAt: date ? format(date, 'yyyy-MM-dd') : null, // Only send 'YYYY-MM-DD'
+      createdAt: date ? format(date, 'yyyy-MM-dd') : null,
       page: '1',
     });
   };
@@ -147,7 +148,7 @@ const ManageOrderProducts = () => {
     const toastId = toast.loading('Updating status...');
 
     try {
-      const res = await updateOrderRequest({
+      const res = await orderApprovedRequest({
         id: orderId,
         vendorApproved: approved,
       }).unwrap();
@@ -363,17 +364,23 @@ const ManageOrderProducts = () => {
 
             {/* Case 3: Vendor already acted */}
             {requestType !== 'none' && vendorApproved === true && (
-              <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
-                <CheckCircle className="w-4 h-4" />
-                Approved ({requestType})
-              </span>
+              <>
+                <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
+                  Vendor <CheckCircle className="w-4 h-4" />
+                  Approved ({requestType})
+                </span>
+                <span className="text-sm">Buyer Request ({requestType})</span>
+              </>
             )}
 
             {requestType !== 'none' && vendorApproved === false && (
-              <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
-                <XCircle className="w-4 h-4" />
-                Rejected ({requestType})
-              </span>
+              <>
+                <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
+                  Vendor <XCircle className="w-4 h-4" />
+                  Rejected ({requestType})
+                </span>
+                <span className="text-sm">Buyer Request ({requestType})</span>
+              </>
             )}
 
             {/* Case 4: Buyer sees pending */}
@@ -449,7 +456,7 @@ const ManageOrderProducts = () => {
     font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200"
               >
                 Cancellation Request
-                <ArrowRightFromLine />
+                <FolderSymlink />
               </TabsTrigger>
 
               {/* Services Tab */}
@@ -462,7 +469,7 @@ const ManageOrderProducts = () => {
     font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200"
               >
                 Return Request
-                <ArrowRightFromLine />
+                <FolderSymlink />
               </TabsTrigger>
             </TabsList>
           </Tabs>

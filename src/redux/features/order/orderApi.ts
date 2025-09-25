@@ -97,7 +97,7 @@ const orderApi = baseApi.injectEndpoints({
     }),
 
     // ✅ Update order request vendor approval
-    updateOrderRequest: builder.mutation<
+    orderApprovedRequest: builder.mutation<
       TResponse<TOrder>,
       { id: string; vendorApproved: boolean }
     >({
@@ -128,6 +128,6 @@ export const {
   useGetOrderByIdQuery,
   useRequestOrderMutation,
   useUpdateOrderStatusMutation,
-  useUpdateOrderRequestMutation,
+  useOrderApprovedRequestMutation,
   useDeleteOrderMutation,
 } = orderApi;
