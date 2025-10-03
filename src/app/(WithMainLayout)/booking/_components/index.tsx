@@ -57,6 +57,7 @@ const Booking = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const bookingData = {
+      user: user?.userId,
       vendor,
       service,
       serviceId,

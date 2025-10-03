@@ -73,9 +73,11 @@ export default function Header() {
 
   const ICONS_LINKS = (
     <>
-      <Link href="/notifications">
-        <Bell size={24} />
-      </Link>
+      {user?.email && (
+        <Link href="/notifications">
+          <Bell size={24} />
+        </Link>
+      )}
       {user?.role === 'user' ? (
         <li
           className="relative cursor-pointer mr-5 lg:block hidden"
