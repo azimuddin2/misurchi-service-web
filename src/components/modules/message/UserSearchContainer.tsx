@@ -1,11 +1,14 @@
 'use client';
 
-import CustomAvatar from '@/components/shared/CustomAvater';
-import Empty from '@/components/shared/Empty';
+import CustomAvatar from '@/components/shared/custom-avater';
+import Empty from '@/components/shared/empty';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useGetAllUserQuery } from '@/redux/api/authApi';
+import { useGetAllUsersQuery } from '@/redux/features/user/userApi';
+import { IUser } from '@/types';
+
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -16,12 +19,19 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
   const [searchText, setSearchText] = useState('');
   const [search] = useDebounce(searchText, 1000);
   const query: Record<string, string | number> = {};
-  query['limit'] = limit;
-  if (search) {
-    query['searchTerm'] = search;
-  }
-  const { data, isLoading } = useGetAllUserQuery(query);
+
   const router = useRouter();
+
+  // query['limit'] = limit;
+  // if (search) {
+  //   query['searchTerm'] = search;
+  // }
+  const { data, isLoading } = useGetAllUsersQuery({});
+
+  const users = data?.data || [];
+  console.log(users);
+
+  const meta = data?.meta || { totalPage: 1 };
 
   return (
     <div className="scroll-hide max-h-[80vh] min-h-[70vh] space-y-5 overflow-auto bg-primary-blue/10 px-2 rounded-lg">
@@ -58,8 +68,8 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
             </div>
           ))}
         </div>
-      ) : data?.data?.data?.length ? (
-        data?.data?.data?.map((user: any) => (
+      ) : users?.length ? (
+        users?.map((user: IUser) => (
           <div
             key={user?._id}
             className="flex gap-x-1 items-center cursor-pointer"
@@ -67,19 +77,19 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
           >
             <CustomAvatar
               img={user?.image}
-              name={user?.name}
+              name={user?.firstName}
               className="size-14"
             />
             <div>
               <p className="text-xl font-medium">
-                {user?.name?.length > 16
-                  ? user?.name.slice(0, 16) + '...'
-                  : user?.name}
+                {user?.firstName?.length > 16
+                  ? user?.firstName.slice(0, 16) + '...'
+                  : user?.firstName}
               </p>
               <p>
-                {user?.title?.length > 20
-                  ? user?.title.slice(0, 20) + '...'
-                  : user?.title}
+                {user?.firstName?.length > 20
+                  ? user?.firstName.slice(0, 20) + '...'
+                  : user?.firstName}
               </p>
             </div>
           </div>
@@ -92,13 +102,13 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
         className={cn(
           `flex justify-end`,
           isLoading && 'hidden',
-          limit >= data?.data?.meta?.total && 'hidden',
+          limit >= meta?.totalPage && 'hidden',
         )}
       >
         <Button
           className="bg-primary-blue rounded-full mb-5"
           onClick={() => setLimit((prev) => prev + 6)}
-          disabled={limit >= data?.data?.meta?.total || isLoading}
+          disabled={limit >= meta?.totalPage || isLoading}
         >
           Load More
         </Button>

@@ -1,5 +1,4 @@
-import MessageContainer from '@/components/modules/message/ChatContainer.js';
-import React from 'react';
+import MessageContainer from '@/components/modules/message/MessageContainer';
 
 const MessagePage = () => {
   return (

@@ -1,4 +1,4 @@
-import CustomAvatar from '@/components/shared/CustomAvater';
+import CustomAvatar from '@/components/shared/custom-avater';
 import { cn } from '@/lib/utils';
 import { calculateTime } from '@/utils/calculateTime';
 import { useRouter } from 'next/navigation';

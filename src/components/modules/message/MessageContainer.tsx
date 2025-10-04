@@ -7,15 +7,18 @@ import OwnerMsgCard from './OwnerMsgCard';
 import ReceiverMsgCard from './ReceiverMsgCard';
 import UserCard from './UserCard';
 import { useEffect, useRef, useState } from 'react';
-import { useSocket } from '@/context/SocketContextApi';
-import { useAppSelector } from '@/redux/hooks';
+
 import { useForm } from 'react-hook-form';
-import { MessageImageUpload } from '@/components/ui/upload-message-image';
+
 import { useSearchParams } from 'next/navigation';
-import CustomAvatar from '@/components/shared/CustomAvater';
 import { cn } from '@/lib/utils';
-import useMultipleFileUpload from '@/hooks/useMultipleFileUpload';
 import UserSearchContainer from './UserSearchContainer';
+import { useAppSelector } from '@/redux/hooks';
+import { useSocket } from '@/providers/SocketProvider';
+import useMultipleFileUpload from '@/hooks/useMultipleFileUpload';
+import CustomAvatar from '@/components/shared/custom-avater';
+import { MessageImageUpload } from '@/components/ui/core/UploadMessageImage';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 export interface UploadedImage {
   id: string;
@@ -28,7 +31,7 @@ const MessageContainer = () => {
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const { socket } = useSocket();
-  const user: any = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector(selectCurrentUser);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [messages, setMessages] = useState<any>(null);

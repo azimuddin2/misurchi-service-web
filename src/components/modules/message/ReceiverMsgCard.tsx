@@ -1,5 +1,6 @@
 'use client';
-import PreviewImageModal from '@/components/shared/PreviewImageModal';
+
+import PreviewImageModal from '@/components/shared/preview-image-modal';
 import { AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
