@@ -6,6 +6,7 @@ export type TPaymentType = 'half' | 'full' | 'later';
 export type TBookingStatus =
   | 'pending'
   | 'confirmed'
+  | 'ongoing'
   | 'cancelled'
   | 'completed';
 
@@ -41,6 +42,8 @@ export type TBooking = {
 
   // Request field for cancel/reschedule
   request?: IBookingRequest;
+
+  assignedTo: string | null;
 
   isDeleted: boolean;
   createdAt: string;

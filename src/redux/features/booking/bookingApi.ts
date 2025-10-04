@@ -128,6 +128,19 @@ const bookingApi = baseApi.injectEndpoints({
       invalidatesTags: ['Booking'],
     }),
 
+    bookingAssignedToMember: builder.mutation<
+      TResponse<TBooking>,
+      { id: string; assignedTo: { assignedTo: string } }
+    >({
+      query: ({ id, assignedTo }) => ({
+        url: `/bookings/assign/${id}`,
+        method: 'PATCH',
+        body: assignedTo,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+
     deleteBooking: builder.mutation<TResponse<TBooking>, string>({
       query: (id) => ({
         url: `/bookings/${id}`,
@@ -148,4 +161,5 @@ export const {
   useUpdateBookingRequestMutation,
   useUpdateBookingRequestApprovalMutation,
   useGetBookingAppointmentsQuery,
+  useBookingAssignedToMemberMutation,
 } = bookingApi;
