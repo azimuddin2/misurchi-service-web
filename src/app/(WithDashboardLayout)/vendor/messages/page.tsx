@@ -1,7 +1,6 @@
-'use client';
 import MessageContainer from '@/components/modules/message/MessageContainer';
 
-const MessagePage = () => {
+const MessagesPage = () => {
   return (
     <div>
       <MessageContainer />
@@ -9,4 +8,4 @@ const MessagePage = () => {
   );
 };
 
-export default MessagePage;
+export default MessagesPage;

@@ -12,6 +12,9 @@ import {
   UsersRound,
   Calendar,
   SquareActivity,
+  BadgeDollarSign,
+  Mail,
+  MessageCircleMore,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -89,6 +92,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Activity Center',
         url: `/vendor/activity-center`,
         icon: SquareActivity,
+      },
+      {
+        title: 'Transaction History',
+        url: `/vendor/transaction-history`,
+        icon: BadgeDollarSign,
+      },
+      {
+        title: 'Messages',
+        url: `/vendor/messages`,
+        icon: MessageCircleMore,
       },
       {
         title: 'Shared Calendar',

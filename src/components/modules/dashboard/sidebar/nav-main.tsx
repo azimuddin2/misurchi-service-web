@@ -66,7 +66,7 @@ export function NavMain({
                     'py-5 rounded-sm w-full text-left transition-colors',
                     isParentActive
                       ? 'hover:text-white bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white font-medium'
-                      : 'hover:bg-muted text-[#165940]',
+                      : 'hover:bg-muted text-[#165940] my-1',
                   )}
                 >
                   <Link href={item.url}>

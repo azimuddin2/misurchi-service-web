@@ -1,7 +1,9 @@
+'use client';
+
 import CustomAvatar from '@/components/shared/custom-avater';
+import { useUpdateSearchParams } from '@/hooks/useUpdateSearchParams';
 import { cn } from '@/lib/utils';
 import { calculateTime } from '@/utils/calculateTime';
-import { useRouter } from 'next/navigation';
 
 const UserCard = ({
   user,
@@ -12,73 +14,90 @@ const UserCard = ({
   setChatId?: any;
   selectedUserId?: string;
 }) => {
-  const router = useRouter();
+  const updateSearchParams = useUpdateSearchParams();
+
+  // Handle click event: navigate + set selected chat
+  const handleSelectUser = () => {
+    updateSearchParams({ selectedUserId: user?.userData?._id });
+    setChatId(user?.message?.chat);
+  };
 
   return (
     <div
+      onClick={handleSelectUser}
       className={cn(
-        `flex items-center xl:gap-x-2 lg:gap-x-1 gap-x-2 cursor-pointer  px-1`,
-        selectedUserId == user?.userData?._id &&
-          'bg-primary-blue py-2 rounded text-white',
-      )}
-      onClick={() => {
-        router.push(`message?selectedUserId=${user?.userData?._id}`);
-        setChatId(user?.message?.chat);
-      }}
-    >
-      <div>
-        <CustomAvatar
-          img={user?.userData?.image}
-          name={user?.userData?.name}
-          className="lg:size-8 size-10 xl:size-12  rounded-full "
-        ></CustomAvatar>
-      </div>
+        // Base container styles
+        'flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ease-in-out',
 
-      <div className="flex-grow ">
-        <div className="flex items-center justify-between gap-x-2">
+        // Hover and selected effects
+        selectedUserId === user?.userData?._id
+          ? 'bg-primary-blue text-white shadow-md'
+          : 'hover:bg-gray-100/80 bg-white',
+
+        // Border and spacing
+        'border border-gray-100 hover:shadow-sm',
+      )}
+    >
+      {/* User Avatar */}
+      <CustomAvatar
+        img={user?.userData?.image}
+        name={user?.userData?.fullName}
+        className="size-12 rounded-full ring-2 ring-transparent hover:ring-primary-blue transition-all"
+      />
+
+      {/* Message Info */}
+      <div className="flex flex-col flex-grow min-w-0">
+        {/* Top Row: Name + Time */}
+        <div className="flex justify-between items-center w-full">
           <h4
             className={cn(
-              'lg:text-[14px] text-base xl:text-base  font-medium text-primary-black truncate lg:max-w-[150px] xl:max-w-[120px] 2xl:max-w-[180px]',
-              selectedUserId == user?.userData?._id && 'text-white',
+              'font-semibold text-sm truncate max-w-[160px]',
+              selectedUserId === user?.userData?._id
+                ? 'text-white'
+                : 'text-gray-900',
             )}
           >
-            {user?.userData?.name}
+            {user?.userData?.fullName}
           </h4>
-          <p
+
+          <span
             className={cn(
-              'font-semibold text-secondary-2 text-primary-gray truncate text-[12px] lg:text-[10px] xl:text-[12px]',
-              selectedUserId == user?.userData?._id && 'text-gray-200',
+              'text-xs font-medium',
+              selectedUserId === user?.userData?._id
+                ? 'text-gray-200'
+                : 'text-gray-500',
             )}
           >
             {calculateTime(user?.message?.createdAt)}
-          </p>
+          </span>
         </div>
-        <div className="flex justify-between items-center">
-          <p
-            className={cn(
-              'text-ellipsis text-[12px]  xl:text-[12px] lg:text-[10px]',
-              user?.unseen && 'font-bold',
-            )}
-          >
-            {user?.message?.text && user?.message?.text?.length > 34
-              ? user?.message?.text?.slice(0, 34) + '...'
-              : user?.message?.text || ''}
 
-            {!user?.message?.text &&
-              user?.message?.imageUrl?.length > 0 &&
-              user?.message?.imageUrl?.length +
-                ' ' +
-                (user?.message?.imageUrl?.length > 1 ? 'Images' : 'Image')}
-          </p>
-          {/* unseen message */}
+        {/* Bottom Row: Last Message + Unread Count */}
+        <div className="flex justify-between items-center mt-1">
           <p
             className={cn(
-              'text-[10px] px-1 bg-primary-blue rounded-full text-white',
-              selectedUserId == user?.userData?._id && 'hidden',
+              'truncate text-sm text-gray-600',
+              user?.unseen && 'font-semibold text-gray-800',
+              selectedUserId === user?.userData?._id && 'text-gray-100',
             )}
           >
-            {user?.unseenMessage ? user?.unseenMessage : ''}
+            {user?.message?.text
+              ? user?.message?.text?.length > 36
+                ? user?.message?.text?.slice(0, 36) + '...'
+                : user?.message?.text
+              : user?.message?.imageUrl?.length
+                ? `${user?.message?.imageUrl?.length} ${
+                    user?.message?.imageUrl?.length > 1 ? 'Images' : 'Image'
+                  }`
+                : ''}
           </p>
+
+          {/* Unread Message Badge */}
+          {user?.unseenMessage && selectedUserId !== user?.userData?._id && (
+            <span className="text-xs font-semibold bg-primary-blue text-white px-2 py-[2px] rounded-full shadow-sm">
+              {user?.unseenMessage}
+            </span>
+          )}
         </div>
       </div>
     </div>

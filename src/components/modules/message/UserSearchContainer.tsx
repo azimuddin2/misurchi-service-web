@@ -5,12 +5,11 @@ import Empty from '@/components/shared/empty';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useUpdateSearchParams } from '@/hooks/useUpdateSearchParams';
 import { cn } from '@/lib/utils';
 import { useGetAllUsersQuery } from '@/redux/features/user/userApi';
 import { IUser } from '@/types';
-
 import { X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
@@ -19,17 +18,11 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
   const [searchText, setSearchText] = useState('');
   const [search] = useDebounce(searchText, 1000);
   const query: Record<string, string | number> = {};
+  const updateSearchParams = useUpdateSearchParams();
 
-  const router = useRouter();
-
-  // query['limit'] = limit;
-  // if (search) {
-  //   query['searchTerm'] = search;
-  // }
   const { data, isLoading } = useGetAllUsersQuery({});
 
   const users = data?.data || [];
-  console.log(users);
 
   const meta = data?.meta || { totalPage: 1 };
 
@@ -73,7 +66,7 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
           <div
             key={user?._id}
             className="flex gap-x-1 items-center cursor-pointer"
-            onClick={() => router.push(`/message?selectedUserId=${user?._id}`)}
+            onClick={() => updateSearchParams({ selectedUserId: user?._id })}
           >
             <CustomAvatar
               img={user?.image}

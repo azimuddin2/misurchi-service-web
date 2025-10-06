@@ -7,9 +7,7 @@ import OwnerMsgCard from './OwnerMsgCard';
 import ReceiverMsgCard from './ReceiverMsgCard';
 import UserCard from './UserCard';
 import { useEffect, useRef, useState } from 'react';
-
 import { useForm } from 'react-hook-form';
-
 import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import UserSearchContainer from './UserSearchContainer';
@@ -19,6 +17,7 @@ import useMultipleFileUpload from '@/hooks/useMultipleFileUpload';
 import CustomAvatar from '@/components/shared/custom-avater';
 import { MessageImageUpload } from '@/components/ui/core/UploadMessageImage';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { toast } from 'sonner';
 
 export interface UploadedImage {
   id: string;
@@ -48,9 +47,12 @@ const MessageContainer = () => {
 
   const [wantTOSearch, setWantTOSearch] = useState(false);
 
+  console.log(messages);
+
   // ========================= listen message::received ===========================
   const handleListenMessage = (res: any) => {
     setMessages(res);
+    // console.log({ message: res });
   };
 
   /**
@@ -61,9 +63,13 @@ const MessageContainer = () => {
   useEffect(() => {
     if (socket && user?.userId) {
       socket?.on('message', handleListenMessage);
-      setTimeout(() => {
-        socket?.emit('message-page', selectedUserId);
-      }, 500);
+
+      console.log(selectedUserId);
+      if (selectedUserId) {
+        setTimeout(() => {
+          socket?.emit('message-page', selectedUserId);
+        }, 500);
+      }
     }
     return () => {
       socket?.off('message', handleListenMessage);
@@ -94,27 +100,46 @@ const MessageContainer = () => {
   useEffect(() => {
     if (socket && user?.userId) {
       socket?.on('user-details', (res: any) => {
+        console.log('user details ============= ', res);
         setUserDetails(res);
       });
     }
   }, [socket, user?.userId, selectedUser]);
 
+  console.log({ userDetails });
+
   // ======================== listen chat-list ===========================
   useEffect(() => {
-    socket?.on(`chat-list::${user?.userId}`, (res: any) => {
+    socket?.on(`chat-list`, (res: any) => {
+      console.log('chat list ==========', res);
       setChatListData(res);
     });
 
     setTimeout(() => {
-      socket?.emit(`my-chat-list`, {});
-    }, 500);
+      socket?.emit(`my-chat-list`, {}, (res: any) => {
+        console.log('Keno chat list pacchi na?');
+        console.log(res);
+        setChatListData(res?.message);
+      });
+    }, 1000);
 
     return () => {
       if (socket) {
-        socket.off(`chat-list::${user?.userId}`);
+        socket.off(`chat-list`);
       }
     };
-  }, [socket, user?.userId]);
+  }, [socket, socket?.connected]);
+
+  // emit chat list
+  // useEffect(() => {
+  //   console.log(socket);
+  //   if (socket && socket?.connected) {
+  //     console.log({ socketConnected: socket.connected });
+  //     socket?.emit(`my-chat-list`, {});
+
+  //   }
+
+  // }, [socket, socket?.connected])
 
   // ======================== listen new message  ===========================
   useEffect(() => {
@@ -159,7 +184,10 @@ const MessageContainer = () => {
       text: data?.message,
     };
     if (socket && user?.userId && selectedUserId) {
-      socket.emit('send-message', payload);
+      socket.emit('send-message', payload, (res: any) => {
+        console.log(res);
+        toast.success('message send successfully');
+      });
       reset();
       setUploadedImages([]);
       setImages([]);
@@ -226,7 +254,7 @@ const MessageContainer = () => {
           )}
         >
           <div className="lg:border-t-black flex items-end gap-x-5 border-b border-opacity-[40%] py-4 text-black">
-            <h4 className="text-2xl font-bold">Messages</h4>
+            <h4 className="text-2xl font-medium">Messages</h4>
           </div>
 
           <div className="mx-auto mb-10 mt-4 lg:w-[95%]">
@@ -288,14 +316,14 @@ const MessageContainer = () => {
                 <div>
                   <CustomAvatar
                     img={userDetails?.image}
-                    name={userDetails?.name}
+                    name={userDetails?.fullName}
                     className="size-12"
                   ></CustomAvatar>
                 </div>
 
                 <div className="lg:flex-grow">
                   <h3 className="text-xl font-semibold text-black">
-                    {userDetails?.name}
+                    {userDetails?.fullName}
                   </h3>
 
                   {isActive ? (
@@ -328,11 +356,11 @@ const MessageContainer = () => {
                   !isPreviousMessageFromSameSender || index === 0; // Show avatar only if it's the first in a series or the first message overall.
 
                 return message?.sender !== user?.userId ? (
-                  <div className="flex items-start gap-x-2" key={message.id}>
+                  <div className="flex items-start gap-x-2" key={message._id}>
                     {showAvatar && (
                       <CustomAvatar
                         img={userDetails?.image}
-                        name={userDetails?.name}
+                        name={userDetails?.fullName}
                         className="size-8 rounded-full"
                       />
                     )}
@@ -353,7 +381,7 @@ const MessageContainer = () => {
                 ) : (
                   <div
                     className="flex flex-row-reverse items-start gap-x-4"
-                    key={message.id}
+                    key={message._id}
                   >
                     <div className="flex md:max-w-[50%] max-w-[75%] flex-col items-end space-y-1 break-words">
                       <OwnerMsgCard
@@ -440,7 +468,7 @@ const MessageContainer = () => {
                         maxHeight={150}
                       ></AutosizeTextarea> */}
 
-                      <Button className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 bg-primary-blue px-3">
+                      <Button className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 bg-[#003250] px-3">
                         <SendHorizontal size={20} color="#fff" />
                       </Button>
                     </div>

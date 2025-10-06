@@ -13,7 +13,7 @@ const OwnerMsgCard = ({ message, files }: { message: string; files: any }) => {
 
   return (
     <>
-      <div className="max-w-max rounded-xl border bg-primary-blue text-primary-white px-3 py-1  overflow-hidden">
+      <div className="max-w-max rounded-sm border bg-primary-blue text-primary-white px-3 py-1  overflow-hidden bg-[#003250]">
         {files && files?.length > 0 && (
           <div
             className={cn(
