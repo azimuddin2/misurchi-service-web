@@ -4,7 +4,6 @@ import { selectCurrentToken } from '@/redux/features/auth/authSlice';
 import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { io, Socket } from 'socket.io-client';
-import { toast } from 'sonner';
 
 type TValueType = {
   socket: Socket;
@@ -32,7 +31,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       });
 
       socketStore.on('connect', () => {
-        toast.success('socket is connected');
+        // toast.success('socket is connected');
         setSocketLoading(false);
       });
 

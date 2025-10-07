@@ -17,7 +17,6 @@ import useMultipleFileUpload from '@/hooks/useMultipleFileUpload';
 import CustomAvatar from '@/components/shared/custom-avater';
 import { MessageImageUpload } from '@/components/ui/core/UploadMessageImage';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { toast } from 'sonner';
 
 export interface UploadedImage {
   id: string;
@@ -186,7 +185,6 @@ const MessageContainer = () => {
     if (socket && user?.userId && selectedUserId) {
       socket.emit('send-message', payload, (res: any) => {
         console.log(res);
-        toast.success('message send successfully');
       });
       reset();
       setUploadedImages([]);
