@@ -32,6 +32,7 @@ import { useAddProductMutation } from '@/redux/features/product/productApi';
 import { toast } from 'sonner';
 import { ProductStatus } from '@/constants/product';
 import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
+import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
 
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -46,6 +47,8 @@ const AddProduct = () => {
   const {
     formState: { isSubmitting },
   } = form;
+
+  const { data: productTypeData } = useGetAllProductTypeQuery({});
 
   const { data } = useGetVendorProfileQuery(user?.email as string);
   const vendor = data?.data;
@@ -145,18 +148,32 @@ const AddProduct = () => {
               control={form.control}
               name="productType"
               render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
+                <FormItem>
+                  <FormLabel className="!text-gray-700 !text-sm font-medium">
                     Product Type
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Product Type"
-                      {...field}
-                      value={field.value || ''}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                    />
+                    <Select
+                      value={field.value || 'none'}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
+                        <SelectValue placeholder="Select Product Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem disabled value="none">
+                          Please Select Type
+                        </SelectItem>
+                        {productTypeData?.data?.map((productType) => (
+                          <SelectItem
+                            key={productType._id}
+                            value={`${productType.name}`}
+                          >
+                            {productType.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

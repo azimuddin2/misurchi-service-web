@@ -4,7 +4,7 @@ import { useUploadImageMutation } from '@/redux/features/imageUpload/imageUpload
 
 // import { TError } from "@/type";
 
-const useMultipleFileUpload: () => [Function, boolean] = () => {
+const useMultipleFileUpload = () => {
   const [uploadFile, { isLoading: isUploading }] = useUploadImageMutation();
   const upload = async (file: File[]) => {
     try {

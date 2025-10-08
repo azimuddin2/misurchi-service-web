@@ -1,6 +1,15 @@
 import { TReview } from './review.type';
 import { TVendorUser } from './user.type';
 
+export type TProductType = {
+  _id: string;
+  name: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+};
+
 export type TProduct = {
   _id: string;
   vendor: TVendorUser;

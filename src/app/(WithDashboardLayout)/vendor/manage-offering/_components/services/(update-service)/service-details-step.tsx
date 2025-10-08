@@ -39,6 +39,7 @@ import { Badge } from '@/components/ui/badge';
 import { ServiceStatus } from '@/constants/service';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TImage, TServicePricing } from '@/types/service.type';
+import { useGetAllServiceTypeQuery } from '@/redux/features/serviceType/serviceTypeApi';
 
 const serviceSchema = z.object({
   name: z.string({ required_error: 'Service name is required' }),
@@ -74,6 +75,8 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
 
   // Duration options in minutes
   const durations = Array.from({ length: 48 }, (_, i) => (i + 1) * 30);
+
+  const { data: serviceTypeData } = useGetAllServiceTypeQuery({});
 
   // React Hook Form initialization
   const form = useForm({
@@ -344,17 +347,22 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                 Service Type
               </FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  defaultValue={field.value || data?.type}
+                  onValueChange={field.onChange}
+                >
                   <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
                     <SelectValue placeholder="Select service type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="beauty-wellness">
-                      Beauty & Wellness
+                    <SelectItem disabled value="none">
+                      Please Select Type
                     </SelectItem>
-                    <SelectItem value="hair-styling">Hair Styling</SelectItem>
-                    <SelectItem value="skincare">Skincare</SelectItem>
-                    <SelectItem value="nail-care">Nail Care</SelectItem>
+                    {serviceTypeData?.data?.map((type) => (
+                      <SelectItem key={type._id} value={`${type.name}`}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>

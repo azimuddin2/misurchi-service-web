@@ -37,6 +37,7 @@ import { updateProductSchema } from './updateProductValidation';
 import { TProduct } from '@/types/product.type';
 import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
+import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
 
 type Props = {
   productId: string;
@@ -48,6 +49,8 @@ const UpdateProduct = ({ productId }: Props) => {
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
+
+  const { data: productTypeData } = useGetAllProductTypeQuery({});
 
   const { data, isLoading } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
@@ -73,7 +76,7 @@ const UpdateProduct = ({ productId }: Props) => {
     if (product) {
       form.reset({
         name: product.name,
-        productType: product.productType,
+        productType: product.productType || '',
         quantity: String(product.quantity),
         price: String(product.price),
         discountPrice: product.discountPrice || 'none', // backend value, e.g. "20%" or fallback
@@ -206,18 +209,32 @@ const UpdateProduct = ({ productId }: Props) => {
               control={form.control}
               name="productType"
               render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
+                <FormItem>
+                  <FormLabel className="!text-gray-700 !text-sm font-medium">
                     Product Type
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Product Type"
-                      {...field}
-                      value={field.value || ''}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                    />
+                    <Select
+                      defaultValue={field.value || product?.productType}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
+                        <SelectValue placeholder="Select Product Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem disabled value="none">
+                          Please Select Type
+                        </SelectItem>
+                        {productTypeData?.data?.map((productType) => (
+                          <SelectItem
+                            key={productType._id}
+                            value={`${productType.name}`}
+                          >
+                            {productType.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

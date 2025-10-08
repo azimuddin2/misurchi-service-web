@@ -165,7 +165,6 @@ const CancelRequest = () => {
         const vendorApproved = request.vendorApproved;
         const requestType = request.type ?? 'none';
 
-        const user = useAppSelector(selectCurrentUser);
         const isBuyer = user?.role === 'buyer';
 
         // Status text and color

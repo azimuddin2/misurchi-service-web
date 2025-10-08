@@ -1,5 +1,5 @@
 import { TReview } from './review.type';
-import { IUser, TVendorUser } from './user.type';
+import { TVendorUser } from './user.type';
 
 export type TStatus = 'available' | 'unavailable';
 
@@ -72,4 +72,13 @@ export type TServiceSlots = {
   duration: string;
   finalPrice: string;
   slots: TSlot[];
+};
+
+export type TServiceType = {
+  _id: string;
+  name: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 };

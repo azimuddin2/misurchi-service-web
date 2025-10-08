@@ -15,7 +15,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Edit, Eye, PlusCircle, Search, Trash2 } from 'lucide-react';
+import {
+  ChevronDown,
+  Edit,
+  Eye,
+  PlusCircle,
+  Search,
+  Trash2,
+} from 'lucide-react';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
@@ -264,8 +271,8 @@ const ManageServices = () => {
       cell: ({ row }) => {
         const status = row.original.status;
         const statusTextColorMap: Record<string, string> = {
-          available: 'text-[#165940]',
-          unavailable: 'text-[#E12728]',
+          available: 'text-[#165940] border-[#165940]',
+          unavailable: 'text-[#E12728] border-[#E12728]',
         };
         const statusColor = statusTextColorMap[status] || 'text-gray-700';
         return (
@@ -273,8 +280,8 @@ const ManageServices = () => {
             <DropdownMenuTrigger
               className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
             >
-              <RxUpdate className="w-4 h-4" />
               {status}
+              <ChevronDown className="w-4 h-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-44">
               {statusOptions.map((option) => (
@@ -305,8 +312,8 @@ const ManageServices = () => {
       cell: ({ row }) => {
         const status = row.original.highlightStatus;
         const statusTextColorMap: Record<string, string> = {
-          Highlight: 'text-[#1D4ED8]',
-          Highlighted: 'text-[#165940]',
+          Highlight: 'text-[#1D4ED8] border-[#1D4ED8]',
+          Highlighted: 'text-[#165940] border-[#165940]',
         };
         const statusColor = statusTextColorMap[status] || 'text-gray-700';
         return (
@@ -314,8 +321,8 @@ const ManageServices = () => {
             <DropdownMenuTrigger
               className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
             >
-              <RxUpdate className="w-4 h-4" />
               {status}
+              <ChevronDown className="w-4 h-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-44">
               {highlightstatusOptions.map((option) => (

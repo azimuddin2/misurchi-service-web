@@ -53,7 +53,7 @@ const VerifyOtpForm = () => {
 
     try {
       const res = (await verifyOtp({ otp: otpCode })) as TResponse<
-        string | Number | any
+        string | any
       >;
 
       if (res.error) {

@@ -4,7 +4,7 @@ import { TSubscriptionPlan } from '@/types/subscription.type';
 
 const subscriptionPlanApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllSubscriptionPlans: builder.query<TResponse<TSubscriptionPlan[]>, {}>({
+    getAllSubscriptionPlans: builder.query<TResponse<TSubscriptionPlan[]>, any>({
       query: () => ({
         url: `/plans`,
         method: 'GET',

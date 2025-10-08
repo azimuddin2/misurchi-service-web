@@ -12,12 +12,19 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 
-  // ✅ Custom override to allow `any`
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-ts-comment": [
+        "warn",
+        {
+          "ts-ignore": false,
+          "ts-expect-error": "allow-with-description",
+        },
+      ],
     },
   },
 ];
+
 
 export default eslintConfig;

@@ -91,7 +91,7 @@ const UserSignupForm = () => {
     >
       <div className="bg-white p-4 lg:p-6 rounded-xl shadow-md lg:w-1/3">
         <h3 className="text-sm text-gray-700 uppercase font-medium">
-          Let's get you started
+          Let&apos;s get you started
         </h3>
         <h2 className="text-2xl font-medium mb-6 mt-1">
           Sign Up to your Account

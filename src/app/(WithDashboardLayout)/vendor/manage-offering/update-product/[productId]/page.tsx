@@ -1,9 +1,10 @@
 import UpdateProduct from '../../_components/products/update-product';
 
-const UpdateProductPage = ({ params }: { params: { productId: string } }) => {
+const UpdateProductPage = async({ params }: { params: Promise<{ productId: string }> }) => {
+  const productID = (await params).productId
   return (
     <div>
-      <UpdateProduct productId={params.productId} />
+      <UpdateProduct productId={productID} />
     </div>
   );
 };

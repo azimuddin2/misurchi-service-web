@@ -23,7 +23,6 @@ import { TOrder } from '@/types/order.type';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import {
-  ArrowRightFromLine,
   CheckCircle,
   ChevronDown,
   FolderSymlink,
@@ -281,8 +280,6 @@ const ManageOrderProducts = () => {
         const vendorApproved = request.vendorApproved;
         const requestType = request.type ?? 'none';
 
-        // Current user
-        const user = useAppSelector(selectCurrentUser);
         const isVendor = user?.role === 'vendor';
         const isBuyer = user?.role === 'buyer';
 

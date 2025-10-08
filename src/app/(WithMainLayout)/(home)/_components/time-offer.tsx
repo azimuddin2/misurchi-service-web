@@ -61,7 +61,7 @@ const TimeOffer = () => {
         <div className="text-center lg:text-left">
           <h2 className="text-5xl font-semibold text-gray-900">30% OFF</h2>
           <p className="text-5xl mt-2 mb-6 text-gray-700 font-medium">
-            Limited Time Offer! Don't Miss Out!
+           { "Limited Time Offer! Don't Miss Out!"}
           </p>
 
           <div className="flex justify-center lg:justify-start gap-3 text-white text-center mb-6">
