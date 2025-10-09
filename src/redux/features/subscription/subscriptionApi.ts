@@ -4,14 +4,16 @@ import { TSubscriptionPlan } from '@/types/subscription.type';
 
 const subscriptionPlanApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllSubscriptionPlans: builder.query<TResponse<TSubscriptionPlan[]>, any>({
-      query: () => ({
-        url: `/plans`,
-        method: 'GET',
-        credentials: 'include',
-      }),
-      providesTags: ['SubscriptionPlan'],
-    }),
+    getAllSubscriptionPlans: builder.query<TResponse<TSubscriptionPlan[]>, any>(
+      {
+        query: () => ({
+          url: `/plans`,
+          method: 'GET',
+          credentials: 'include',
+        }),
+        providesTags: ['SubscriptionPlan'],
+      },
+    ),
 
     getSubscriptionPlanById: builder.query<
       TResponse<TSubscriptionPlan>,

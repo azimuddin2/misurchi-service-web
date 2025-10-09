@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import checkIcon from '@/assets/icons/check.png';
 import closeIcon from '@/assets/icons/close.png';
@@ -8,10 +7,52 @@ import Image from 'next/image';
 import { useGetAllSubscriptionPlansQuery } from '@/redux/features/subscription/subscriptionApi';
 import { TSubscriptionPlan } from '@/types/subscription.type';
 import Spinner from '@/components/shared/Spinner';
+import { useAddSubPaymentMutation } from '@/redux/features/subPayment/subPaymentApi';
+import { FieldValues, SubmitHandler } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 
 const Pricing = () => {
   const { data, isLoading } = useGetAllSubscriptionPlansQuery({});
   const subscriptionPlans = data?.data || [];
+
+  const router = useRouter();
+  const [addSubPayment, { isLoading: isPaying }] = useAddSubPaymentMutation();
+
+  const handleSubscribe: SubmitHandler<FieldValues> = async (plan) => {
+    try {
+      // Build payload
+      const payload: any = {
+        plan: plan._id,
+        durationType: plan.validity.type === 'custom' ? 'custom' : 'monthly',
+        amount: plan.cost,
+      };
+
+      // 🟢 Free plan → directly activate subscription (no Stripe call)
+      if (plan.cost === 0) {
+        const res = await addSubPayment(payload).unwrap();
+
+        if (res.success) {
+          alert('✅ Free subscription activated successfully!');
+          router.push('/dashboard'); // or wherever you want to redirect
+        } else {
+          console.error('Failed to activate free plan');
+        }
+
+        return; // stop here (no Stripe)
+      }
+
+      // 💳 Paid plan → go through Stripe
+      const res = await addSubPayment(payload).unwrap();
+
+      if (res?.data && typeof res.data === 'string') {
+        window.location.href = res.data; // redirect to Stripe checkout
+      } else {
+        console.error('Payment URL not found');
+      }
+    } catch (err: any) {
+      console.error('Subscription error:', err);
+    }
+  };
 
   if (isLoading) {
     return <Spinner />;
@@ -139,12 +180,21 @@ const Pricing = () => {
             </ul>
 
             {/* Edit Button */}
-            <Link
+            {/* <Link
               href={`/admin/manage-subscription/edit-subscription/${plan._id}`}
               className="block text-center border border-gray-300 rounded-md py-3 px-4 font-medium hover:bg-gray-50 transition-colors"
             >
               Get Started <ArrowRight className="inline-block ml-2 h-4 w-4" />
-            </Link>
+            </Link> */}
+
+            <button
+              onClick={() => handleSubscribe(plan)}
+              disabled={isPaying}
+              className="w-full text-center border border-gray-300 rounded-md py-3 px-4 font-medium hover:bg-gray-50 transition-colors"
+            >
+              {'Get Started'}
+              <ArrowRight className="inline-block ml-2 h-4 w-4" />
+            </button>
           </div>
         ))}
       </div>

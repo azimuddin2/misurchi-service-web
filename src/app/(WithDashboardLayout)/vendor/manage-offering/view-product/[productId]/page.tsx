@@ -1,9 +1,15 @@
 import ViewProduct from '../../_components/products/view-product';
 
-const ViewProductPage = ({ params }: { params: { productId: string } }) => {
+const ViewProductPage = async ({
+  params,
+}: {
+  params: Promise<{ productId: string }>;
+}) => {
+  const productID = (await params).productId;
+
   return (
     <div>
-      <ViewProduct productId={params.productId} />
+      <ViewProduct productId={productID} />
     </div>
   );
 };

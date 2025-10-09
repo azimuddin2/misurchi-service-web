@@ -1,5 +1,6 @@
 export const protectedRoutes = [
   '/cart',
+  '/pricing',
   '/my-orders',
   '/my-bookings',
   '/schedule/:path*',

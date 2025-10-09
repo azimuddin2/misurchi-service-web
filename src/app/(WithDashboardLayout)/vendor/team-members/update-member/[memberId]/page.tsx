@@ -1,9 +1,15 @@
 import UpdateMember from '../../_components/update-member';
 
-const UpdateMemberPage = ({ params }: { params: { memberId: string } }) => {
+const UpdateMemberPage = async ({
+  params,
+}: {
+  params: Promise<{ memberId: string }>;
+}) => {
+  const memberID = (await params).memberId;
+
   return (
     <div>
-      <UpdateMember memberId={params.memberId} />
+      <UpdateMember memberId={memberID} />
     </div>
   );
 };

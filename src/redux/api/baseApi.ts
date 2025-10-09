@@ -78,6 +78,7 @@ export const baseApi = createApi({
     'Booking',
     'Order',
     'Payment',
+    'subPayment',
     'Notification',
     'Support',
     'SubscriptionPlan',

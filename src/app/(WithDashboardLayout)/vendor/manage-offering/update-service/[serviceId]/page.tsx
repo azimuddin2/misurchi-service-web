@@ -1,9 +1,15 @@
 import UpdateService from '../../_components/services/(update-service)/update-service';
 
-const UpdateServicePage = ({ params }: { params: { serviceId: string } }) => {
+const UpdateServicePage = async ({
+  params,
+}: {
+  params: Promise<{ serviceId: string }>;
+}) => {
+  const serviceID = (await params).serviceId;
+
   return (
     <div>
-      <UpdateService serviceId={params.serviceId} />
+      <UpdateService serviceId={serviceID} />
     </div>
   );
 };

@@ -1,10 +1,15 @@
-import React from 'react';
 import ViewService from '../../_components/services/(view-service)/view-service';
 
-const ViewServicePage = ({ params }: { params: { serviceId: string } }) => {
+const ViewServicePage = async ({
+  params,
+}: {
+  params: Promise<{ serviceId: string }>;
+}) => {
+  const serviceID = (await params).serviceId;
+
   return (
     <div>
-      <ViewService serviceId={params.serviceId} />
+      <ViewService serviceId={serviceID} />
     </div>
   );
 };

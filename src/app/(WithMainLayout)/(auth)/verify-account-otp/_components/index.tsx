@@ -60,7 +60,7 @@ const VerifyAccountOtpForm = () => {
         toast.error(res.error.data.message);
       } else {
         toast.success(res.data.message);
-        router.push('/user/profile');
+        router.push('/pricing');
       }
     } catch (error: any) {
       const message = error?.data?.message || error?.message;

@@ -1,9 +1,15 @@
 import ProviderProfile from '../_components/provider-profile';
 
-const ProviderProfilePage = ({ params }: { params: { id: string } }) => {
+const ProviderProfilePage = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+  const providerID = (await params).id;
+
   return (
     <div>
-      <ProviderProfile providerId={params.id} />
+      <ProviderProfile providerId={providerID} />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { TResponse } from '@/types';
 import { baseApi } from '../../api/baseApi';
+import { TPayment } from '@/types/payment.type';
 
 interface CheckoutPayload {
   user: string;
@@ -28,14 +29,15 @@ const paymentApi = baseApi.injectEndpoints({
     }),
 
     getAllPayment: builder.query<
-      TResponse<any[]>,
+      TResponse<TPayment[]>,
       {
+        vendorId: string;
         page?: number | string;
         limit?: number | string;
         query?: Record<string, string | string[] | undefined>;
       }
     >({
-      query: ({ page = 1, limit = 10, query }) => {
+      query: ({ vendorId, page = 1, limit = 10, query }) => {
         const params = new URLSearchParams();
 
         if (query?.price) {
@@ -53,7 +55,7 @@ const paymentApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/payments?page=${page}&limit=${limit}&${params.toString()}`,
+          url: `/payments?vendor=${vendorId}&page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };

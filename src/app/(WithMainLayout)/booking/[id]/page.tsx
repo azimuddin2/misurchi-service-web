@@ -1,9 +1,15 @@
 import BookingDetails from '../_components/booking-details';
 
-const BookingDetailsPage = ({ params }: { params: { id: string } }) => {
+const BookingDetailsPage = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+  const bookingID = (await params).id;
+
   return (
     <div>
-      <BookingDetails bookingId={params.id} />
+      <BookingDetails bookingId={bookingID} />
     </div>
   );
 };

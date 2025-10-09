@@ -15,7 +15,7 @@ const roleBasedPrivateRoutes = {
     /^\/booking(\/.*)?$/,
     /^\/shipping-address(\/.*)?$/,
   ],
-  vendor: [/^\/vendor/],
+  vendor: [/^\/vendor/, /^\/pricing/],
 };
 
 export const middleware = async (request: NextRequest) => {
@@ -49,6 +49,7 @@ export const middleware = async (request: NextRequest) => {
 export const config = {
   matcher: [
     '/cart',
+    '/pricing',
     '/my-orders',
     '/my-bookings',
     '/schedule/:path*',
