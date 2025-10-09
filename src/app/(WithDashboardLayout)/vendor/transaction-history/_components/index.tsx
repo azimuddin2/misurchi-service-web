@@ -119,25 +119,31 @@ const TransactionHistory = () => {
         />
       ),
     },
+    // {
+    //   accessorKey: 'reference',
+    //   header: 'Product / Service',
+    //   cell: ({ row }) => {
+    //     const reference = row.original.reference;
+    //     console.log(reference)
+    //     const imageUrl = reference?.images?.[0]?.url || '/placeholder.png';
+    //     return (
+    //       <div className="flex items-start space-x-3">
+    //         <Image
+    //           src={imageUrl}
+    //           alt={reference?.name || 'Product'}
+    //           width={60}
+    //           height={60}
+    //           className="w-28 h-28 rounded-sm object-cover border"
+    //         />
+    //         <span className="truncate">{reference?.name}</span>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
-      accessorKey: 'reference',
-      header: 'Product / Service',
-      cell: ({ row }) => {
-        const reference = row.original.reference;
-        const imageUrl = reference?.images?.[0]?.url || '/placeholder.png';
-        return (
-          <div className="flex items-start space-x-3">
-            <Image
-              src={imageUrl}
-              alt={reference?.name || 'Product'}
-              width={60}
-              height={60}
-              className="w-28 h-28 rounded-sm object-cover border"
-            />
-            <span className="truncate">{reference?.name}</span>
-          </div>
-        );
-      },
+      accessorKey: 'modelType',
+      header: 'Type',
+      cell: ({ row }) => <span>{row.original.modelType}</span>,
     },
     {
       accessorKey: 'trnId',
@@ -145,12 +151,7 @@ const TransactionHistory = () => {
       cell: ({ row }) => <span>#{row.original.trnId}</span>,
     },
     {
-      accessorKey: 'modelType',
-      header: 'Type',
-      cell: ({ row }) => <span>{row.original.modelType}</span>,
-    },
-    {
-      accessorKey: 'user',
+      accessorKey: 'user.email',
       header: 'Buyer',
       cell: ({ row }) => <span>{row.original.user.email}</span>,
     },
@@ -169,13 +170,12 @@ const TransactionHistory = () => {
       header: 'Transaction Status',
       cell: ({ row }) => (
         <span
-          className={`capitalize font-medium ${
-            row.original.status === 'paid'
+          className={`capitalize font-medium ${row.original.status === 'paid'
               ? 'text-green-600'
               : row.original.status === 'pending'
                 ? 'text-yellow-600'
                 : 'text-red-600'
-          }`}
+            }`}
         >
           {row.original.status === 'paid' ? 'Completed' : row.original.status}
         </span>
