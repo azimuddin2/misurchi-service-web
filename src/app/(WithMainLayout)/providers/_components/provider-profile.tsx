@@ -13,7 +13,6 @@ import {
   Send,
   Plus,
   XCircle,
-  User,
 } from 'lucide-react';
 import bannerImg from '@/assets/images/banner.png';
 import Image from 'next/image';
@@ -22,10 +21,10 @@ import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProviderProducts from './provider-products';
 import ProviderServices from './provider-services';
-import { useGetVendorUserByIdQuery } from '@/redux/features/user/userApi';
-import { IUser, TVendorUser } from '@/types';
+import { TVendorUser } from '@/types';
 import { format } from 'date-fns';
 import Spinner from '@/components/shared/Spinner';
+import { useGetVendorUserByIdQuery } from '@/redux/features/vendor/vendorApi';
 
 type Props = {
   providerId: string;

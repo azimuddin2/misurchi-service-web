@@ -1,13 +1,13 @@
 'use client';
 
 import { Switch } from '@/components/ui/switch';
-import { useGetAllVendorUserQuery } from '@/redux/features/user/userApi';
 import { Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import ProviderCard from './provider-card';
 import { TVendorUser } from '@/types';
 import MSWPagination from '@/components/ui/core/MSWPagination';
+import { useGetAllVendorUserQuery } from '@/redux/features/vendor/vendorApi';
 
 const Providers = () => {
   const router = useRouter();

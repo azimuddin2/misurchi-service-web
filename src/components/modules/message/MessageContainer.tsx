@@ -161,12 +161,12 @@ const MessageContainer = () => {
     if (images.length > 0) {
       const files = images?.map((image) => image.file);
 
-      const res = await upload(files);
+      // const res = await upload(files);
 
       const payload = {
         receiver: selectedUserId,
         text: data?.message,
-        imageUrl: res?.data?.images,
+        // imageUrl: res?.data?.images,
       };
 
       if (socket && user?.userId && selectedUserId) {
