@@ -30,8 +30,8 @@ const productApi = baseApi.injectEndpoints({
           params.append('maxPrice', query.price.toString());
         }
 
-        if (query?.category) {
-          params.append('category', query.category.toString());
+        if (query?.productType) {
+          params.append('productType', query.productType.toString());
         }
 
         if (query?.searchTerm) {

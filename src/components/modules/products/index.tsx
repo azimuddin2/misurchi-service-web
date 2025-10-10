@@ -10,6 +10,7 @@ import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllProductsQuery } from '@/redux/features/product/productApi';
 import { TProduct } from '@/types/product.type';
 import FilterSidebar from './filter-sidebar';
+import Image from 'next/image';
 
 const AllProducts = () => {
   const router = useRouter();
@@ -21,12 +22,18 @@ const AllProducts = () => {
 
   const page = searchParams.get('page') || 1;
   const limit = searchParams.get('limit') || 9;
+
+  const productType = searchParams
+    .get('productType')
+    ?.split(',')
+    .map((t) => decodeURIComponent(t)) || [];
+
   const searchTerm = searchParams.get('searchTerm') || '';
 
   const { data, isLoading } = useGetAllProductsQuery({
     page,
     limit,
-    query: { searchTerm },
+    query: { searchTerm, productType },
   });
 
   const products = data?.data || [];
@@ -91,9 +98,16 @@ const AllProducts = () => {
                 <ProductCard key={product._id} product={product} />
               ))
             ) : (
-              <p className="col-span-full h-screen text-center text-gray-500">
-                No product found matching your search.
-              </p>
+              <div className="col-span-full h-screen text-center text-gray-500 my-20">
+                <Image
+                  src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                  alt="No results"
+                  width={100}
+                  height={100}
+                  className="mx-auto"
+                />
+                <p>No product found matching your search.</p>
+              </div>
             )}
           </div>
         </div>

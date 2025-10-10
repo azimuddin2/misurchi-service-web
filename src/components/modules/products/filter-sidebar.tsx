@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Checkbox } from '@/components/ui/checkbox';
 import { X, Filter, CircleX } from 'lucide-react';
+import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
 
 export default function FilterSidebar() {
   const [price, setPrice] = useState([0, 500]);
@@ -23,7 +24,7 @@ export default function FilterSidebar() {
   const handleSearchQuery = (query: string, values: string[]) => {
     const params = new URLSearchParams(searchParams.toString());
     if (values.length > 0) {
-      params.set(query, values.join(','));
+      params.set(query, values.map(encodeURIComponent).join(',')); // encode for URL
     } else {
       params.delete(query);
     }
@@ -56,19 +57,9 @@ export default function FilterSidebar() {
     'Top Rated',
   ];
 
-  const productTypes = [
-    'Fitness Equipment',
-    'Electronics',
-    'Fashion & Apparel',
-    'Home Goods',
-    'Beauty Care Products',
-    'Sports & Outdoors',
-    'Toys & Games',
-    'Food & Beverage',
-    'Arts & Crafts',
-    'Health & Fitness Products',
-    'Books & Media',
-  ];
+
+  const { data } = useGetAllProductTypeQuery({});
+  const productTypes = data?.data;
 
   const discounts = [
     'All',
@@ -157,25 +148,25 @@ export default function FilterSidebar() {
           {/* Product Types */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Product Types</h2>
-            {productTypes.map((product) => (
-              <div key={product} className="flex items-center gap-2 mb-1">
+            {productTypes?.map((type) => (
+              <div key={type._id} className="flex items-center gap-2 mb-1">
                 <Checkbox
-                  checked={selectedProducts.includes(product)}
+                  checked={selectedProducts.includes(type.name)}
                   onCheckedChange={() =>
                     toggleSelection(
-                      product,
+                      type.name,
                       selectedProducts,
                       setSelectedProducts,
-                      'product',
+                      'productType',
                     )
                   }
-                  id={`product-${product}`}
+                  id={`${type.name}`}
                 />
                 <Label
-                  htmlFor={`product-${product}`}
+                  htmlFor={`${type.name}`}
                   className="text-sm text-gray-700"
                 >
-                  {product}
+                  {type.name}
                 </Label>
               </div>
             ))}
