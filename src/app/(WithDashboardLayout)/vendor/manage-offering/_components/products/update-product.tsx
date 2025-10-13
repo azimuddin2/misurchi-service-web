@@ -38,6 +38,7 @@ import { TProduct } from '@/types/product.type';
 import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
 import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
+import { ColorInput } from '@/components/ui/core/color-input';
 
 type Props = {
   productId: string;
@@ -65,7 +66,7 @@ const UpdateProduct = ({ productId }: Props) => {
       quantity: '',
       price: '',
       discountPrice: '',
-      colors: '',
+      colors: [''],
       size: '',
       status: '',
       description: '',
@@ -80,7 +81,7 @@ const UpdateProduct = ({ productId }: Props) => {
         quantity: String(product.quantity),
         price: String(product.price),
         discountPrice: product.discountPrice || 'none', // backend value, e.g. "20%" or fallback
-        colors: product.colors?.join(', ') ?? '',
+        colors: product.colors || [],
         size: product.size ?? '',
         status: product.status ?? '',
         description: product.description ?? '',
@@ -108,14 +109,8 @@ const UpdateProduct = ({ productId }: Props) => {
   };
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    const colors = data?.colors
-      .split(',')
-      .map((color: string) => color.trim())
-      .filter((color: string) => color !== '');
-
     const modifiedData = {
       ...data,
-      colors,
       quantity: Number(data.quantity),
       price: Number(data.price),
       deleteKey: deleteKeys,
@@ -127,7 +122,7 @@ const UpdateProduct = ({ productId }: Props) => {
       formData.append('images', file); //✅Append multiple images
     });
 
-    const toastId = toast.loading('Updateing product...');
+    const toastId = toast.loading('Updating product...');
 
     console.log(productId);
 
@@ -321,22 +316,19 @@ const UpdateProduct = ({ productId }: Props) => {
               )}
             />
 
-            {/* Color */}
+            {/* Colors (custom input) */}
             <FormField
               control={form.control}
               name="colors"
               render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
+                <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Color
+                    Colors
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Color"
-                      {...field}
-                      value={field.value || ''}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
+                    <ColorInput
+                      value={field.value || []} // ✅ always array
+                      onChange={field.onChange} // ✅ updates the form state
                     />
                   </FormControl>
                   <FormMessage />

@@ -23,10 +23,11 @@ const AllProducts = () => {
   const page = searchParams.get('page') || 1;
   const limit = searchParams.get('limit') || 9;
 
-  const productType = searchParams
-    .get('productType')
-    ?.split(',')
-    .map((t) => decodeURIComponent(t)) || [];
+  const productType =
+    searchParams
+      .get('productType')
+      ?.split(',')
+      .map((t) => decodeURIComponent(t)) || [];
 
   const searchTerm = searchParams.get('searchTerm') || '';
 

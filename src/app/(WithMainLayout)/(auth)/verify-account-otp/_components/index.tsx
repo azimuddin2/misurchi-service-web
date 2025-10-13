@@ -11,10 +11,13 @@ import { useRouter } from 'next/navigation';
 import { useVerifyOtpMutation } from '@/redux/features/otp/otpApi';
 import { toast } from 'sonner';
 import { TResponse } from '@/types';
+import { useAppSelector } from '@/redux/hooks';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 const OTP_LENGTH = 4;
 
 const VerifyAccountOtpForm = () => {
+  const user = useAppSelector(selectCurrentUser);
   const form = useForm<FieldValues>();
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
@@ -59,8 +62,13 @@ const VerifyAccountOtpForm = () => {
       if (res.error) {
         toast.error(res.error.data.message);
       } else {
-        toast.success(res.data.message);
-        router.push('/pricing');
+        if (user?.role === 'vendor') {
+          toast.success(res.data.message);
+          router.push('/choose-offer');
+        } else if (user?.role === 'user') {
+          toast.success(res.data.message);
+          router.push('/user/profile');
+        }
       }
     } catch (error: any) {
       const message = error?.data?.message || error?.message;

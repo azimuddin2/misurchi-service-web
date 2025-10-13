@@ -170,12 +170,13 @@ const TransactionHistory = () => {
       header: 'Transaction Status',
       cell: ({ row }) => (
         <span
-          className={`capitalize font-medium ${row.original.status === 'paid'
+          className={`capitalize font-medium ${
+            row.original.status === 'paid'
               ? 'text-green-600'
               : row.original.status === 'pending'
                 ? 'text-yellow-600'
                 : 'text-red-600'
-            }`}
+          }`}
         >
           {row.original.status === 'paid' ? 'Completed' : row.original.status}
         </span>

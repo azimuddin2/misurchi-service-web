@@ -31,7 +31,7 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
       <div className="relative">
         <Input
           placeholder="Search People...."
-          className="w-full rounded-xl border bg-transparent px-2 py-6 mt-2 border-black"
+          className="w-full rounded-sm border bg-transparent px-2 py-6 mt-2 border-black"
           type="text"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}

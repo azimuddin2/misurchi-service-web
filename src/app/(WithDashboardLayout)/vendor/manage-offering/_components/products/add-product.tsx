@@ -33,6 +33,7 @@ import { toast } from 'sonner';
 import { ProductStatus } from '@/constants/product';
 import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
+import { ColorInput } from '@/components/ui/core/color-input';
 
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -56,15 +57,9 @@ const AddProduct = () => {
   const [addProduct] = useAddProductMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    const colors = data?.colors
-      .split(',')
-      .map((color: string) => color.trim())
-      .filter((color: string) => color !== '');
-
     const modifiedData = {
       vendor: vendor?._id,
       ...data,
-      colors,
       quantity: Number(data.quantity),
       price: Number(data.price),
     };
@@ -261,22 +256,19 @@ const AddProduct = () => {
               )}
             />
 
-            {/* Color */}
+            {/* Colors (custom input) */}
             <FormField
               control={form.control}
               name="colors"
               render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
+                <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Color
+                    Colors
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Color"
-                      {...field}
-                      value={field.value || ''}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
+                    <ColorInput
+                      value={field.value || []}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -367,7 +359,7 @@ const AddProduct = () => {
             className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
             content={
               <div className="flex justify-center items-center space-x-2 font-semibold">
-                <p>{isSubmitting ? 'Saveing...' : 'Save'}</p>
+                <p>{isSubmitting ? 'Saving...' : 'Save'}</p>
                 <ArrowRight />
               </div>
             }

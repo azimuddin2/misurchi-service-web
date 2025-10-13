@@ -29,6 +29,7 @@ import { useUserSignupMutation } from '@/redux/features/auth/authApi';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { verifyToken } from '@/utils/verifyToken';
 import { setUser, TUser } from '@/redux/features/auth/authSlice';
+import Cookies from 'js-cookie';
 
 const UserSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -59,13 +60,19 @@ const UserSignupForm = () => {
         return;
       }
 
+      // Decode/verify token
       const user = verifyToken(accessToken) as TUser;
       if (!user) {
         toast.error('Invalid access token.');
         return;
       }
 
+      // Update Redux state
       dispatch(setUser({ user, token: accessToken }));
+
+      // ✅ Persist token in cookie for client-side access
+      Cookies.set('accessToken', accessToken, { expires: 1, sameSite: 'lax' });
+
       toast.success(response.message || 'User registered successfully');
       form.reset();
 

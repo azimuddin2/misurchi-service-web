@@ -27,11 +27,11 @@ const UserCard = ({
       onClick={handleSelectUser}
       className={cn(
         // Base container styles
-        'flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ease-in-out',
+        'flex items-center gap-2 m-3 p-3 rounded-sm cursor-pointer transition-all duration-200 ease-in-out',
 
         // Hover and selected effects
         selectedUserId === user?.userData?._id
-          ? 'bg-primary-blue text-white shadow-md'
+          ? 'bg-green-50 text-gray-200 shadow-md'
           : 'hover:bg-gray-100/80 bg-white',
 
         // Border and spacing
@@ -53,8 +53,8 @@ const UserCard = ({
             className={cn(
               'font-semibold text-sm truncate max-w-[160px]',
               selectedUserId === user?.userData?._id
-                ? 'text-white'
-                : 'text-gray-900',
+                ? 'text-gray-800'
+                : 'text-gray-800',
             )}
           >
             {user?.userData?.fullName}
@@ -64,7 +64,7 @@ const UserCard = ({
             className={cn(
               'text-xs font-medium',
               selectedUserId === user?.userData?._id
-                ? 'text-gray-200'
+                ? 'text-gray-500'
                 : 'text-gray-500',
             )}
           >
@@ -78,7 +78,7 @@ const UserCard = ({
             className={cn(
               'truncate text-sm text-gray-600',
               user?.unseen && 'font-semibold text-gray-800',
-              selectedUserId === user?.userData?._id && 'text-gray-100',
+              selectedUserId === user?.userData?._id && 'text-gray-600',
             )}
           >
             {user?.message?.text

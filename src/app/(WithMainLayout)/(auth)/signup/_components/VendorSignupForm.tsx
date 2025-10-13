@@ -25,9 +25,6 @@ import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { vendorSignupSchema } from './vendorSignupValidation';
 import CountryStateCitySelector from '@/components/ui/core/country-state-city-selector';
-import googleIcon from '@/assets/icons/google.png';
-import phoneIcon from '@/assets/icons/phone.png';
-import Image from 'next/image';
 import { currencyOptions } from '@/constants/currency';
 import { timezonesOptions } from '@/constants/timezones';
 import { workHourOptions } from '@/constants/workHour';
@@ -40,6 +37,7 @@ import { useVendorSignupMutation } from '@/redux/features/auth/authApi';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { verifyToken } from '@/utils/verifyToken';
 import { setUser, TUser } from '@/redux/features/auth/authSlice';
+import Cookies from 'js-cookie';
 
 const VendorSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -72,13 +70,19 @@ const VendorSignupForm = () => {
         return;
       }
 
+      // Decode/verify token
       const user = verifyToken(accessToken) as TUser;
       if (!user) {
         toast.error('Invalid access token.');
         return;
       }
 
+      // Update Redux state
       dispatch(setUser({ user, token: accessToken }));
+
+      // ✅ Persist token in cookie for client-side access
+      Cookies.set('accessToken', accessToken, { expires: 1, sameSite: 'lax' });
+
       toast.success(response.message || 'Vendor registered successfully');
       form.reset();
 
@@ -109,30 +113,6 @@ const VendorSignupForm = () => {
         <h2 className="text-2xl font-medium mb-6 mt-1">
           Sign Up to your Account
         </h2>
-
-        {/* Social Buttons */}
-        <div className="space-y-3">
-          <Button
-            variant="outline"
-            className="w-full py-6 rounded-full flex gap-2 justify-center bg-gradient-to-r from-blue-100 to-green-100 cursor-pointer"
-          >
-            <Image src={googleIcon} alt="Google" />
-            <span className="font-medium text-lg text-[#165940]">
-              Sign In with Google
-            </span>
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full rounded-full py-6 flex gap-2 justify-center cursor-pointer"
-          >
-            <Image src={phoneIcon} alt="phone" />
-            <span className="font-medium text-lg text-[#165940]">
-              Sign In with Phone Number
-            </span>
-          </Button>
-        </div>
-
-        <div className="my-4 text-center text-xs text-gray-500">OR USE</div>
 
         {/* Form Inputs */}
         <Form {...form}>

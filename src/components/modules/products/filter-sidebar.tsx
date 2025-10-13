@@ -57,7 +57,6 @@ export default function FilterSidebar() {
     'Top Rated',
   ];
 
-
   const { data } = useGetAllProductTypeQuery({});
   const productTypes = data?.data;
 

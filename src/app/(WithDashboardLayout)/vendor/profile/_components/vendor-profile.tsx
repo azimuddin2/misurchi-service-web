@@ -107,7 +107,7 @@ const VendorProfile = () => {
       formData.append('profile', file); //✅Append multiple images
     });
 
-    const toastId = toast.loading('Updateing product...');
+    const toastId = toast.loading('Updating profile...');
 
     try {
       const res = await updateVendorProfile({

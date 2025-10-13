@@ -17,7 +17,7 @@ const CustomAvatar = ({
     <Avatar className={cn('', className)}>
       <AvatarImage src={img?.src || img} className="object-cover" />
       <AvatarFallback
-        className={cn('bg-gray-300 text-black text-3xl', fallbackClass)}
+        className={cn('bg-green-100 text-black text-2xl', fallbackClass)}
       >
         {name?.charAt(0).toUpperCase()}
       </AvatarFallback>

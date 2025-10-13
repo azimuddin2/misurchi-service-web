@@ -62,6 +62,19 @@ const vendorApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Vendor'],
     }),
+
+    chooseOffer: builder.mutation<
+      TResponse<TVendorUser>,
+      { id: string; chooseOffer: { chooseOffer: string } }
+    >({
+      query: ({ id, chooseOffer }) => ({
+        url: `/vendors/choose-offer/${id}`,
+        method: 'PUT',
+        body: chooseOffer,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Vendor'],
+    }),
   }),
 });
 
@@ -70,4 +83,5 @@ export const {
   useGetVendorProfileQuery,
   useGetVendorUserByIdQuery,
   useUpdateVendorProfileMutation,
+  useChooseOfferMutation,
 } = vendorApi;

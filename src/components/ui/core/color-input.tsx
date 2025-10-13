@@ -1,3 +1,5 @@
+'use client';
+
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -28,14 +30,13 @@ export const ColorInput = ({
   };
 
   return (
-    <div className="bg-[#f5f5f5] rounded-sm p-3 flex flex-wrap gap-2 min-h-[52px]">
+    <div className="bg-[#f5f5f5] rounded-sm p-3 flex flex-wrap gap-2 min-h-[40px]">
       {/* Existing colors as chips */}
       {value.map((color) => (
         <div
           key={color}
           className="flex items-center gap-2 px-3 py-1 rounded-md shadow border bg-white hover:shadow-md transition"
         >
-          {/* Swatch */}
           <span
             className="w-5 h-5 rounded-full border"
             style={{ backgroundColor: color }}
@@ -69,11 +70,12 @@ export const ColorInput = ({
           type="color"
           value={pickerValue}
           onChange={(e) => setPickerValue(e.target.value)}
-          className="w-10 h-10 border rounded cursor-pointer"
+          className="w-10 h-10 border rounded cursor-pointer bg-white"
         />
         <Button
           type="button"
           variant="secondary"
+          className="bg-white rounded-sm"
           size="sm"
           onClick={() => addColor(pickerValue)}
         >

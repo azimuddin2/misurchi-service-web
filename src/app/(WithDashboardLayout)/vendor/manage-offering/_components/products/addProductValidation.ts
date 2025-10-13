@@ -25,9 +25,10 @@ export const addProductSchema = z.object({
     .nullable()
     .optional(),
 
-  colors: z.string({
-    required_error: 'At least one color is required',
-  }),
+  colors: z
+    .array(z.string())
+    .min(1, { message: 'At least one color is required' })
+    .nonempty({ message: 'At least one color is required' }),
 
   size: z.string({
     required_error: 'Size is required',

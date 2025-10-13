@@ -1,7 +1,7 @@
 'use client';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { MessageCircleMore, SendHorizontal, X } from 'lucide-react';
+import { MessageCircleMore, Send, SendHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import OwnerMsgCard from './OwnerMsgCard';
 import ReceiverMsgCard from './ReceiverMsgCard';
@@ -264,12 +264,12 @@ const MessageContainer = () => {
               <>
                 <Input
                   placeholder="Search people... "
-                  className="w-full rounded-xl border  bg-transparent px-2 py-6 "
+                  className="w-full rounded-sm border  bg-transparent px-2 py-6 "
                   type="text"
                   onFocus={() => setWantTOSearch(true)}
                 />
                 {/* users list - TODO: Use dynamic data */}
-                <div className="scroll-hide lg:mt-8 mt-5  max-h-[70vh] min-h-[65vh] space-y-5 overflow-auto">
+                <div className="scroll-hide mt-5  max-h-[70vh] min-h-[65vh] space-y-5 overflow-auto">
                   {chatListData?.map((chatData: any, idx: number) => (
                     <UserCard
                       key={idx}
@@ -449,7 +449,7 @@ const MessageContainer = () => {
                       <Input
                         placeholder="Type a message"
                         type="text"
-                        className="w-full border-2 border-black/50 bg-transparent px-4 py-6 rounded-3xl"
+                        className="w-full border-2 border-black/50 bg-transparent px-4 py-5 rounded-sm"
                         {...register('message', {
                           required: images.length > 0 ? false : true,
                         })}
@@ -466,8 +466,8 @@ const MessageContainer = () => {
                         maxHeight={150}
                       ></AutosizeTextarea> */}
 
-                      <Button className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 bg-[#003250] px-3">
-                        <SendHorizontal size={20} color="#fff" />
+                      <Button className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 hover:bg-white bg-white shadow-none">
+                        <Send color="#003250" />
                       </Button>
                     </div>
                   </form>
