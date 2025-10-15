@@ -87,10 +87,11 @@ const ProductDetails = ({ productId }: Props) => {
               <button
                 key={index}
                 type="button"
-                className={`border-2 rounded-md p-1 transition ${selectedImage === image.url
+                className={`border-2 rounded-md p-1 transition ${
+                  selectedImage === image.url
                     ? 'border-green-800'
                     : 'border-gray-300'
-                  }`}
+                }`}
                 onClick={() => setSelectedImage(image.url)}
               >
                 <Image
@@ -164,10 +165,11 @@ const ProductDetails = ({ productId }: Props) => {
               {/* Original Price */}
               <div className="flex items-center">
                 <p
-                  className={`text-xl font-medium ${discountPercent > 0
+                  className={`text-xl font-medium ${
+                    discountPercent > 0
                       ? 'text-gray-500 line-through pr-3'
                       : 'text-gray-800'
-                    }`}
+                  }`}
                 >
                   ${price.toFixed(2)}
                 </p>

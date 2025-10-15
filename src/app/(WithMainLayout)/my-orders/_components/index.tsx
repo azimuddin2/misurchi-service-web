@@ -23,14 +23,14 @@ const MyOrders = () => {
 
   const [createCheckoutSession] = useCreateCheckoutSessionMutation();
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (order: TOrder) => {
     try {
       const payload = {
-        user: '689f1527ce742b32bb432932',
-        vendor: '68a2bf8ecaa3a51e25460eea',
+        user: order.buyer,
+        vendor: order.vendor,
         modelType: 'Order',
-        reference: '68d16c8f2fc7a4dee1715ba4',
-        price: '762.45',
+        reference: order._id,
+        price: order.totalPrice,
       };
 
       const response = await createCheckoutSession(payload).unwrap();
@@ -114,7 +114,7 @@ const MyOrders = () => {
       header: 'SubTotal',
       cell: ({ row }) => (
         <span className="font-semibold text-green-600">
-          ${row.original.totalPrice}
+          ${row.original.totalPrice.toFixed(2)}
         </span>
       ),
     },
@@ -165,7 +165,7 @@ const MyOrders = () => {
         <div className="flex items-center gap-2">
           {!row.original.isPaid === true && (
             <Button
-              onClick={handleCheckout}
+              onClick={() => handleCheckout(row.original)}
               disabled={isLoading}
               size="sm"
               className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer"

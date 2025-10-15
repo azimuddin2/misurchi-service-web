@@ -1,11 +1,6 @@
 import { IUser } from './user.type';
 
-export type TValidityType =
-  | 'unlimited'
-  | '1month'
-  | '3month'
-  | '6month'
-  | 'custom';
+export type TValidityType = 'free' | '1month' | '1year';
 
 export type TSubscriptionPlan = {
   _id: string;
@@ -28,10 +23,7 @@ export type TSubscriptionPlan = {
     transactionFee: number;
   };
 
-  validity: {
-    type: TValidityType;
-    durationInMonths?: string;
-  };
+  validity: TValidityType;
 
   isDeleted?: boolean;
   isActive: boolean;
