@@ -25,7 +25,7 @@ const MyOrders = () => {
 
   const handleCheckout = async (order: TOrder) => {
     try {
-      const payload = {
+      const payload: any = {
         user: order.buyer,
         vendor: order.vendor,
         modelType: 'Order',
@@ -90,17 +90,6 @@ const MyOrders = () => {
       ),
     },
     {
-      accessorKey: 'customerName',
-      header: 'Customer',
-      cell: ({ row }) => (
-        <div>
-          <p className="text-base font-semibold">{row.original.customerName}</p>
-          <p className="text-sm text-gray-500">{row.original.customerEmail}</p>
-          <p className="text-sm text-gray-500">{row.original.customerPhone}</p>
-        </div>
-      ),
-    },
-    {
       accessorKey: 'createdAt',
       header: 'Date',
       cell: ({ row }) => (
@@ -120,7 +109,7 @@ const MyOrders = () => {
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: 'Delivery Status',
       cell: ({ row }) => {
         const status = row.original.status;
         const statusMap: Record<string, { className: string; label: string }> =

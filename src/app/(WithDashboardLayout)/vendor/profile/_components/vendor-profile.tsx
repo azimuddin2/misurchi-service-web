@@ -130,7 +130,7 @@ const VendorProfile = () => {
 
   return (
     <div className="bg-white rounded-lg flex-grow max-w-5xl p-4 lg:p-8 shadow">
-      <div className="flex flex-col items-cente rounded-b-2xl overflow-hidden">
+      <div className="flex flex-col items-cente rounded-b-2xl overflow-hidden mb-5">
         {/* Cover Image */}
         <div className="relative w-full h-48 md:h-56 lg:h-64">
           <Image
@@ -166,7 +166,7 @@ const VendorProfile = () => {
           </div>
         </div>
         {/* Share Button */}
-        <div className="mt-3 mb-6 text-center">
+        {/* <div className="mt-3 mb-6 text-center">
           <AppButton
             className="w-4/5 lg:w-2/6 text-gray-50 border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] hover:bg-green-500/80"
             content={
@@ -176,7 +176,7 @@ const VendorProfile = () => {
               </div>
             }
           />
-        </div>
+        </div> */}
       </div>
 
       <Form {...form}>

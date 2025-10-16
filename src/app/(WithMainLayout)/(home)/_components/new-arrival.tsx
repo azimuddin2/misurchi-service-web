@@ -2,6 +2,7 @@ import { SectionHeadWithBorder } from '@/components/common/section-head-with-bor
 import Container from '@/components/shared/Container';
 import { ArrivalImageCard } from '@/components/ui/core/arrival-image-card';
 import { MoveRight } from 'lucide-react';
+import Link from 'next/link';
 
 type TArrivalServices = {
   id: number;
@@ -43,12 +44,15 @@ export const NewArrival = () => {
         <SectionHeadWithBorder
           title="New Join"
           rightContent={
-            <div className="flex gap-x-4 p-1 px-4 shadow-sm">
+            <Link
+              href={'/all-products-services'}
+              className="flex gap-x-4 p-1 px-4 shadow-sm"
+            >
               <p className="uppercase font-semibold tracking-tight">View All</p>
               <button>
                 <MoveRight />
               </button>
-            </div>
+            </Link>
           }
         />
 

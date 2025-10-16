@@ -6,6 +6,7 @@ import offerProduct from '@/assets/images/offer.png';
 import offerBackgroundImg from '@/assets/images/offer-bg.png';
 import { AppButton } from '@/components/shared/app-button';
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 const TimeOffer = () => {
   const calculateTimeLeft = () => {
@@ -84,10 +85,13 @@ const TimeOffer = () => {
           <AppButton
             className="w-1/2 text-gray-50 border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] hover:bg-green-500/80"
             content={
-              <div className="flex justify-center items-center space-x-2 font-semibold text-black">
+              <Link
+                href={'/all-products-services'}
+                className="flex justify-center items-center space-x-2 font-semibold text-black"
+              >
                 <p className="uppercase">SHOP NOW</p>
                 <ArrowRight />
-              </div>
+              </Link>
             }
           />
         </div>

@@ -5,6 +5,7 @@ import socialGroupIconLift from '@/assets/images/social-group-left-icon.png';
 import socialGroupIconRight from '@/assets/images/social-group-right-icon.png';
 import teams from '@/assets/images/teams.png';
 import { Search } from 'lucide-react';
+import Link from 'next/link';
 
 const Banner = () => {
   return (
@@ -30,9 +31,11 @@ const Banner = () => {
                 placeholder="Search Service or Products"
                 className="w-full px-6 py-3 outline-none"
               />
-              <button className="bg-sky-950 text-white p-3 rounded-full absolute right-0">
-                <Search className="h-5 w-5" />
-              </button>
+              <Link href={'/all-products-services'}>
+                <button className="bg-sky-950 text-white p-3 rounded-full absolute right-0 top-1">
+                  <Search className="h-5 w-5" />
+                </button>
+              </Link>
             </div>
           </div>
 

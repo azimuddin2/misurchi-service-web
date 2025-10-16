@@ -9,7 +9,6 @@ import { format } from 'date-fns';
 import Image from 'next/image';
 import Spinner from '@/components/shared/Spinner';
 import { useCreateCheckoutSessionMutation } from '@/redux/features/payment/paymentApi';
-import { TBooking } from '@/types/booking.type';
 import { toast } from 'sonner';
 
 type Props = {
@@ -18,17 +17,18 @@ type Props = {
 
 const BookingDetails = ({ bookingId }: Props) => {
   const { data, isLoading } = useGetBookingByIdQuery(bookingId);
+  const booking = data?.data;
 
   const [createCheckoutSession] = useCreateCheckoutSessionMutation();
 
   const handleCheckout = async () => {
     try {
-      const payload = {
-        user: '689f1527ce742b32bb432932',
-        vendor: '68a2bf8ecaa3a51e25460eea',
+      const payload: any = {
+        user: booking?.user,
+        vendor: booking?.vendor,
         modelType: 'Booking',
-        reference: '68c82901a6a41d0eb70496b2',
-        price: '350',
+        reference: booking?._id,
+        price: booking?.price,
       };
 
       const response = await createCheckoutSession(payload).unwrap();
@@ -47,7 +47,6 @@ const BookingDetails = ({ bookingId }: Props) => {
     return <Spinner />;
   }
 
-  const booking = data?.data;
   if (!booking) {
     return (
       <div className="flex justify-center items-center h-40">
