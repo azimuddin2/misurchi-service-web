@@ -1,9 +1,22 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { useGetVendorDashboardStatsQuery } from '@/redux/features/dashboard/dashboardApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
+import { useAppSelector } from '@/redux/hooks';
+import { TVendorDashboardStats } from '@/types/dashboard.type';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
 const TotalStats = () => {
+  const user = useAppSelector(selectCurrentUser);
+
+  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
+  const vendorId = vendorData?.data?._id as string;
+
+  const { data } = useGetVendorDashboardStatsQuery(vendorId);
+  const vendorDashboardStates = data?.data as TVendorDashboardStats;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sora">
       <Card className="border-none shadow">
@@ -17,7 +30,9 @@ const TotalStats = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <h2 className="text-3xl font-semibold text-ns-title">$1250.00</h2>
+          <h2 className="text-3xl font-semibold text-ns-title">
+            ${vendorDashboardStates?.totalSales.toFixed(2) || '00'}
+          </h2>
           <p className="mt-2 text-base font-medium text-[#7F7F7F] text-sc-clarity-ice">
             Last 30 days
           </p>
@@ -34,7 +49,9 @@ const TotalStats = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <h2 className="text-3xl font-semibold text-ns-title">$1250.00</h2>
+          <h2 className="text-3xl font-semibold text-ns-title">
+            {vendorDashboardStates?.totalSchedule || 0}
+          </h2>
           <p className="mt-2 text-base font-medium text-[#7F7F7F] text-sc-clarity-ice">
             Last 30 days
           </p>
@@ -51,7 +68,9 @@ const TotalStats = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <h2 className="text-3xl font-semibold text-ns-title">200</h2>
+          <h2 className="text-3xl font-semibold text-ns-title">
+            {vendorDashboardStates?.pendingOrders || 0}
+          </h2>
           <p className="mt-2 text-base font-medium text-[#7F7F7F] text-sc-clarity-ice">
             Last 30 days
           </p>
@@ -68,7 +87,9 @@ const TotalStats = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <h2 className="text-3xl font-semibold text-ns-title">18</h2>
+          <h2 className="text-3xl font-semibold text-ns-title">
+            {vendorDashboardStates?.pendingBookings || 0}
+          </h2>
           <p className="mt-2 text-base font-medium text-[#7F7F7F] text-sc-clarity-ice">
             Last 30 days
           </p>
