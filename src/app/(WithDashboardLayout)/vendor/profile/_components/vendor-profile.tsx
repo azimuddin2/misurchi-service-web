@@ -45,7 +45,6 @@ import {
 const VendorProfile = () => {
   const user = useAppSelector(selectCurrentUser);
   const email = user?.email as string;
-  const router = useRouter();
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
 
@@ -116,7 +115,6 @@ const VendorProfile = () => {
       }).unwrap();
       toast.success(res.message || 'Product update successfully');
       refetch();
-      router.push(`${user?.role}/dashboard`);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to add product');
     } finally {

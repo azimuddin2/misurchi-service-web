@@ -42,6 +42,10 @@ const orderApi = baseApi.injectEndpoints({
           params.append('requestType', query.requestType.toString());
         }
 
+        if (query?.status) {
+          params.append('status', query.status.toString());
+        }
+
         return {
           url: `/orders?vendor=${vendorId}&page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',

@@ -19,7 +19,7 @@ const TotalStats = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sora">
-      <Card className="border-none shadow">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-lg font-medium text-ns-neutral-dark">
             Total Sales
@@ -38,7 +38,7 @@ const TotalStats = () => {
           </p>
         </CardContent>
       </Card>
-      <Card className="border-none shadow">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-lg font-medium text-ns-neutral-dark">
             Total Schedule
@@ -57,7 +57,7 @@ const TotalStats = () => {
           </p>
         </CardContent>
       </Card>
-      <Card className="border-none shadow">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-lg font-medium text-ns-neutral-dark">
             Pending Orders
@@ -76,7 +76,7 @@ const TotalStats = () => {
           </p>
         </CardContent>
       </Card>
-      <Card className="border-none shadow">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-lg font-medium text-ns-neutral-dark">
             Pending Schedule

@@ -27,10 +27,23 @@ const dashboardApi = baseApi.injectEndpoints({
       }),
       providesTags: ['Dashboard'],
     }),
+
+    getAppointmentsOverviewRate: builder.query<
+      TResponse<any>,
+      { id: string; month?: number }
+    >({
+      query: ({ id, month }) => ({
+        url: `/dashboard/appointments-overview/${id}?month=${month}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Dashboard'],
+    }),
   }),
 });
 
 export const {
   useGetVendorDashboardStatsQuery,
   useGetVendorSalesOverviewChartQuery,
+  useGetAppointmentsOverviewRateQuery,
 } = dashboardApi;
