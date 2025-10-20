@@ -143,6 +143,7 @@ const Booking = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
+                        required
                         type="text"
                         placeholder="Enter your phone number"
                         {...field}

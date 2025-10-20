@@ -28,6 +28,7 @@ export type TOrderProduct = {
 
 export type TOrder = {
   _id: string;
+  orderId: string;
   products: TOrderProduct[];
   vendor: TVendorUser;
   buyer: IUser;
