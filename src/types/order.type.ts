@@ -42,6 +42,7 @@ export type TOrder = {
   status: TOrderStatus;
   request: TOrderRequest;
   isPaid: boolean;
+  trnId: string;
   billingDetails: {
     country: string;
     city?: string;

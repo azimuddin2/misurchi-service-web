@@ -41,6 +41,9 @@ export type TBooking = {
   paymentType: TPaymentType;
   paymentStatus: TPaymentStatus;
 
+  isPaid: boolean;
+  trnId: string;
+
   // Request field for cancel/reschedule
   request?: IBookingRequest;
 

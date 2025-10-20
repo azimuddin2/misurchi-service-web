@@ -36,11 +36,11 @@ const MyBookings = () => {
               className="w-24 h-28 rounded-sm object-cover border"
             />
             <div>
-              <p className="truncate">
-                Service Name: {row.original.serviceName}
+              <p className="truncate font-medium">{row.original.serviceName}</p>
+              <p className="text-xs text-gray-500">
+                Service ID: {service?.serviceId}
               </p>
-              <p className="truncate">ServiceId: {service?.serviceId}</p>
-              <p className="truncate">
+              <p className="text-xs text-gray-500">
                 Provider: {row?.original?.vendor?.businessName}
               </p>
             </div>
@@ -82,11 +82,18 @@ const MyBookings = () => {
       header: 'Action',
       cell: ({ row }) => (
         <div className="flex items-center space-x-3">
-          <Link href={`/booking/${row.original._id}`}>
-            <Button className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer">
-              Pay
-            </Button>
-          </Link>
+          {row.original.isPaid === false ? (
+            <Link href={`/booking/${row.original._id}`}>
+              <Button className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer">
+                Pay
+              </Button>
+            </Link>
+          ) : (
+            <div>
+              <h2 className="text-green-500">Paid</h2>
+              <p>Transaction ID: {row.original.trnId}</p>
+            </div>
+          )}
         </div>
       ),
     },

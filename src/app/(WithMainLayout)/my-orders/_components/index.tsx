@@ -152,7 +152,7 @@ const MyOrders = () => {
       header: 'Action',
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          {!row.original.isPaid === true && (
+          {!row.original.isPaid === true ? (
             <Button
               onClick={() => handleCheckout(row.original)}
               disabled={isLoading}
@@ -161,6 +161,11 @@ const MyOrders = () => {
             >
               Pay
             </Button>
+          ) : (
+            <div>
+              <h2 className="text-green-500">Paid</h2>
+              <p>Transaction ID: {row.original.trnId}</p>
+            </div>
           )}
         </div>
       ),

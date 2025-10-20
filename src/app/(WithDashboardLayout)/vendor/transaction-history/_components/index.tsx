@@ -135,7 +135,7 @@ const TransactionHistory = () => {
     //           height={60}
     //           className="w-28 h-28 rounded-sm object-cover border"
     //         />
-    //         <span className="truncate">{reference?.name}</span>
+    //         <span className="truncate">{reference}</span>
     //       </div>
     //     );
     //   },
@@ -153,7 +153,12 @@ const TransactionHistory = () => {
     {
       accessorKey: 'user.email',
       header: 'Buyer',
-      cell: ({ row }) => <span>{row.original.user.email}</span>,
+      cell: ({ row }) => (
+        <div className="text-sm">
+          <p>{row.original.user.fullName}</p>
+          <p>{row.original.user.email}</p>
+        </div>
+      ),
     },
     {
       accessorKey: 'adminAmount',
