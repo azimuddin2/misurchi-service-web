@@ -9,11 +9,11 @@ export const KnowAboutUs = () => {
     <Container>
       <section className="space-y-8 my-10 lg:my-20 mx-3">
         {/* section head section */}
-        <div className="lg:flex justify- items-center gap-4 my-6 lg:my-16">
-          <h2 className="text-3xl lg:text-5xl font-semibold lg:w-[45%]">
+        <div className="lg:flex text-center lg:text-left items-center gap-4 my-6 lg:my-16">
+          <h2 className="text-2xl lg:text-5xl font-semibold lg:w-[45%]">
             Get to Know About Us
           </h2>
-          <p className="lg:w-[55%] text-lg text-gray-400 font-normal">
+          <p className="lg:w-[55%] text-base text-gray-400 font-normal">
             {
               'We ensure that your next business step is just a click away. That&apos;s why we built a marketplace that serves both vendors and buyers with seamless interaction and growth in one place.'
             }

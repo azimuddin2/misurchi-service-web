@@ -52,7 +52,40 @@ const reviewApi = baseApi.injectEndpoints({
       },
       providesTags: ['Review'],
     }),
+
+    getAllReviewsCollection: builder.query<
+      TResponse<TReview[]>,
+      {
+        page?: number | string;
+        limit?: number | string;
+        query?: Record<string, string | string[] | undefined>;
+      }
+    >({
+      query: ({ page = 1, limit = 10, query }) => {
+        const params = new URLSearchParams();
+
+        // Add optional search or date filters
+        if (query?.searchTerm) {
+          params.append('searchTerm', query.searchTerm.toString());
+        }
+        if (query?.createdAt) {
+          const date = new Date(query.createdAt.toString().slice(0, 10));
+          params.append('createdAt', date.toISOString());
+        }
+
+        return {
+          url: `/reviews?page=${page}&limit=${limit}&${params.toString()}`,
+          method: 'GET',
+          credentials: 'include',
+        };
+      },
+      providesTags: ['Review'],
+    }),
   }),
 });
 
-export const { useAddReviewMutation, useGetAllReviewsQuery } = reviewApi;
+export const {
+  useAddReviewMutation,
+  useGetAllReviewsQuery,
+  useGetAllReviewsCollectionQuery,
+} = reviewApi;

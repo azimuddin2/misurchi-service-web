@@ -61,7 +61,7 @@ const TimeOffer = () => {
         {/* Text & Countdown */}
         <div className="text-center lg:text-left">
           <h2 className="text-5xl font-semibold text-gray-900">30% OFF</h2>
-          <p className="text-5xl mt-2 mb-6 text-gray-700 font-medium">
+          <p className="text-3xl lg:text-5xl mt-2 mb-6 text-gray-700 font-medium">
             {"Limited Time Offer! Don't Miss Out!"}
           </p>
 

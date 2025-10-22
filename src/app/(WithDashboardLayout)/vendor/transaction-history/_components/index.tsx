@@ -92,6 +92,7 @@ const TransactionHistory = () => {
   }, [searchParams]);
 
   const columns: ColumnDef<TPayment>[] = [
+    // Select checkbox
     {
       id: 'select',
       header: ({ table }) => (
@@ -107,93 +108,105 @@ const TransactionHistory = () => {
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => {
-            setSelectedIds((prev) =>
-              value
-                ? [...prev, row.original.trnId]
-                : prev.filter((id) => id !== row.original.trnId),
-            );
-            row.toggleSelected(!!value);
-          }}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
         />
       ),
     },
-    // {
-    //   accessorKey: 'reference',
-    //   header: 'Product / Service',
-    //   cell: ({ row }) => {
-    //     const reference = row.original.reference;
-    //     console.log(reference)
-    //     const imageUrl = reference?.images?.[0]?.url || '/placeholder.png';
-    //     return (
-    //       <div className="flex items-start space-x-3">
-    //         <Image
-    //           src={imageUrl}
-    //           alt={reference?.name || 'Product'}
-    //           width={60}
-    //           height={60}
-    //           className="w-28 h-28 rounded-sm object-cover border"
-    //         />
-    //         <span className="truncate">{reference}</span>
-    //       </div>
-    //     );
-    //   },
-    // },
+
+    // Reference & Buyer Column with optional thumbnail
+    {
+      accessorKey: 'reference',
+      header: 'Reference & Buyer',
+      cell: ({ row }) => {
+        const ref = row.original.reference as any;
+        const refId = ref?.bookingId || ref?.orderId || '-';
+        const user = row.original.user as any;
+
+        const imageUrl = ref?.images?.[0]?.url || '/placeholder.png';
+
+        return (
+          <div className="flex items-start gap-3">
+            <div className="flex flex-col gap-1">
+              <p className="font-medium text-gray-900">{refId}</p>
+              <p className="text-gray-700 text-sm">Trx: {row.original.trnId}</p>
+              <p className="font-medium text-sm text-gray-900">
+                Buyer: {user?.fullName || 'Unknown'}
+              </p>
+              <p className="text-gray-500 text-sm">
+                Email: {user?.email || '-'}
+              </p>
+              <p className="text-gray-500 text-sm">
+                Platform Fee: ${row.original.adminAmount.toFixed(2)}
+              </p>
+              <p className="text-gray-500 text-sm">
+                Net Payout: ${row.original.vendorAmount.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        );
+      },
+    },
+
+    // Price
+    {
+      accessorKey: 'price',
+      header: 'Amount',
+      cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
+    },
+
+    // Type Column (Booking / Order)
     {
       accessorKey: 'modelType',
       header: 'Type',
-      cell: ({ row }) => <span>{row.original.modelType}</span>,
+      cell: ({ row }) => {
+        const isBooking = row.original.modelType === 'Booking';
+        return (
+          <span
+            className={`px-3 py-1 rounded text-sm font-medium ${
+              isBooking
+                ? 'bg-blue-50 text-blue-700'
+                : 'bg-purple-50 text-purple-700 rounded-sm'
+            }`}
+          >
+            {isBooking ? 'Booking' : 'Order'}
+          </span>
+        );
+      },
     },
-    {
-      accessorKey: 'trnId',
-      header: 'Transaction ID',
-      cell: ({ row }) => <span>#{row.original.trnId}</span>,
-    },
-    {
-      accessorKey: 'user.email',
-      header: 'Buyer',
-      cell: ({ row }) => (
-        <div className="text-sm">
-          <p>{row.original.user.fullName}</p>
-          <p>{row.original.user.email}</p>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'adminAmount',
-      header: 'Platform Fee',
-      cell: ({ row }) => <span>${row.original.adminAmount.toFixed(2)}</span>,
-    },
-    {
-      accessorKey: 'vendorAmount',
-      header: 'Net Payout',
-      cell: ({ row }) => <span>${row.original.vendorAmount.toFixed(2)}</span>,
-    },
+
+    // Payment Status Column
     {
       accessorKey: 'status',
-      header: 'Transaction Status',
-      cell: ({ row }) => (
-        <span
-          className={`capitalize font-medium ${
-            row.original.status === 'paid'
-              ? 'text-green-600'
-              : row.original.status === 'pending'
-                ? 'text-yellow-600'
-                : 'text-red-600'
-          }`}
-        >
-          {row.original.status === 'paid' ? 'Completed' : row.original.status}
-        </span>
-      ),
+      header: 'Payment Status',
+      cell: ({ row }) => {
+        const status = row.original.status;
+        return (
+          <span
+            className={`capitalize font-medium ${
+              status === 'paid'
+                ? 'text-green-600'
+                : status === 'pending'
+                  ? 'text-yellow-600'
+                  : 'text-red-600'
+            }`}
+          >
+            {status === 'paid' ? 'Completed' : status}
+          </span>
+        );
+      },
     },
+
+    // Date Column
     {
       accessorKey: 'createdAt',
       header: 'Date',
       cell: ({ row }) => {
         const date = row.original.createdAt;
         return (
-          <span>{date ? format(new Date(date), 'dd MMM, yyyy') : '-'}</span>
+          <span className="text-gray-600">
+            {date ? format(new Date(date), 'dd MMM, yyyy') : '-'}
+          </span>
         );
       },
     },

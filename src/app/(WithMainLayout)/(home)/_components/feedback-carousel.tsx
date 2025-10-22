@@ -10,6 +10,7 @@ import {
 import './styles/embla.css';
 import { EmblaViewportRefType } from 'embla-carousel-react';
 import { ClientFeedbackCard } from '@/components/ui/core/client-feedback-card';
+import { useGetAllReviewsCollectionQuery } from '@/redux/features/review/reviewApi';
 
 const TWEEN_FACTOR_BASE = 0.52;
 
@@ -25,6 +26,9 @@ type PropType = {
 
 export const FeedbackCarousel: React.FC<PropType> = (props) => {
   const { slides, emblaApi, emblaRef } = props;
+
+  const { data } = useGetAllReviewsCollectionQuery({});
+  const reviews = data?.data;
 
   const tweenFactor = useRef(0);
   const tweenNodes = useRef<HTMLElement[]>([]);
@@ -102,10 +106,10 @@ export const FeedbackCarousel: React.FC<PropType> = (props) => {
     <div className="embla">
       <div className="embla__viewport" ref={emblaRef}>
         <div className="embla__container">
-          {slides.map((index) => (
-            <div className="embla__slide" key={index}>
-              <div className="embla__slide__number">
-                <ClientFeedbackCard />
+          {reviews?.map((review) => (
+            <div className="embla__slide" key={review._id}>
+              <div className="embla__slide__number grid grid-cols-1 lg:grid-cols-3">
+                <ClientFeedbackCard review={review} />
               </div>
             </div>
           ))}

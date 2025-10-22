@@ -26,6 +26,8 @@ const ProductDetails = ({ productId }: Props) => {
   const { data, isLoading, refetch } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
 
+  const vendorId = product?.vendor as string | undefined;
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // When data is loaded, set the first image as default
@@ -323,7 +325,11 @@ const ProductDetails = ({ productId }: Props) => {
 
         {/* Add Review */}
         <div className="lg:w-3/4">
-          <AddReview productId={productId} refetch={refetch} />
+          <AddReview
+            vendorId={vendorId}
+            productId={productId}
+            refetch={refetch}
+          />
         </div>
       </div>
 

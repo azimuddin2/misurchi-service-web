@@ -6,8 +6,8 @@ import Services from './services';
 
 const ProductServiceSection = () => {
   return (
-    <div className="container lg:mx-auto">
-      <h1 className="text-[#000000] text-4xl font-semibold text-center">
+    <div className="container lg:mx-auto px-4 lg:px-0">
+      <h1 className="text-[#000000] text-2xl lg:text-4xl font-semibold text-center">
         Our Top Rated Services & Products
       </h1>
       <p className="text-center text-[#212529] mb-8 mt-3">
@@ -18,7 +18,7 @@ const ProductServiceSection = () => {
       <Tabs defaultValue="products">
         <TabsList
           style={{ background: 'none' }}
-          className="flex rounded-md w-full py-5 lg:max-w-6xl gap-1 mx-auto lg:gap-3 shadow-none"
+          className="flex rounded-md w-full py-5 lg:max-w-6xl gap-2 mx-auto lg:gap-3 shadow-none"
         >
           {/* Products Tab */}
           <TabsTrigger

@@ -9,11 +9,11 @@ import Link from 'next/link';
 
 const Banner = () => {
   return (
-    <div className="text-center overflow-hidden mb-16 mt-8">
+    <div className="text-center overflow-hidden mb-8 lg:mb-16 mt-8">
       {/* Heading */}
-      <div className="container mx-auto">
+      <div className="container mx-auto px-4 lg:px-0">
         <div className="relative">
-          <h2 className="text-4xl md:text-6xl font-bold">
+          <h2 className="text-3xl md:text-6xl font-bold">
             Explore Featured Services <br className="hidden md:block" />&
             Exclusive Products
           </h2>

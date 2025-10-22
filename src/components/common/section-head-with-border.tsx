@@ -9,8 +9,10 @@ export const SectionHeadWithBorder = ({
   title,
 }: ISectionHeadWithBorderProps) => {
   return (
-    <div className="flex justify-between items-center border-b py-4 mb-10">
-      <h3 className="text-2xl font-semibold text-gray-800">{title}</h3>
+    <div className="flex justify-between items-center border-b py-4 mb-10 px-5">
+      <h3 className="text-lg lg:text-2xl font-semibold text-gray-800">
+        {title}
+      </h3>
 
       {rightContent}
     </div>

@@ -21,6 +21,7 @@ type Props = {
 const ServiceDetails = ({ serviceId }: Props) => {
   const { data, refetch } = useGetServiceByIdQuery(serviceId);
   const service: TService | undefined = data?.data;
+  const vendorId = service?.vendor as string | undefined;
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -281,7 +282,11 @@ const ServiceDetails = ({ serviceId }: Props) => {
 
         {/* Add Review */}
         <div className="lg:w-3/4">
-          <AddReview serviceId={serviceId} refetch={refetch} />
+          <AddReview
+            vendorId={vendorId}
+            serviceId={serviceId}
+            refetch={refetch}
+          />
         </div>
       </div>
 

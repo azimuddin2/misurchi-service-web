@@ -1,8 +1,9 @@
-import { IUser } from './user.type';
+import { IUser, TVendorUser } from './user.type';
 
 export type TReview = {
   _id: string;
   user: IUser;
+  vendor: TVendorUser;
   service?: IService;
   product?: IProduct;
   review: string;

@@ -21,6 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 type Props = {
+  vendorId: string | undefined;
   productId: string;
   refetch: () => any;
 };
@@ -31,7 +32,7 @@ const reviewSchema = z.object({
     .min(20, 'Review must be at least 20 characters long'),
 });
 
-const AddReview = ({ productId, refetch }: Props) => {
+const AddReview = ({ vendorId, productId, refetch }: Props) => {
   const user = useAppSelector(selectCurrentUser);
   const [rating, setRating] = useState<number>(0);
 
@@ -53,6 +54,7 @@ const AddReview = ({ productId, refetch }: Props) => {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const reviewData: any = {
       user: user?.userId,
+      vendor: vendorId,
       product: productId,
       rating,
       ...data,

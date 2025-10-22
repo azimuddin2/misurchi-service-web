@@ -10,7 +10,7 @@ type TArrivalServices = {
   text: string;
 };
 
-const arrivalSerivecs: TArrivalServices[] = [
+const arrivalServices: TArrivalServices[] = [
   {
     id: 1,
     image:
@@ -38,7 +38,7 @@ const arrivalSerivecs: TArrivalServices[] = [
 
 export const NewArrival = () => {
   return (
-    <section className="flex justify-center items-center mb-20">
+    <section className="flex justify-center items-center mb-20 px-4 lg:px-0">
       <Container>
         {/* New Arrivals sections head content displayed here */}
         <SectionHeadWithBorder
@@ -57,8 +57,8 @@ export const NewArrival = () => {
         />
 
         {/* New Arrivals services image cards displayed here */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 px-4">
-          {arrivalSerivecs.map((content) => (
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5">
+          {arrivalServices.map((content) => (
             <ArrivalImageCard key={content.id} content={content} />
           ))}
         </div>

@@ -13,8 +13,8 @@ import {
   Calendar,
   SquareActivity,
   BadgeDollarSign,
-  Mail,
   MessageCircleMore,
+  Home,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -122,6 +122,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Settings',
         url: '/vendor/settings',
         icon: Settings,
+      },
+      {
+        title: 'BacK Home',
+        url: '/',
+        icon: Home,
       },
     );
   }

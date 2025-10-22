@@ -1,6 +1,6 @@
 import { KnowAboutUs, NewArrival, OurHappyClients } from './_components';
 import Banner from './_components/banner';
-import FAQSection from './_components/faq-seciton';
+import FAQSection from './_components/faq-section';
 import ProductServiceSection from './_components/product-service-section';
 import TimeOffer from './_components/time-offer';
 
