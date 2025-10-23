@@ -88,6 +88,7 @@ export const baseApi = createApi({
     'ProductType',
     'ServiceType',
     'Dashboard',
+    'Follow',
   ],
   endpoints: () => ({}),
 });

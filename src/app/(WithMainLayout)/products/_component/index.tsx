@@ -16,6 +16,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { addToCart } from '@/redux/features/cart/cartSlice';
 import { toast } from 'sonner';
 import { TReview } from '@/types/review.type';
+import FollowButton from '@/components/modules/follow-button';
 
 type Props = {
   productId: string;
@@ -25,8 +26,7 @@ const ProductDetails = ({ productId }: Props) => {
   const [quantity, setQuantity] = useState<number>(1);
   const { data, isLoading, refetch } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
-
-  const vendorId = product?.vendor as string | undefined;
+  const vendorId = product?.vendor._id as string;
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -57,7 +57,7 @@ const ProductDetails = ({ productId }: Props) => {
 
   const dispatch = useAppDispatch();
 
-  const handleAddtoCart = (product?: TProduct) => {
+  const handleAddToCart = (product?: TProduct) => {
     if (!product) return; // guard clause
     dispatch(addToCart(product));
     toast.success('Product successfully added to cart.', { duration: 3000 });
@@ -108,8 +108,8 @@ const ProductDetails = ({ productId }: Props) => {
           </div>
 
           {/* Vendor Profile */}
-          <div className="mt-12 hidden lg:block">
-            <div className="flex items-center gap-3">
+          <div className="mt-12">
+            <div className="flex items-center gap-3 mb-5">
               <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
                 <AvatarImage src={product?.vendor?.image} />
                 <AvatarFallback>
@@ -128,10 +128,10 @@ const ProductDetails = ({ productId }: Props) => {
               </div>
             </div>
 
-            <Button className="w-1/2 text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
-              <Plus className="w-5 h-5" />
-              <span className="uppercase text-sm font-semibold">Follow</span>
-            </Button>
+            <FollowButton
+              vendorId={vendorId}
+              className="w-full lg:w-1/2 text-black border-gray-800 bg-gradient-to-t to-white from-white hover:bg-green-500/80"
+            />
           </div>
         </div>
 
@@ -255,7 +255,7 @@ const ProductDetails = ({ productId }: Props) => {
 
           <div>
             <Button
-              onClick={() => handleAddtoCart(product)}
+              onClick={() => handleAddToCart(product)}
               className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-6 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
             >
               <ShoppingCart className="w-6 h-6" />

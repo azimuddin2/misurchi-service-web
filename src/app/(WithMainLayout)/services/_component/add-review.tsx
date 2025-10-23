@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 type Props = {
-  vendorId: string | undefined;
+  vendorId: string;
   serviceId: string;
   refetch: () => any;
 };
@@ -115,7 +115,7 @@ const AddReview = ({ vendorId, serviceId, refetch }: Props) => {
 
           {/* Submit Button */}
           <AppButton
-            // disabled={user?.role === 'vendor'}
+            disabled={!user?.userId}
             className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 mt-5"
             content={
               <div className="flex justify-center items-center space-x-2 font-semibold">

@@ -16,7 +16,7 @@ export const Footer = () => {
         </div>
 
         {/* About Description */}
-        <div className="text-center text-lg text-gray-50 max-w-3xl mx-auto">
+        <div className="text-center text-sm lg:text-lg text-gray-50 max-w-3xl mx-auto">
           {
             "We’re dedicated to providing the best products and services to our customers. Whether you're a vendor looking to showcase your offerings or a user searching for top-rated solutions, we offer a seamless experience for everyone."
           }

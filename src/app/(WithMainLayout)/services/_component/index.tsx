@@ -13,6 +13,7 @@ import ViewReviews from './view-reviews';
 import { Progress } from '@/components/ui/progress';
 import Link from 'next/link';
 import { TReview } from '@/types/review.type';
+import FollowButton from '@/components/modules/follow-button';
 
 type Props = {
   serviceId: string;
@@ -21,7 +22,7 @@ type Props = {
 const ServiceDetails = ({ serviceId }: Props) => {
   const { data, refetch } = useGetServiceByIdQuery(serviceId);
   const service: TService | undefined = data?.data;
-  const vendorId = service?.vendor as string | undefined;
+  const vendorId = service?.vendor._id as string;
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -90,8 +91,8 @@ const ServiceDetails = ({ serviceId }: Props) => {
           </div>
 
           {/* Vendor Profile */}
-          <div className="mt-12 hidden lg:block">
-            <div className="flex items-center gap-3">
+          <div className="mt-12">
+            <div className="flex items-center gap-3 mb-5">
               <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
                 <AvatarImage src={service?.vendor?.image} />
                 <AvatarFallback>
@@ -110,10 +111,10 @@ const ServiceDetails = ({ serviceId }: Props) => {
               </div>
             </div>
 
-            <Button className="w-1/2 text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
-              <Plus className="w-5 h-5" />
-              <span className="uppercase text-sm font-semibold">Follow</span>
-            </Button>
+            <FollowButton
+              vendorId={vendorId}
+              className="w-full lg:w-1/2 text-black border-gray-800 bg-gradient-to-t to-white from-white hover:bg-green-500/80"
+            />
           </div>
         </div>
 

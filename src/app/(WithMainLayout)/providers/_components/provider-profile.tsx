@@ -25,6 +25,7 @@ import { TVendorUser } from '@/types';
 import { format } from 'date-fns';
 import Spinner from '@/components/shared/Spinner';
 import { useGetVendorUserByIdQuery } from '@/redux/features/vendor/vendorApi';
+import FollowButton from '@/components/modules/follow-button';
 
 type Props = {
   providerId: string;
@@ -79,7 +80,7 @@ const ProviderProfile = ({ providerId }: Props) => {
                   </p>
                 </div>
                 {/* Button */}
-                <div className="mt-4 sm:mt-0 flex gap-2">
+                <div className="mt-4 sm:mt-0 flex items-center gap-2">
                   <AppButton
                     className="text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
                     content={
@@ -94,19 +95,10 @@ const ProviderProfile = ({ providerId }: Props) => {
                       </Link>
                     }
                   />
-                  <AppButton
-                    className="text-white border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
-                    content={
-                      <Link
-                        href={`/`}
-                        className="flex justify-center items-center space-x-1 font-semibold"
-                      >
-                        <Plus size={24} />
-                        <span className="uppercase text-sm font-semibold">
-                          Follow
-                        </span>
-                      </Link>
-                    }
+
+                  <FollowButton
+                    vendorId={vendorId}
+                    className="text-white border-gray-800 bg-gradient-to-t mt-2 to-green-800 from-green-500/70 hover:bg-green-500/80"
                   />
                 </div>
               </div>
