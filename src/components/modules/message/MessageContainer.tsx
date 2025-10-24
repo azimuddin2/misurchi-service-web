@@ -1,7 +1,8 @@
 'use client';
+
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { MessageCircleMore, Send, SendHorizontal, X } from 'lucide-react';
+import { MessageCircleMore, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import OwnerMsgCard from './OwnerMsgCard';
 import ReceiverMsgCard from './ReceiverMsgCard';
@@ -14,7 +15,7 @@ import UserSearchContainer from './UserSearchContainer';
 import { useAppSelector } from '@/redux/hooks';
 import { useSocket } from '@/providers/SocketProvider';
 import useMultipleFileUpload from '@/hooks/useMultipleFileUpload';
-import CustomAvatar from '@/components/shared/custom-avater';
+import CustomAvatar from '@/components/shared/custom-avatar';
 import { MessageImageUpload } from '@/components/ui/core/UploadMessageImage';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
@@ -30,187 +31,158 @@ const MessageContainer = () => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const { socket } = useSocket();
   const user = useAppSelector(selectCurrentUser);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const [messages, setMessages] = useState<any>(null);
-  const [onlineUser, setOnlineUser] = useState([]);
-  const [onlineUserLoading, setOnlineUserLoading] = useState(false);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [onlineUser, setOnlineUser] = useState<string[]>([]);
   const [userDetails, setUserDetails] = useState<any>(null);
-  const [chatListData, setChatListData] = useState([]);
+  const [chatListData, setChatListData] = useState<any[]>([]);
   const [chatId, setChatId] = useState<string>('');
   const [isActive, setIsActive] = useState(false);
+  const [wantTOSearch, setWantTOSearch] = useState(false);
   const selectedUserIdFrom = useSearchParams().get('selectedUserId');
   const { register, handleSubmit, reset } = useForm();
-  const chatBoxRef = useRef(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
   const [upload] = useMultipleFileUpload();
 
-  const [wantTOSearch, setWantTOSearch] = useState(false);
+  console.log('uploadedImages', uploadedImages);
 
-  console.log(messages);
-
-  // ========================= listen message::received ===========================
-  const handleListenMessage = (res: any) => {
-    setMessages(res);
-    // console.log({ message: res });
-  };
-
-  /**
-   * emit message page and listen message  to get
-   * previous message
-   *
-   * **/
+  // ========================= Listen for received messages ===========================
   useEffect(() => {
-    if (socket && user?.userId) {
-      socket?.on('message', handleListenMessage);
+    if (!socket || !user?.userId) return;
 
-      console.log(selectedUserId);
-      if (selectedUserId) {
-        setTimeout(() => {
-          socket?.emit('message-page', selectedUserId);
-        }, 500);
-      }
+    const handleMessage = (res: any) => {
+      setMessages(res);
+    };
+
+    socket.on('message', handleMessage);
+
+    if (selectedUserId) {
+      socket.emit('message-page', selectedUserId);
     }
+
     return () => {
-      socket?.off('message', handleListenMessage);
+      socket.off('message', handleMessage);
     };
   }, [socket, selectedUserId, user?.userId]);
 
-  // ======================== listen online user ===========================
+  // ========================= Listen for new message ===========================
   useEffect(() => {
-    setOnlineUserLoading(true);
-    if (socket && user?.userId) {
-      socket.on('onlineUser', (res: any) => {
-        setOnlineUser(res);
-        setOnlineUserLoading(false);
-      });
-    }
+    if (!socket || !user?.userId || !chatId) return;
 
-    // return () => {
-    //   if (socket && user?.userId) {
-    //     socket.off("onlineUser", (res) => {
-    //       setOnlineUser(res);
-    //       setOnlineUserLoading(false);
-    //     });
-    //   }
-    // };
-  }, [socket, user?.userId, selectedUserId]);
+    const handleNewMessage = (res: any) => {
+      setMessages((prev) => [...prev, res]);
+    };
 
-  // ======================== listen user-details ===========================
-  useEffect(() => {
-    if (socket && user?.userId) {
-      socket?.on('user-details', (res: any) => {
-        console.log('user details ============= ', res);
-        setUserDetails(res);
-      });
-    }
-  }, [socket, user?.userId, selectedUser]);
-
-  console.log({ userDetails });
-
-  // ======================== listen chat-list ===========================
-  useEffect(() => {
-    socket?.on(`chat-list`, (res: any) => {
-      console.log('chat list ==========', res);
-      setChatListData(res);
-    });
-
-    setTimeout(() => {
-      socket?.emit(`my-chat-list`, {}, (res: any) => {
-        console.log('Keno chat list pacchi na?');
-        console.log(res);
-        setChatListData(res?.message);
-      });
-    }, 1000);
+    socket.on(`new-message::${chatId}`, handleNewMessage);
 
     return () => {
-      if (socket) {
-        socket.off(`chat-list`);
-      }
+      socket.off(`new-message::${chatId}`, handleNewMessage);
     };
-  }, [socket, socket?.connected]);
+  }, [socket, chatId, user?.userId]);
 
-  // emit chat list
-  // useEffect(() => {
-  //   console.log(socket);
-  //   if (socket && socket?.connected) {
-  //     console.log({ socketConnected: socket.connected });
-  //     socket?.emit(`my-chat-list`, {});
-
-  //   }
-
-  // }, [socket, socket?.connected])
-
-  // ======================== listen new message  ===========================
+  // ========================= Listen for online users ===========================
   useEffect(() => {
-    if (socket && user?.userId && selectedUserId && chatId) {
-      socket?.on(`new-message::${chatId}`, (res: any) => {
-        setMessages((prevMessages: any) => [...prevMessages, res]);
+    if (!socket || !user?.userId) return;
+
+    const handleOnlineUser = (res: any) => {
+      setOnlineUser(res);
+    };
+
+    socket.on('onlineUser', handleOnlineUser);
+
+    return () => {
+      socket.off('onlineUser', handleOnlineUser);
+    };
+  }, [socket, user?.userId]);
+
+  // ========================= Listen for user details ===========================
+  useEffect(() => {
+    if (!socket || !user?.userId) return;
+
+    const handleUserDetails = (res: any) => {
+      setUserDetails(res);
+    };
+
+    socket.on('user-details', handleUserDetails);
+
+    return () => {
+      socket.off('user-details', handleUserDetails);
+    };
+  }, [socket, user?.userId]);
+
+  // ========================= Listen for chat list ===========================
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleChatList = (res: any) => {
+      setChatListData(res);
+    };
+
+    socket.on('chat-list', handleChatList);
+
+    setTimeout(() => {
+      socket.emit('my-chat-list', {}, (res: any) => {
+        setChatListData(res?.message || []);
       });
-    }
-  }, [socket, user?.userId, selectedUserId, chatId]);
+    }, 500);
 
-  // ======================== emit for seen message  ===========================
+    return () => {
+      socket.off('chat-list', handleChatList);
+    };
+  }, [socket]);
+
+  // ========================= Emit seen message ===========================
   useEffect(() => {
-    if (socket && user?.userId && selectedUserId && chatId) {
+    if (socket && user?.userId && chatId) {
       socket.emit('seen', { chatId });
     }
-  }, [socket, user, selectedUserId, chatId]);
+  }, [socket, user, chatId]);
 
-  // emit for send message
+  // ========================= Handle send message ===========================
   const handleSendMessage = async (data: any) => {
-    if (images.length > 0) {
-      const files = images?.map((image) => image.file);
+    if (!socket || !user?.userId || !selectedUserId) return;
 
-      // const res = await upload(files);
-
-      const payload = {
-        receiver: selectedUserId,
-        text: data?.message,
-        // imageUrl: res?.data?.images,
-      };
-
-      if (socket && user?.userId && selectedUserId) {
-        socket.emit('send-message', payload);
-        reset();
-        setUploadedImages([]);
-        setImages([]);
-      }
-      return;
-    }
-
-    const payload = {
+    const payload: any = {
       receiver: selectedUserId,
-      text: data?.message,
+      text: data?.message || '',
+      imageUrl: images.length > 0 ? images.map((i) => i.previewUrl) : [],
+      sender: user.userId,
+      chatId,
+      createdAt: new Date().toISOString(),
     };
-    if (socket && user?.userId && selectedUserId) {
-      socket.emit('send-message', payload, (res: any) => {
-        console.log(res);
-      });
-      reset();
-      setUploadedImages([]);
-      setImages([]);
-    }
+
+    // Update local UI immediately
+    setMessages((prev) => [...prev, payload]);
+
+    // Emit to server
+    socket.emit('send-message', payload, (res: any) => {
+      console.log('Message sent:', res);
+    });
+
+    reset();
+    setUploadedImages([]);
+    setImages([]);
   };
 
-  const handleImagesChange = (newImages: UploadedImage[]) => {
+  // ========================= Image management ===========================
+  const handleImagesChange = (newImages: UploadedImage[]) =>
     setImages(newImages);
-  };
 
   const removeImage = (id: string) => {
-    const updatedImages = uploadedImages.filter((image) => image.id !== id);
-    setUploadedImages(updatedImages);
-    handleImagesChange(updatedImages);
+    const updated = uploadedImages.filter((image) => image.id !== id);
+    setUploadedImages(updated);
+    handleImagesChange(updated);
   };
 
-  // ============================= check isActive user====================================
+  // ========================= Active user check ===========================
   useEffect(() => {
     if (userDetails && onlineUser) {
       // @ts-ignore
-      setIsActive(onlineUser?.includes(userDetails?._id));
+      setIsActive(onlineUser.includes(userDetails?._id));
     }
   }, [userDetails, onlineUser]);
 
-  // set selected  user
+  // ========================= Selected user management ===========================
   useEffect(() => {
     if (selectedUserIdFrom) {
       setSelectedUserId(selectedUserIdFrom);
@@ -219,262 +191,214 @@ const MessageContainer = () => {
     }
   }, [selectedUserIdFrom]);
 
-  // set chat id
+  // ========================= Set chatId ===========================
   useEffect(() => {
-    const selectedUserChatId: any = chatListData?.find(
+    const foundChat = chatListData?.find(
       (chatList: any) =>
         chatList?.chat?.participants?.[0]?._id === selectedUserId,
     );
-
-    if (!chatId) {
-      setChatId(selectedUserChatId?.chat?._id);
-    }
+    if (foundChat) setChatId(foundChat.chat?._id);
   }, [selectedUserId, chatListData]);
 
-  // ===================================== scroll to bottom of chat box ==============================================
+  // ========================= Scroll to bottom ===========================
   useEffect(() => {
-    if (messages) {
-      if (chatBoxRef.current) {
-        // @ts-ignore
-        chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
-      }
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [messages]);
 
+  // ========================= Render ===========================
   return (
-    <div className="lg:mx-auto ">
-      <div className="relative z-10 flex flex-col rounded-xl rounded-t-xl lg:border-t-8 lg:border-t-primary-blue  lg:px-10 lg:py-8 lg:flex-row ">
-        {/* left */}
-        <div
-          className={cn(
-            'border-opacity-[40%] pr-2 lg:w-[30%] lg:border-r-2 lg:border-gray-300',
-            selectedUserId && 'hidden lg:block',
-          )}
-        >
-          <div className="lg:border-t-black flex items-end gap-x-5 border-b border-opacity-[40%] py-4 text-black">
-            <h4 className="text-2xl font-medium">Messages</h4>
-          </div>
-
-          <div className="mx-auto mb-10 mt-4 lg:w-[95%]">
-            {wantTOSearch ? (
-              <UserSearchContainer
-                setWantTOSearch={setWantTOSearch}
-              ></UserSearchContainer>
-            ) : (
-              <>
-                <Input
-                  placeholder="Search people... "
-                  className="w-full rounded-sm border  bg-transparent px-2 py-6 "
-                  type="text"
-                  onFocus={() => setWantTOSearch(true)}
-                />
-                {/* users list - TODO: Use dynamic data */}
-                <div className="scroll-hide mt-5  max-h-[70vh] min-h-[65vh] space-y-5 overflow-auto">
-                  {chatListData?.map((chatData: any, idx: number) => (
-                    <UserCard
-                      key={idx}
-                      selectedUserId={selectedUserId}
-                      setChatId={setChatId}
-                      user={{
-                        userData: chatData?.chat?.participants?.[0],
-                        message: chatData?.message,
-                        unseen: chatData?.unreadMessageCount ? true : false,
-                        unseenMessage: chatData?.unreadMessageCount,
-                      }}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+    <div className="mx-auto flex h-[90vh] w-full max-w-6xl rounded-xl bg-white shadow-lg overflow-hidden">
+      {/* Left Sidebar */}
+      <div
+        className={cn(
+          'flex flex-col border-r border-gray-200 bg-gray-50 transition-all duration-300',
+          selectedUserId ? 'hidden lg:flex lg:w-[30%]' : 'w-full lg:w-[30%]',
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4">
+          <h4 className="text-2xl font-medium text-gray-800">Messages</h4>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="lg:hidden"
+            onClick={() => setWantTOSearch((prev) => !prev)}
+          >
+            <MessageCircleMore className="text-gray-700" />
+          </Button>
         </div>
 
-        {/* right */}
+        {/* Search */}
+        <div className="p-4">
+          {wantTOSearch ? (
+            <UserSearchContainer setWantTOSearch={setWantTOSearch} />
+          ) : (
+            <Input
+              placeholder="Search people..."
+              className="w-full rounded-full border-gray-300 bg-white text-gray-800 focus:ring-2 focus:ring-primary-blue"
+              onFocus={() => setWantTOSearch(true)}
+            />
+          )}
+        </div>
+
+        {/* Chat List */}
+        <div className="scroll-hide flex-1 overflow-y-auto px-4 pb-6">
+          {chatListData?.length === 0 ? (
+            <p className="text-center text-gray-500 mt-10">No recent chats</p>
+          ) : (
+            chatListData?.map((chatData: any, idx: number) => (
+              <UserCard
+                key={idx}
+                selectedUserId={selectedUserId}
+                setChatId={setChatId}
+                user={{
+                  userData: chatData?.chat?.participants?.[0],
+                  message: chatData?.message,
+                  unseen: chatData?.unreadMessageCount ? true : false,
+                  unseenMessage: chatData?.unreadMessageCount,
+                }}
+              />
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Chat Section */}
+      <div className="flex flex-1 flex-col bg-white">
+        {/* When no user selected */}
         {!selectedUserId ? (
-          <div
-            className={cn(
-              'flex flex-1 h-[80vh] items-center justify-center',
-              !selectedUserId && 'hidden lg:flex',
-            )}
-          >
-            <div className="flex items-center gap-x-3 font-dm-sans lg:text-2xl">
-              <MessageCircleMore size={26} /> Select your partner to start a
-              conversation
-            </div>
+          <div className="flex flex-1 items-center justify-center text-gray-500 text-lg font-medium">
+            <MessageCircleMore className="mr-2 text-gray-400" />
+            Select a user to start chatting
           </div>
         ) : (
-          <div
-            className={cn(
-              'flex flex-col justify-between lg:flex-grow lg:px-8',
-              !selectedUserId && 'hidden lg:flex',
-            )}
-          >
-            <div className="border-t-black flex items-center justify-between border-b border-opacity-[40%] pb-1">
-              <div className="flex items-center gap-x-2">
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+              <div className="flex items-center gap-x-3">
+                <CustomAvatar
+                  img={userDetails?.profile}
+                  name={userDetails?.name}
+                  className="size-12"
+                />
                 <div>
-                  <CustomAvatar
-                    img={userDetails?.image}
-                    name={userDetails?.fullName}
-                    className="size-12"
-                  ></CustomAvatar>
-                </div>
-
-                <div className="lg:flex-grow">
-                  <h3 className="text-xl font-semibold text-black">
-                    {userDetails?.fullName}
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {userDetails?.name}
                   </h3>
-
-                  {isActive ? (
-                    <div className="mt-1 flex items-center gap-x-1">
-                      {/* Active/Online Indicator */}
-                      <div className="size-3 rounded-full bg-green-500" />
-                      <p className="text-black border-t-black">Online</p>
-                    </div>
-                  ) : (
-                    <div className="mt-1 flex items-center gap-x-1">
-                      {/* Active/Online Indicator */}
-                      <div className="size-3 rounded-full bg-yellow-500" />
-                      <p className="text-black border-t-black">Offline</p>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-x-2">
+                    <div
+                      className={cn(
+                        'h-2 w-2 rounded-full',
+                        isActive ? 'bg-green-500' : 'bg-yellow-500',
+                      )}
+                    />
+                    <p className="text-sm text-gray-600">
+                      {isActive ? 'Online' : 'Offline'}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Messages */}
             <div
-              key={'message'}
-              className="scroll-hide space-y-1 pt-8  max-h-[65vh] min-h-[65vh]  overflow-auto"
               ref={chatBoxRef}
+              className="scroll-hide flex-1 space-y-3 overflow-y-auto bg-gray-50 px-6 py-4"
             >
-              {messages?.map((message: any, index: number) => {
-                const isPreviousMessageFromSameSender =
-                  index > 0 && messages[index - 1]?.sender === message.sender;
-
-                const showAvatar =
-                  !isPreviousMessageFromSameSender || index === 0; // Show avatar only if it's the first in a series or the first message overall.
-
-                return message?.sender !== user?.userId ? (
-                  <div className="flex items-start gap-x-2" key={message._id}>
-                    {showAvatar && (
-                      <CustomAvatar
-                        img={userDetails?.image}
-                        name={userDetails?.fullName}
-                        className="size-8 rounded-full"
-                      />
-                    )}
-                    <div
-                      className={cn(
-                        'md:max-w-[50%] max-w-[75%] space-y-3 overflow-ellipsis',
-                        !showAvatar && 'pl-10',
-                      )}
-                    >
+              {messages?.map((message, index) =>
+                message.sender !== user?.userId ? (
+                  <div className="flex items-end gap-x-2" key={index}>
+                    <CustomAvatar
+                      img={userDetails?.profile}
+                      name={userDetails?.name}
+                      className="size-8 rounded-full"
+                    />
+                    <div className="max-w-[75%] md:max-w-[60%]">
                       <ReceiverMsgCard
                         message={message?.text}
                         files={
-                          message?.imageUrl?.length ? message?.imageUrl : null
+                          message?.imageUrl?.length ? message.imageUrl : null
                         }
                       />
                     </div>
                   </div>
                 ) : (
                   <div
-                    className="flex flex-row-reverse items-start gap-x-4"
-                    key={message._id}
+                    className="flex flex-row-reverse items-end gap-x-2"
+                    key={index}
                   >
-                    <div className="flex md:max-w-[50%] max-w-[75%] flex-col items-end space-y-1 break-words">
+                    <div className="max-w-[75%] md:max-w-[60%] flex flex-col items-end">
                       <OwnerMsgCard
                         message={message?.text}
                         files={
-                          message?.imageUrl?.length ? message?.imageUrl : null
+                          message?.imageUrl?.length ? message.imageUrl : null
                         }
                       />
                     </div>
                   </div>
-                );
-              })}
+                ),
+              )}
             </div>
 
-            {/* right bottom */}
-            <div className="mt-3 flex w-full items-center gap-x-6 ">
-              <div className="mt-5 relative  w-full">
-                {uploadedImages?.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4   bg-gray-200 w-full px-10">
-                    {uploadedImages?.map((image) => (
-                      <div
-                        key={image.id}
-                        className="relative group flex flex-col justify-center items-center gap-x-2 py-2"
+            {/* Message Input */}
+            <div className="border-t border-gray-200 bg-white p-4">
+              {uploadedImages?.length > 0 && (
+                <div className="mb-2 grid w-full gap-3 rounded-md bg-gray-100 p-3 sm:grid-cols-2 md:grid-cols-3">
+                  {uploadedImages.map((image) => (
+                    <div
+                      key={image.id}
+                      className="relative flex flex-col items-center"
+                    >
+                      {image.isImage ? (
+                        <Image
+                          src={image.previewUrl}
+                          alt="Preview"
+                          width={100}
+                          height={100}
+                          className="h-20 w-auto rounded-md object-cover shadow-sm"
+                        />
+                      ) : (
+                        <p className="truncate text-sm">{image.file.name}</p>
+                      )}
+                      <button
+                        onClick={() => removeImage(image.id)}
+                        className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white shadow-sm"
                       >
-                        {image?.isImage && (
-                          <Image
-                            src={image?.previewUrl}
-                            alt="Uploaded preview"
-                            width={1200}
-                            height={1200}
-                            className="rounded-lg md:max-w-44 w-auto mx-auto h-20 max-w-36"
-                          />
-                        )}
-
-                        {!image?.isImage && (
-                          <p className=" max-w-[200px] truncate text-[14px]">
-                            {image?.file?.name}
-                          </p>
-                        )}
-
-                        <button
-                          onClick={() => removeImage(image.id)}
-                          className="absolute top-2 right-2 p-1 bg-red-500 rounded-full opacity-100 transition-opacity z-30"
-                        >
-                          <X className="w-4 h-4 text-white" />
-                        </button>
-                        <div className="absolute inset-0 bg-black/5 opacity-100 transition-opacity rounded-lg" />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex w-full items-center gap-x-3">
-                  <div>
-                    <MessageImageUpload
-                      onImagesChange={handleImagesChange}
-                      uploadedImages={uploadedImages}
-                      setUploadedImages={setUploadedImages}
-                    />
-                  </div>
-
-                  <form
-                    onSubmit={handleSubmit(handleSendMessage)}
-                    className="flex flex-col w-full items-stretch gap-x-4 relative"
-                  >
-                    <div>
-                      <Input
-                        placeholder="Type a message"
-                        type="text"
-                        className="w-full border-2 border-black/50 bg-transparent px-4 py-5 rounded-sm"
-                        {...register('message', {
-                          required: images.length > 0 ? false : true,
-                        })}
-                        // onFocus={handleInputFocus}
-                        // onBlur={handleInputBlur}
-                      />
-                      {/*
-                      <AutosizeTextarea
-                        placeholder="Type a message"
-                        className="w-full border-2 bg-transparent rounded-3xl"
-                        {...register("message", {
-                          required: images.length > 0 ? false : true,
-                        })}
-                        maxHeight={150}
-                      ></AutosizeTextarea> */}
-
-                      <Button className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 hover:bg-white bg-white shadow-none">
-                        <Send color="#003250" />
-                      </Button>
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
-                  </form>
+                  ))}
                 </div>
-              </div>
+              )}
+
+              <form
+                onSubmit={handleSubmit(handleSendMessage)}
+                className="flex items-center gap-x-3"
+              >
+                <MessageImageUpload
+                  onImagesChange={handleImagesChange}
+                  uploadedImages={uploadedImages}
+                  setUploadedImages={setUploadedImages}
+                />
+                <Input
+                  placeholder="Type a message..."
+                  type="text"
+                  className="flex-1 rounded-full border-gray-300 bg-gray-100 px-5 py-3 text-gray-800 placeholder:text-gray-500 focus:border-primary-blue focus:ring-2 focus:ring-primary-blue"
+                  {...register('message', {
+                    required: images.length > 0 ? false : true,
+                  })}
+                />
+                <Button
+                  type="submit"
+                  className="rounded-full bg-[#003250] w-9 h-9 text-white"
+                >
+                  <Send className="h-5 w-5 text-white" />
+                </Button>
+              </form>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>

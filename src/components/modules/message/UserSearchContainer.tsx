@@ -1,6 +1,6 @@
 'use client';
 
-import CustomAvatar from '@/components/shared/custom-avater';
+import CustomAvatar from '@/components/shared/custom-avatar';
 import Empty from '@/components/shared/empty';
 
 import { Button } from '@/components/ui/button';

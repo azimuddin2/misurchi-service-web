@@ -19,7 +19,7 @@ const ReceiverMsgCard = ({
 
   return (
     <>
-      <div className="max-w-max rounded-sm border bg-[#DFE1E3] px-3 py-1">
+      <div className="max-w-max rounded-xl border bg-[#DFE1E3] px-4 py-2">
         {files && files?.length > 0 && (
           <div
             className={cn(

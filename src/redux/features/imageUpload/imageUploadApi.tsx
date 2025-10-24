@@ -1,12 +1,12 @@
 import { baseApi } from '@/redux/api/baseApi';
 
-const imageUploadApi = baseApi.injectEndpoints({
+export const imageUploadApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    uploadImage: builder.mutation({
-      query: (data) => ({
-        url: '/imageUpload/create-imageUpload',
+    uploadImage: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: '/upload/images', // ✅ backend route
         method: 'POST',
-        body: data,
+        body: formData,
       }),
     }),
   }),

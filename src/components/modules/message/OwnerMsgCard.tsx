@@ -5,48 +5,78 @@ import { AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Avatar } from '@radix-ui/react-avatar';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-const OwnerMsgCard = ({ message, files }: { message: string; files: any }) => {
+interface OwnerMsgCardProps {
+  message: string;
+  files?: { url: string }[];
+}
+
+const OwnerMsgCard = ({ message, files = [] }: OwnerMsgCardProps) => {
   const [imageUrl, setImageUrl] = useState('');
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
   return (
     <>
-      <div className="max-w-max rounded-sm border bg-primary-blue text-primary-white px-3 py-1  overflow-hidden bg-[#003250]">
-        {files && files?.length > 0 && (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25 }}
+        className="max-w-max rounded-xl border border-primary-blue/20 bg-gradient-to-tr from-[#004b63] to-[#006884] px-4 py-2 text-white shadow-md"
+      >
+        {/* Image Grid */}
+        {files?.length > 0 && (
           <div
             className={cn(
-              'grid grid-cols-1  gap-2',
-              files?.length > 2 && 'xl:grid-cols-3',
-              files?.length > 1 && 'grid-cols-2',
+              'mb-2 grid gap-2',
+              files.length === 1 && 'grid-cols-1',
+              files.length === 2 && 'grid-cols-2',
+              files.length >= 3 && 'grid-cols-3',
             )}
           >
-            {files?.map((file: any, index: number) => (
-              <Avatar
-                onClick={() => {
-                  setOpenPreviewModal(true);
-                  setImageUrl(file?.url);
-                }}
+            {files.map((file, index) => (
+              <div
                 key={index}
-                className="h-24 xl:h-28 rounded-none max-w-[250px] cursor-pointer"
+                className="relative group cursor-pointer overflow-hidden rounded-lg border border-white/20 hover:scale-[1.02] transition-all"
+                onClick={() => {
+                  setImageUrl(file?.url);
+                  setOpenPreviewModal(true);
+                }}
               >
-                <AvatarImage src={file?.url} />
-                <AvatarFallback className=" rounded-none">
-                  <Skeleton className="h-24 xl:h-28 w-28  bg-[#9991e6]"></Skeleton>
-                </AvatarFallback>
-              </Avatar>
+                <Avatar className="h-24 w-full xl:h-28">
+                  <AvatarImage
+                    src={file?.url}
+                    className="h-full w-full object-cover"
+                  />
+                  <AvatarFallback>
+                    <Skeleton className="h-24 xl:h-28 w-full bg-[#1f5a73]" />
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-sm">
+                  🔍 View
+                </div>
+              </div>
             ))}
           </div>
         )}
 
-        <p className="text-white break-words ">{message}</p>
-      </div>
+        {/* Message Text */}
+        {message && (
+          <p className="break-words text-[15px] leading-relaxed tracking-wide">
+            {message}
+          </p>
+        )}
+      </motion.div>
+
+      {/* Image Preview Modal */}
       <PreviewImageModal
         open={openPreviewModal}
         setOpen={setOpenPreviewModal}
         url={imageUrl}
-      ></PreviewImageModal>
+      />
     </>
   );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import CustomAvatar from '@/components/shared/custom-avater';
+import CustomAvatar from '@/components/shared/custom-avatar';
 import { useUpdateSearchParams } from '@/hooks/useUpdateSearchParams';
 import { cn } from '@/lib/utils';
 import { calculateTime } from '@/utils/calculateTime';
