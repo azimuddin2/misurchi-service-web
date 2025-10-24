@@ -1,18 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 import { X, Filter, CircleX } from 'lucide-react';
 import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
 
 export default function FilterSidebar() {
-  const [price, setPrice] = useState([0, 500]);
+  const [price, setPrice] = useState<[number, number]>([0, 5000]);
   const [isOpen, setIsOpen] = useState(false);
-
   const [selectedRecommended, setSelectedRecommended] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [selectedDiscounts, setSelectedDiscounts] = useState<string[]>([]);
@@ -21,13 +19,16 @@ export default function FilterSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const handleSearchQuery = (query: string, values: string[]) => {
+  // Utility to update URL query params
+  const updateQueryParam = (key: string, values: string[]) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (values.length > 0) {
-      params.set(query, values.map(encodeURIComponent).join(',')); // encode for URL
-    } else {
-      params.delete(query);
-    }
+
+    // remove old values
+    params.delete(key);
+
+    // add new values
+    values.forEach((v) => params.append(key, v));
+
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
@@ -35,20 +36,17 @@ export default function FilterSidebar() {
     value: string,
     selected: string[],
     setSelected: (vals: string[]) => void,
-    query: string,
+    queryKey: string,
   ) => {
-    let newSelected: string[];
-    if (selected.includes(value)) {
-      newSelected = selected.filter((v) => v !== value);
-    } else {
-      newSelected = [...selected, value];
-    }
+    const newSelected = selected.includes(value)
+      ? selected.filter((v) => v !== value)
+      : [...selected, value];
+
     setSelected(newSelected);
-    handleSearchQuery(query, newSelected);
+    updateQueryParam(queryKey, newSelected);
   };
 
-  // Filter options
-  const recommended = [
+  const recommendedOptions = [
     'All',
     'Special Offer',
     'New Arrivals',
@@ -56,9 +54,6 @@ export default function FilterSidebar() {
     'Black Friday Deal',
     'Top Rated',
   ];
-
-  const { data } = useGetAllProductTypeQuery({});
-  const productTypes = data?.data;
 
   const discounts = [
     'All',
@@ -69,9 +64,12 @@ export default function FilterSidebar() {
     '50% Above',
   ];
 
+  const { data } = useGetAllProductTypeQuery({});
+  const productTypes = data?.data || [];
+
   return (
     <>
-      {/* Mobile Filter Toggle */}
+      {/* Mobile toggle */}
       <div className="md:hidden mb-4">
         <Button
           variant="outline"
@@ -79,8 +77,7 @@ export default function FilterSidebar() {
           onClick={() => setIsOpen(true)}
           className="flex items-center gap-2 w-full p-5 rounded-full"
         >
-          <Filter className="w-4 h-4" />
-          Filters
+          <Filter className="w-4 h-4" /> Filters
         </Button>
       </div>
 
@@ -99,14 +96,11 @@ export default function FilterSidebar() {
           <div className="flex items-center gap-2">
             {searchParams.toString().length > 0 && (
               <Button
-                onClick={() => {
-                  router.push(`${pathname}`, { scroll: false });
-                }}
+                onClick={() => router.push(pathname, { scroll: false })}
                 size="sm"
-                className="bg-red-400 hover:bg-red-500 text-white rounded flex items-center cursor-pointer"
+                className="bg-red-400 hover:bg-red-500 text-white rounded flex items-center gap-1"
               >
-                <span className="text-sm">Clear</span>
-                <CircleX size={20} />
+                Clear <CircleX size={20} />
               </Button>
             )}
             <button className="md:hidden p-2" onClick={() => setIsOpen(false)}>
@@ -120,7 +114,7 @@ export default function FilterSidebar() {
           {/* Recommended */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Recommended</h2>
-            {recommended.map((item) => (
+            {recommendedOptions.map((item) => (
               <div key={item} className="flex items-center gap-2 mb-1">
                 <Checkbox
                   checked={selectedRecommended.includes(item)}
@@ -134,12 +128,12 @@ export default function FilterSidebar() {
                   }
                   id={`rec-${item}`}
                 />
-                <Label
+                <label
                   htmlFor={`rec-${item}`}
                   className="text-sm text-gray-700"
                 >
                   {item}
-                </Label>
+                </label>
               </div>
             ))}
           </div>
@@ -147,7 +141,7 @@ export default function FilterSidebar() {
           {/* Product Types */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Product Types</h2>
-            {productTypes?.map((type) => (
+            {productTypes.map((type: any) => (
               <div key={type._id} className="flex items-center gap-2 mb-1">
                 <Checkbox
                   checked={selectedProducts.includes(type.name)}
@@ -159,14 +153,11 @@ export default function FilterSidebar() {
                       'productType',
                     )
                   }
-                  id={`${type.name}`}
+                  id={type.name}
                 />
-                <Label
-                  htmlFor={`${type.name}`}
-                  className="text-sm text-gray-700"
-                >
+                <label htmlFor={type.name} className="text-sm text-gray-700">
                   {type.name}
-                </Label>
+                </label>
               </div>
             ))}
           </div>
@@ -179,12 +170,13 @@ export default function FilterSidebar() {
               <span>${price[1]}</span>
             </div>
             <Slider
-              max={500}
+              max={5000}
               step={5}
               value={price}
-              onValueChange={(value) => {
+              onValueChange={(value: any) => {
+                const priceRange = `${value[0]}-${value[1]}`;
                 setPrice(value);
-                handleSearchQuery('price', [`${value[0]}-${value[1]}`]);
+                updateQueryParam('price', [priceRange]);
               }}
               className="w-full"
             />
@@ -207,12 +199,12 @@ export default function FilterSidebar() {
                   }
                   id={`disc-${discount}`}
                 />
-                <Label
+                <label
                   htmlFor={`disc-${discount}`}
                   className="text-sm text-gray-700"
                 >
                   {discount}
-                </Label>
+                </label>
               </div>
             ))}
           </div>

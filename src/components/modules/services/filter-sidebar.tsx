@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Checkbox } from '@/components/ui/checkbox';
 import { X, Filter, CircleX } from 'lucide-react';
+import { useGetAllServiceTypeQuery } from '@/redux/features/serviceType/serviceTypeApi';
 
 export default function FilterSidebar() {
   const [price, setPrice] = useState([0, 500]);
@@ -56,18 +57,8 @@ export default function FilterSidebar() {
     'Top Rated',
   ];
 
-  const serviceTypes = [
-    'Beauty & Personal Care',
-    'Health & Wellness',
-    'Home Services',
-    'Event Services',
-    'Education & Tutoring',
-    'Pet Services',
-    'Photography & Videography',
-    'Baking Services',
-    'Catering & Food Services',
-    'Cleaning',
-  ];
+  const { data } = useGetAllServiceTypeQuery({});
+  const serviceTypes = data?.data;
 
   const discounts = [
     'All',
@@ -130,7 +121,7 @@ export default function FilterSidebar() {
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Recommended</h2>
             {recommended.map((item) => (
-              <div key={item} className="flex items-center gap-2 mb-1">
+              <div key={item} className="flex items-center gap-2 mb-2">
                 <Checkbox
                   checked={selectedRecommended.includes(item)}
                   onCheckedChange={() =>
@@ -156,25 +147,25 @@ export default function FilterSidebar() {
           {/* Service Types */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-3">Service Types</h2>
-            {serviceTypes.map((service) => (
-              <div key={service} className="flex items-center gap-2 mb-1">
+            {serviceTypes?.map((type) => (
+              <div key={type._id} className="flex items-center gap-2 mb-2">
                 <Checkbox
-                  checked={selectedServices.includes(service)}
+                  checked={selectedServices.includes(type.name)}
                   onCheckedChange={() =>
                     toggleSelection(
-                      service,
+                      type.name,
                       selectedServices,
                       setSelectedServices,
-                      'service',
+                      'type',
                     )
                   }
-                  id={`service-${service}`}
+                  id={`${type.name}`}
                 />
                 <Label
-                  htmlFor={`service-${service}`}
+                  htmlFor={`${type.name}`}
                   className="text-sm text-gray-700"
                 >
-                  {service}
+                  {type.name}
                 </Label>
               </div>
             ))}

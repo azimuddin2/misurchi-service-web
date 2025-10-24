@@ -22,11 +22,18 @@ const AllServices = () => {
   const limit = searchParams.get('limit') || 9;
   const searchTerm = searchParams.get('searchTerm') || '';
 
+  const type =
+    searchParams
+      .get('type')
+      ?.split(',')
+      .map((t) => decodeURIComponent(t)) || [];
+
   const { data, isLoading } = useGetAllServicesQuery({
     page,
     limit,
     query: {
       searchTerm,
+      type,
     },
   });
 

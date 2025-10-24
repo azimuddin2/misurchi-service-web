@@ -25,22 +25,52 @@ const productApi = baseApi.injectEndpoints({
       query: ({ page = 1, limit = 10, query }) => {
         const params = new URLSearchParams();
 
-        if (query?.price) {
-          params.append('minPrice', '0');
-          params.append('maxPrice', query.price.toString());
+        if (!query) query = {};
+
+        // ===== Price range =====
+        if (query.price) {
+          const [minPrice, maxPrice] = query.price.toString().split('-');
+          if (minPrice) params.append('minPrice', minPrice);
+          if (maxPrice) params.append('maxPrice', maxPrice);
         }
 
-        if (query?.productType) {
-          params.append('productType', query.productType.toString());
+        // ===== Discount =====
+        if (query.discount) {
+          const discountStr = Array.isArray(query.discount)
+            ? query.discount[0]
+            : query.discount.toString();
+
+          if (discountStr.includes('Above')) {
+            const num = discountStr.match(/\d+/)?.[0] ?? '50';
+            params.append('minDiscount', num);
+          } else {
+            const nums = discountStr.replace(/[^\d\-]/g, '').split('-');
+            if (nums[0]) params.append('minDiscount', nums[0]);
+            if (nums[1]) params.append('maxDiscount', nums[1]);
+          }
         }
 
-        if (query?.searchTerm) {
+        // ===== Product Types =====
+        if (query.productType) {
+          if (Array.isArray(query.productType)) {
+            params.append('productType', query.productType.join(','));
+          } else {
+            params.append('productType', query.productType.toString());
+          }
+        }
+
+        // ===== Recommended =====
+        if (query.recommended) {
+          if (Array.isArray(query.recommended)) {
+            params.append('recommended', query.recommended.join(','));
+          } else {
+            params.append('recommended', query.recommended.toString());
+          }
+        }
+
+        // ===== Search Term =====
+        if (query.searchTerm) {
           params.append('searchTerm', query.searchTerm.toString());
-        }
-
-        if (query?.createdAt) {
-          const date = new Date(query.createdAt.toString().slice(0, 10));
-          params.append('createdAt', date.toISOString());
         }
 
         return {

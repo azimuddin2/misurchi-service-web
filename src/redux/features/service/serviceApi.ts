@@ -41,8 +41,8 @@ const serviceApi = baseApi.injectEndpoints({
           params.append('maxPrice', query.price.toString());
         }
 
-        if (query?.category) {
-          params.append('category', query.category.toString());
+        if (query?.type) {
+          params.append('type', query.type.toString());
         }
 
         if (query?.searchTerm) {
