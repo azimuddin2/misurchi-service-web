@@ -22,6 +22,11 @@ import {
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils'; // Your class merging utility
 import { Badge } from '@/components/ui/badge';
+import { useAppSelector } from '@/redux/hooks';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
+import { useGetUserProfileQuery } from '@/redux/features/user/userApi';
+import { IUser } from '@/types';
 
 export function NavMain({
   items,
@@ -39,15 +44,30 @@ export function NavMain({
   currentPath: string; // ✅ Add this line
 }) {
   const pathname = usePathname();
+  const user = useAppSelector(selectCurrentUser);
+
+  const { data } = useGetVendorProfileQuery(user?.email as string);
+  const vendor = data?.data;
+
+  const { data: userData } = useGetUserProfileQuery(user?.email as string);
+  const userInfo: IUser | undefined = userData?.data;
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="mb-8">
         <div>
-          <h2 className="text-lg font-semibold mb-1">Fashion_Makeup</h2>
-          <Badge className="capitalize rounded-full text-blue-500 border border-blue-300 bg-blue-100 hover:bg-blue-100">
-            Advance Plan
-          </Badge>
+          <h2 className="text-lg font-semibold mb-1 capitalize">
+            {vendor?.businessName}
+          </h2>
+          {userInfo?.subscribed ? (
+            <Badge className="capitalize rounded-full text-blue-500 border border-blue-300 bg-blue-100 hover:bg-blue-100">
+              {userInfo?.subscribed}
+            </Badge>
+          ) : (
+            <Badge className="capitalize rounded-full text-blue-500 border border-blue-300 bg-blue-100 hover:bg-blue-100">
+              Basic
+            </Badge>
+          )}
         </div>
       </SidebarGroupLabel>
       <SidebarMenu>

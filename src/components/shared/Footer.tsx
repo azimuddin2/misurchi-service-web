@@ -39,7 +39,7 @@ export const Footer = () => {
           </p>
           <ul className="flex flex-wrap justify-center gap-6">
             <li>
-              <Link href="#" className="hover:underline text-gray-400">
+              <Link href="/" className="hover:underline text-gray-400">
                 Home
               </Link>
             </li>
@@ -54,7 +54,7 @@ export const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:underline text-gray-400">
+              <Link href="/pricing" className="hover:underline text-gray-400">
                 Pricing
               </Link>
             </li>

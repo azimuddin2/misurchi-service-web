@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, CalendarDaysIcon, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import noDataImg from '@/assets/images/no-data.jpg';
 import Image from 'next/image';
 
 type Props = {
@@ -243,13 +242,13 @@ const Schedule = ({ id }: Props) => {
               ))}
           </>
         ) : (
-          <div>
+          <div className="mt-20 mb-10">
             <p className="text-gray-500 mt-4 text-center capitalize">
               Service not available on this day
             </p>
             <Image
-              src={noDataImg}
-              alt="No Data"
+              src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+              alt="No results"
               width={100}
               height={100}
               className="mx-auto"

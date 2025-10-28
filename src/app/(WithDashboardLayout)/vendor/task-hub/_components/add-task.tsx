@@ -89,6 +89,7 @@ const AddTask = () => {
     }
 
     const taskData = {
+      vendor: vendorId,
       ...data,
       date:
         date instanceof Date
@@ -103,6 +104,9 @@ const AddTask = () => {
 
     try {
       const res = await AddTask(taskData).unwrap();
+
+      console.log(res);
+
       toast.success(res.message || 'Task added successfully');
       router.push(`/${user?.role}/task-hub`);
       refetch();

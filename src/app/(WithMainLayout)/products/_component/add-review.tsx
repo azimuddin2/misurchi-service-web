@@ -38,6 +38,9 @@ const AddReview = ({ vendorId, productId, refetch }: Props) => {
 
   const form = useForm({
     resolver: zodResolver(reviewSchema),
+    defaultValues: {
+      review: '',
+    },
   });
 
   const {
@@ -49,7 +52,7 @@ const AddReview = ({ vendorId, productId, refetch }: Props) => {
     setRating(newRating);
   };
 
-  const [addReview, { reset }] = useAddReviewMutation();
+  const [addReview] = useAddReviewMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const reviewData: any = {
@@ -65,8 +68,12 @@ const AddReview = ({ vendorId, productId, refetch }: Props) => {
     try {
       const res = await addReview(reviewData).unwrap();
       toast.success(res.message || 'Your review has been added!');
-      reset();
       refetch();
+
+      form.reset({
+        review: '',
+      });
+      setRating(0);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to submit your review');
     } finally {

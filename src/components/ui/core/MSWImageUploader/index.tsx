@@ -59,7 +59,7 @@ const MSWImageUploader = ({
             height={50}
             className="mx-auto mb-2"
           />
-          <span className="font-medium">{label}</span>
+          <span className="font-medium uppercase text-sm">{label}</span>
         </p>
       </label>
     </div>

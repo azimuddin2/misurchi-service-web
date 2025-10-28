@@ -33,7 +33,7 @@ const ReviewCard = ({ review }: ReviewProps) => {
       <div>
         <p>{review.review}</p>
 
-        <div className="flex gap-2 mt-2">
+        {/* <div className="flex gap-2 mt-2">
           {review.product?.images?.map((img, index) => (
             <div key={index} className="relative w-20 h-20">
               <Image
@@ -44,7 +44,7 @@ const ReviewCard = ({ review }: ReviewProps) => {
               />
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

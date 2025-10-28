@@ -1,6 +1,7 @@
 export type TRole = 'vendor' | 'user' | 'admin';
 
 export type TStatus = 'ongoing' | 'confirmed' | 'blocked';
+export type TSubscribed = 'advance' | 'basic';
 
 export interface IUser {
   firstName: string;
@@ -13,6 +14,7 @@ export interface IUser {
   needsPasswordChange: boolean;
   passwordChangeAt?: Date;
   role: TRole;
+  coverImage?: string;
   image?: string;
   country?: string;
   status: TStatus;
@@ -23,6 +25,8 @@ export interface IUser {
     expiresAt: Date;
     status: boolean;
   };
+  isSubscribed: boolean;
+  subscribed?: TSubscribed;
   _id: string;
   createdAt: string;
   updatedAt: string;

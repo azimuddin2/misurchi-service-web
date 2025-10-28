@@ -292,49 +292,51 @@ const ManageBookingServices = () => {
       header: 'Request Action',
       cell: ({ row }) => {
         const request = row.original.request || {};
-        const vendorApproved = request.vendorApproved;
+        const vendorApproved = request.vendorApproved; // true | false | undefined
         const requestType = request.type ?? 'none';
 
-        // Current user
         const isVendor = user?.role === 'vendor';
         const isBuyer = user?.role === 'buyer';
 
+        const handleApproval = (approved: boolean) => {
+          handleVendorApproval(row.original._id, approved);
+        };
+
+        // Check if a request exists
+        const hasRequest = requestType !== 'none';
+
         return (
           <div className="flex flex-col gap-2">
-            {/* Case 1: No request submitted */}
-            {requestType === 'none' && (
+            {/* No request submitted */}
+            {!hasRequest && (
               <span className="text-gray-400 text-sm italic">
                 No request submitted
               </span>
             )}
 
-            {/* Case 2: Vendor must act */}
-            {requestType !== 'none' && isVendor && (
+            {/* Vendor action buttons (only if request exists and vendor hasn't acted) */}
+            {hasRequest && isVendor && vendorApproved === undefined && (
               <div className="flex items-center gap-2">
-                {/* Approve button with Popover */}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       size="sm"
                       variant="outline"
                       className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded"
-                      disabled={vendorApproved === true}
                     >
                       Approve
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-56">
                     <p className="text-sm font-medium mb-2">
-                      Confirm approval for this request?
+                      Confirm approval?
                     </p>
                     <div className="flex justify-end gap-2">
                       <Button
                         size="sm"
                         variant="outline"
                         className="border-green-600 rounded text-green-600 cursor-pointer hover:bg-white hover:text-green-700"
-                        onClick={() =>
-                          handleVendorApproval(row.original._id, true)
-                        }
+                        onClick={() => handleApproval(true)}
                       >
                         Yes, Approve
                       </Button>
@@ -342,30 +344,26 @@ const ManageBookingServices = () => {
                   </PopoverContent>
                 </Popover>
 
-                {/* Reject button with Popover */}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       size="sm"
                       variant="outline"
                       className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
-                      disabled={vendorApproved === false}
                     >
                       Reject
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-56">
                     <p className="text-sm font-medium mb-2">
-                      Confirm rejection for this request?
+                      Confirm rejection?
                     </p>
                     <div className="flex justify-end gap-2">
                       <Button
                         size="sm"
                         variant="outline"
                         className="border-red-500 rounded text-red-500 cursor-pointer bg-white hover:bg-white hover:text-red-700"
-                        onClick={() =>
-                          handleVendorApproval(row.original._id, false)
-                        }
+                        onClick={() => handleApproval(false)}
                       >
                         Yes, Reject
                       </Button>
@@ -375,35 +373,25 @@ const ManageBookingServices = () => {
               </div>
             )}
 
-            {/* Case 3: Vendor already acted */}
-            {requestType !== 'none' && vendorApproved === true && (
-              <>
-                <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
-                  Vendor <CheckCircle className="w-4 h-4" />
-                  Approved ({requestType})
-                </span>
-                <span className="text-sm">Buyer Request ({requestType})</span>
-              </>
+            {/* Vendor already acted */}
+            {vendorApproved === true && (
+              <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
+                Vendor <CheckCircle className="w-4 h-4" /> Approved (
+                {requestType})
+              </span>
+            )}
+            {vendorApproved === false && (
+              <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
+                Vendor <XCircle className="w-4 h-4" /> Rejected (Cancelled)
+              </span>
             )}
 
-            {requestType !== 'none' && vendorApproved === false && (
-              <>
-                <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
-                  Vendor <XCircle className="w-4 h-4" />
-                  Rejected ({requestType})
-                </span>
-                <span className="text-sm">Buyer Request ({requestType})</span>
-              </>
+            {/* Buyer sees pending */}
+            {isBuyer && hasRequest && vendorApproved === undefined && (
+              <span className="text-yellow-600 font-medium text-sm">
+                Pending Vendor Approval
+              </span>
             )}
-
-            {/* Case 4: Buyer sees pending */}
-            {requestType !== 'none' &&
-              isBuyer &&
-              vendorApproved === undefined && (
-                <span className="text-yellow-600 font-medium text-sm">
-                  Pending Vendor Approval
-                </span>
-              )}
           </div>
         );
       },

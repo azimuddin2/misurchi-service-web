@@ -15,8 +15,6 @@ import { toast } from 'sonner';
 import { AppButton } from '@/components/shared/app-button';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import Link from 'next/link';
-import Image from 'next/image';
-import bannerImg from '@/assets/images/banner.png';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { useEffect, useState } from 'react';
@@ -29,12 +27,16 @@ import {
   useUpdateUserProfileMutation,
 } from '@/redux/features/user/userApi';
 import LocationMap from '@/components/shared/location-map';
+import CoverImageUploader from '@/components/ui/core/CoverImageUploader';
+import CoverImagePreview from '@/components/ui/core/CoverImageUploader/CoverImagePreview';
 
 const UserProfilePage = () => {
   const user = useAppSelector(selectCurrentUser);
   const email = user?.email as string;
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
+  const [coverImageFiles, setCoverImageFiles] = useState<File[] | []>([]);
+  const [coverImagePreview, setCoverImagePreview] = useState<string[] | []>([]);
 
   const { data, isLoading, refetch } = useGetUserProfileQuery(email);
   const userData: IUser | undefined = data?.data;
@@ -60,6 +62,7 @@ const UserProfilePage = () => {
         email: userData.email || '',
         phone: userData.phone || '',
       });
+      setCoverImagePreview(userData.coverImage ? [userData.coverImage] : []);
       setImagePreview(userData.image ? [userData.image] : []);
     }
   }, [userData, form]);
@@ -70,16 +73,29 @@ const UserProfilePage = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const formData = new FormData();
-    formData.append('data', JSON.stringify(data)); //✅Backend expects JSON string
+
+    // Backend expects JSON string for other fields
+    formData.append('data', JSON.stringify(data));
+
+    // Append profile image(s)
     imageFiles.forEach((file) => {
-      formData.append('profile', file); //✅Append multiple images
+      formData.append('profile', file);
     });
-    const toastId = toast.loading('Updateing Profile...');
+
+    // Append cover image(s)
+    coverImageFiles.forEach((file) => {
+      formData.append('coverImage', file);
+    });
+
+    console.log(data);
+
+    const toastId = toast.loading('Updating Profile...');
     try {
       const res = await updateUserProfile({
         email: email,
         body: formData,
       }).unwrap();
+
       toast.success(res.message || 'Profile update successfully');
       refetch();
     } catch (error: any) {
@@ -95,15 +111,31 @@ const UserProfilePage = () => {
 
   return (
     <div className="bg-white rounded-lg flex-grow max-w-5xl mx-auto p-4 lg:p-8 shadow mb-12">
-      <div className="flex flex-col items-cente rounded-b-2xl overflow-hidden">
+      <div className="flex flex-col rounded-b-2xl overflow-hidden">
         {/* Cover Image */}
-        <div className="relative w-full h-48 md:h-56 lg:h-64">
-          <Image
-            src={bannerImg}
-            alt="Cover"
-            fill
-            className="object-cover rounded-xl"
-          />
+        <div className="w-full flex flex-col items-center">
+          {/* When no image uploaded yet */}
+          {coverImageFiles.length < 1 && coverImagePreview.length < 1 && (
+            <div className="w-full">
+              <CoverImageUploader
+                setCoverImageFiles={setCoverImageFiles}
+                setCoverImagePreview={setCoverImagePreview}
+                label="Upload Cover Image"
+                className="rounded-lg bg-white w-full"
+              />
+            </div>
+          )}
+
+          {/* When images are uploaded */}
+          {coverImagePreview.length > 0 && (
+            <div className="w-full max-w-5xl">
+              <CoverImagePreview
+                setCoverImageFiles={setCoverImageFiles}
+                coverImagePreview={coverImagePreview}
+                setCoverImagePreview={setCoverImagePreview}
+              />
+            </div>
+          )}
         </div>
 
         {/* Profile Image */}
@@ -136,7 +168,7 @@ const UserProfilePage = () => {
             className="w-4/5 lg:w-2/6 text-gray-50 border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] hover:bg-green-500/80"
             content={
               <div className="flex justify-center items-center space-x-2 font-semibold text-black">
-                <p className="uppercase">SHARE YOUR PROFILE</p>
+                <p className="uppercase">Register as a service provider</p>
                 <ArrowRight />
               </div>
             }
@@ -282,7 +314,7 @@ const UserProfilePage = () => {
               content={
                 <div className="flex justify-center items-center space-x-2 font-semibold">
                   <p className="uppercase">
-                    {isSubmitting ? 'Updateing...' : 'Update'}
+                    {isSubmitting ? 'Updating...' : 'Update'}
                   </p>
                   <ArrowRight />
                 </div>

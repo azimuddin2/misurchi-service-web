@@ -10,8 +10,11 @@ import Spinner from '@/components/shared/Spinner';
 import { useAddSubPaymentMutation } from '@/redux/features/subPayment/subPaymentApi';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import { useAppSelector } from '@/redux/hooks';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 const Pricing = () => {
+  const user = useAppSelector(selectCurrentUser);
   const { data, isLoading } = useGetAllSubscriptionPlansQuery({});
   const subscriptionPlans = data?.data || [];
 
@@ -170,8 +173,12 @@ const Pricing = () => {
 
               <button
                 onClick={() => handleSubscribe(plan)}
-                disabled={isPaying}
-                className="w-full text-center cursor-pointer border border-gray-300 rounded-md py-3 px-4 font-medium hover:bg-gray-50 transition-colors"
+                disabled={!user?.email || user?.role !== 'vendor' || isPaying}
+                className={`w-full text-center cursor-pointer border border-gray-300 rounded-md py-3 px-4 font-medium transition-colors ${
+                  !user?.email || user?.role !== 'vendor' || isPaying
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-gray-50'
+                }`}
               >
                 Get Started <ArrowRight className="inline-block ml-2 h-4 w-4" />
               </button>

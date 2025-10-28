@@ -59,7 +59,14 @@ export default function Contact() {
         },
       );
 
-      form.reset();
+      form.reset({
+        firstName: '',
+        lastName: '',
+        email: '',
+        message: '',
+      });
+      setFollowUp(null);
+      setRating(null);
     } catch (error: any) {
       const errorMessage =
         error?.data?.message ||
@@ -258,7 +265,9 @@ export default function Contact() {
               content={
                 <div className="flex justify-center items-center space-x-2 font-semibold">
                   <p className="uppercase">
-                    {isSubmitting ? 'Submting Feedback...' : 'Submit Feedback'}
+                    {isSubmitting
+                      ? 'Submitting Feedback...'
+                      : 'Submit Feedback'}
                   </p>
                   <ArrowRight />
                 </div>
