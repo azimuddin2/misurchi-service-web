@@ -44,8 +44,6 @@ const MessageContainer = () => {
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const [upload] = useMultipleFileUpload();
 
-  console.log('uploadedImages', uploadedImages);
-
   // ========================= Listen for received messages ===========================
   useEffect(() => {
     if (!socket || !user?.userId) return;
@@ -142,26 +140,43 @@ const MessageContainer = () => {
   const handleSendMessage = async (data: any) => {
     if (!socket || !user?.userId || !selectedUserId) return;
 
-    const payload: any = {
-      receiver: selectedUserId,
-      text: data?.message || '',
-      imageUrl: images.length > 0 ? images.map((i) => i.previewUrl) : [],
-      sender: user.userId,
-      chatId,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      let uploadedUrls: string[] = [];
 
-    // Update local UI immediately
-    setMessages((prev) => [...prev, payload]);
+      // Step 1: Upload images (if any)
+      if (uploadedImages.length > 0) {
+        const files = uploadedImages.map((img) => img.file);
+        const result = await upload(files); // useMultipleFileUpload
+        uploadedUrls = result.map((r: any) => r.url); // based on your API response
+      }
 
-    // Emit to server
-    socket.emit('send-message', payload, (res: any) => {
-      console.log('Message sent:', res);
-    });
+      // Step 2: Build payload
+      const payload: any = {
+        receiver: selectedUserId,
+        text: data?.message || '',
+        imageUrl: uploadedUrls, // ✅ Real URLs from backend
+        sender: user.userId,
+        chatId,
+        createdAt: new Date().toISOString(),
+      };
 
-    reset();
-    setUploadedImages([]);
-    setImages([]);
+      console.log(payload);
+
+      // Step 3: Optimistic UI update
+      setMessages((prev) => [...prev, payload]);
+
+      // Step 4: Emit message to socket
+      socket.emit('send-message', payload, (res: any) => {
+        console.log('Message sent:', res);
+      });
+
+      // Step 5: Reset input + previews
+      reset();
+      setUploadedImages([]);
+      setImages([]);
+    } catch (err) {
+      console.error('Message send failed:', err);
+    }
   };
 
   // ========================= Image management ===========================

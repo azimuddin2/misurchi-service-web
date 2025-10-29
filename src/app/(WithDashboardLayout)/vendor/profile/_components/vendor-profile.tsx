@@ -24,10 +24,7 @@ import { timezonesOptions } from '@/constants/timezones';
 import { workHourOptions } from '@/constants/workHour';
 import { AppButton } from '@/components/shared/app-button';
 import { PhoneInput } from '@/components/ui/core/phone-input';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import bannerImg from '@/assets/images/banner.png';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { useEffect, useState } from 'react';
@@ -41,12 +38,16 @@ import {
   useGetVendorProfileQuery,
   useUpdateVendorProfileMutation,
 } from '@/redux/features/vendor/vendorApi';
+import CoverImageUploader from '@/components/ui/core/CoverImageUploader';
+import CoverImagePreview from '@/components/ui/core/CoverImageUploader/CoverImagePreview';
 
 const VendorProfile = () => {
   const user = useAppSelector(selectCurrentUser);
   const email = user?.email as string;
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
+  const [coverImageFiles, setCoverImageFiles] = useState<File[] | []>([]);
+  const [coverImagePreview, setCoverImagePreview] = useState<string[] | []>([]);
 
   const { data, isLoading, refetch } = useGetVendorProfileQuery(email);
   const vendorUser: TVendorUser | undefined = data?.data;
@@ -89,6 +90,9 @@ const VendorProfile = () => {
         lastName: vendorUser.lastName || '',
         description: vendorUser.description || '',
       });
+      setCoverImagePreview(
+        vendorUser.coverImage ? [vendorUser.coverImage] : [],
+      );
       setImagePreview(vendorUser.image ? [vendorUser.image] : []);
     }
   }, [vendorUser, form]);
@@ -101,9 +105,18 @@ const VendorProfile = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const formData = new FormData();
-    formData.append('data', JSON.stringify(data)); //✅Backend expects JSON string
+
+    // Backend expects JSON string for other fields
+    formData.append('data', JSON.stringify(data));
+
+    // Append profile image(s)
     imageFiles.forEach((file) => {
-      formData.append('profile', file); //✅Append multiple images
+      formData.append('profile', file);
+    });
+
+    // Append cover image(s)
+    coverImageFiles.forEach((file) => {
+      formData.append('coverImage', file);
     });
 
     const toastId = toast.loading('Updating profile...');
@@ -113,7 +126,7 @@ const VendorProfile = () => {
         email: email,
         body: formData,
       }).unwrap();
-      toast.success(res.message || 'Product update successfully');
+      toast.success(res.message || 'Profile update successfully');
       refetch();
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to add product');
@@ -128,15 +141,31 @@ const VendorProfile = () => {
 
   return (
     <div className="bg-white rounded-lg flex-grow max-w-5xl p-4 lg:p-8 shadow">
-      <div className="flex flex-col items-cente rounded-b-2xl overflow-hidden mb-5">
+      <div className="flex flex-col rounded-b-2xl overflow-hidden mb-5">
         {/* Cover Image */}
-        <div className="relative w-full h-48 md:h-56 lg:h-64">
-          <Image
-            src={bannerImg}
-            alt="Cover"
-            fill
-            className="object-cover rounded-xl"
-          />
+        <div className="w-full flex flex-col items-center">
+          {/* When no image uploaded yet */}
+          {coverImageFiles.length < 1 && coverImagePreview.length < 1 && (
+            <div className="w-full">
+              <CoverImageUploader
+                setCoverImageFiles={setCoverImageFiles}
+                setCoverImagePreview={setCoverImagePreview}
+                label="Upload Cover Image"
+                className="rounded-lg bg-white w-full"
+              />
+            </div>
+          )}
+
+          {/* When images are uploaded */}
+          {coverImagePreview.length > 0 && (
+            <div className="w-full max-w-5xl">
+              <CoverImagePreview
+                setCoverImageFiles={setCoverImageFiles}
+                coverImagePreview={coverImagePreview}
+                setCoverImagePreview={setCoverImagePreview}
+              />
+            </div>
+          )}
         </div>
 
         {/* Profile Image */}
@@ -492,7 +521,7 @@ const VendorProfile = () => {
               content={
                 <div className="flex justify-center items-center space-x-2 font-semibold">
                   <p className="uppercase">
-                    {isSubmitting ? 'Updateing...' : 'Update'}
+                    {isSubmitting ? 'Updating...' : 'Update'}
                   </p>
                   <ArrowRight />
                 </div>

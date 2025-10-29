@@ -7,13 +7,13 @@ const PreviewImageModal = ({ open, setOpen, url, className }: any) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className={cn('bg-transparent border-none outline-none', className)}
+        className={cn('bg-white border-none outline-none', className)}
         // @ts-ignore
         showDialogClose={false}
       >
         <div>
-          <Avatar className="w-full h-full rounded-none">
-            <AvatarImage src={url} />
+          <Avatar className="w-full h-full rounded-lg">
+            <AvatarImage src={url} className="w-full rounded-xl mt-5" />
             <AvatarFallback className=" rounded-none">
               <Skeleton className="h-full w-full bg-[#e69191]"></Skeleton>
             </AvatarFallback>

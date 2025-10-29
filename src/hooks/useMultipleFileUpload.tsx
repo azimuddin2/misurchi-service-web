@@ -6,13 +6,12 @@ const useMultipleFileUpload = () => {
   const upload = async (files: File[]) => {
     try {
       const formData = new FormData();
-      files.forEach((file) => formData.append('images', file)); // ✅ must match backend field name
+      files.forEach((file) => formData.append('images', file)); // ✅ matches backend
 
       const response = await uploadFile(formData).unwrap();
 
-      // Optional: check structure
       if (response?.data) {
-        return response.data; // returns array of uploaded image URLs
+        return response.data; // ✅ returns array of uploaded image URLs or objects
       } else {
         throw new Error('Unexpected response structure');
       }

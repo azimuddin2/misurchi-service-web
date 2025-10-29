@@ -10,7 +10,7 @@ import { useState } from 'react';
 
 interface OwnerMsgCardProps {
   message: string;
-  files?: { url: string }[];
+  files?: any[];
 }
 
 const OwnerMsgCard = ({ message, files = [] }: OwnerMsgCardProps) => {
@@ -40,13 +40,13 @@ const OwnerMsgCard = ({ message, files = [] }: OwnerMsgCardProps) => {
                 key={index}
                 className="relative group cursor-pointer overflow-hidden rounded-lg border border-white/20 hover:scale-[1.02] transition-all"
                 onClick={() => {
-                  setImageUrl(file?.url);
+                  setImageUrl(file);
                   setOpenPreviewModal(true);
                 }}
               >
                 <Avatar className="h-24 w-full xl:h-28">
                   <AvatarImage
-                    src={file?.url}
+                    src={file}
                     className="h-full w-full object-cover"
                   />
                   <AvatarFallback>

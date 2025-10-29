@@ -12,7 +12,7 @@ const ReceiverMsgCard = ({
   files,
 }: {
   message: string;
-  files: any;
+  files: any[];
 }) => {
   const [imageUrl, setImageUrl] = useState('');
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
@@ -24,20 +24,21 @@ const ReceiverMsgCard = ({
           <div
             className={cn(
               'grid grid-cols-1  gap-2',
-              files?.length > 2 && 'xl:grid-cols-3',
-              files?.length > 1 && 'grid-cols-2',
+              files.length === 1 && 'grid-cols-1',
+              files.length === 2 && 'grid-cols-2',
+              files.length >= 3 && 'grid-cols-3',
             )}
           >
             {files?.map((file: any, index: number) => (
               <Avatar
                 onClick={() => {
                   setOpenPreviewModal(true);
-                  setImageUrl(file?.url);
+                  setImageUrl(file);
                 }}
                 key={index}
                 className="h-24 xl:h-28 rounded-none max-w-[250px] cursor-pointer"
               >
-                <AvatarImage src={file?.url} />
+                <AvatarImage src={file} />
                 <AvatarFallback className=" rounded-none">
                   <Skeleton className="h-24 xl:h-28 w-28 bg-[#9991e6]"></Skeleton>
                 </AvatarFallback>

@@ -49,8 +49,9 @@ export type TVendorUser = {
   firstName: string;
   lastName: string;
   description: string;
+  image?: string;
+  coverImage?: string;
   createdAt: string;
   updatedAt: string;
   __v: number;
-  image?: string;
 };

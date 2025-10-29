@@ -87,8 +87,6 @@ const UserProfilePage = () => {
       formData.append('coverImage', file);
     });
 
-    console.log(data);
-
     const toastId = toast.loading('Updating Profile...');
     try {
       const res = await updateUserProfile({

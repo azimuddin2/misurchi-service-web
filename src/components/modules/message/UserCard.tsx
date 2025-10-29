@@ -94,7 +94,7 @@ const UserCard = ({
 
           {/* Unread Message Badge */}
           {user?.unseenMessage && selectedUserId !== user?.userData?._id && (
-            <span className="text-xs font-semibold bg-primary-blue text-white px-2 py-[2px] rounded-full shadow-sm">
+            <span className="text-xs font-medium bg-green-600 text-white px-2 py-[2px] rounded-full shadow-sm">
               {user?.unseenMessage}
             </span>
           )}

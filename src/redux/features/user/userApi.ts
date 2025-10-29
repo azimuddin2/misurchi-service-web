@@ -12,19 +12,19 @@ const userApi = baseApi.injectEndpoints({
       }
     >({
       query: ({ page = 1, limit = 10, query }) => {
-        // const params = new URLSearchParams();
+        const params = new URLSearchParams();
 
-        // if (query?.searchTerm) {
-        //   params.append('searchTerm', query.searchTerm.toString());
-        // }
+        if (query?.searchTerm) {
+          params.append('searchTerm', query.searchTerm.toString());
+        }
 
-        // if (query?.createdAt) {
-        //   const date = new Date(query.createdAt.toString().slice(0, 10));
-        //   params.append('createdAt', date.toISOString());
-        // }
+        if (query?.createdAt) {
+          const date = new Date(query.createdAt.toString().slice(0, 10));
+          params.append('createdAt', date.toISOString());
+        }
 
         return {
-          url: `/users`,
+          url: `/users?page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };
