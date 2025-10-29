@@ -9,23 +9,34 @@ import {
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
-      <Header />
-      <div className="container mx-auto">
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-white shadow">
+        <Header />
+      </div>
+
+      <div className="flex flex-1 container mx-auto">
         <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-              <div className="flex items-center gap-2 px-4">
+          {/* Sticky Sidebar */}
+          <div className="sticky top-[160px] z-40 h-[calc(100vh-68px)] overflow-y-auto">
+            <AppSidebar />
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            <SidebarInset>
+              <header className="flex h-16 items-center gap-2 px-4">
                 <SidebarTrigger className="-ml-1" />
+              </header>
+
+              <div className="min-h-[calc(100vh-64px)] bg-white rounded p-3 lg:p-8 lg:pt-0 lg:m-2 mt-0">
+                {children}
               </div>
-            </header>
-            <div className="min-h-[100vh] bg-white flex-1 rounded md:min-h-min p-3 lg:p-8 lg:pt-0 lg:m-2 mt-0">
-              {children}
-            </div>
-          </SidebarInset>
+            </SidebarInset>
+          </div>
         </SidebarProvider>
       </div>
+
       <Footer />
     </div>
   );

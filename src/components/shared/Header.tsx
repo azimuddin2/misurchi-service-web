@@ -192,7 +192,7 @@ export default function Header() {
       </div>
 
       {/* Main Nav */}
-      <div className="flex justify-between items-center container mx-auto px-5 lg:px-0 py-3">
+      <div className="flex justify-between items-center container mx-auto px-5 lg:px-0 py-3 bg-white">
         {/* Desktop Top Nav */}
         <nav className="hidden md:flex gap-6">
           {TOP_NAV_LINKS.map(({ label, href }) => (
