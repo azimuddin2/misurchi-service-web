@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
 import { TService } from '@/types/service.type';
-import { ArrowRight, MapPin, Plus, Send } from 'lucide-react';
+import { ArrowRight, MapPin, Send } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
@@ -14,15 +14,21 @@ import { Progress } from '@/components/ui/progress';
 import Link from 'next/link';
 import { TReview } from '@/types/review.type';
 import FollowButton from '@/components/modules/follow-button';
+import { useRouter } from 'next/navigation';
+import { useAppSelector } from '@/redux/hooks';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 type Props = {
   serviceId: string;
 };
 
 const ServiceDetails = ({ serviceId }: Props) => {
+  const router = useRouter();
   const { data, refetch } = useGetServiceByIdQuery(serviceId);
   const service: TService | undefined = data?.data;
   const vendorId = service?.vendor._id as string;
+  const userId = service?.user._id as string;
+  const user = useAppSelector(selectCurrentUser);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -49,6 +55,10 @@ const ServiceDetails = ({ serviceId }: Props) => {
     const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
     return { star, count, percentage };
   });
+
+  const handleMessageVendor = () => {
+    router.push(`/user/message?userId=${userId}&serviceId=${serviceId}`);
+  };
 
   return (
     <div className="my-20">
@@ -223,7 +233,11 @@ const ServiceDetails = ({ serviceId }: Props) => {
               </Button>
             </Link>
 
-            <Button className="w-full text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
+            <Button
+              disabled={!user?.userId}
+              onClick={handleMessageVendor}
+              className="w-full text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+            >
               <span className="uppercase text-sm font-semibold">Message</span>
               <Send className="w-5 h-5" />
             </Button>

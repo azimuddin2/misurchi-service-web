@@ -89,6 +89,7 @@ export const baseApi = createApi({
     'ServiceType',
     'Dashboard',
     'Follow',
+    'StripeAccount',
   ],
   endpoints: () => ({}),
 });

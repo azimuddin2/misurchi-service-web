@@ -1,5 +1,5 @@
 import { TReview } from './review.type';
-import { TVendorUser } from './user.type';
+import { IUser, TVendorUser } from './user.type';
 
 export type TStatus = 'available' | 'unavailable';
 
@@ -36,6 +36,7 @@ export type TImage = {
 // Main ServiceData type
 export type TService = {
   vendor: TVendorUser;
+  user: IUser;
   deleteKey?: string[];
   _id: string;
   serviceId: string;

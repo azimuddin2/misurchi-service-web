@@ -59,6 +59,7 @@ const AddProduct = () => {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const modifiedData = {
       vendor: vendor?._id,
+      user: user?.userId,
       ...data,
       quantity: Number(data.quantity),
       price: Number(data.price),

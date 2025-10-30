@@ -7,17 +7,19 @@ import { Button } from '@/components/ui/button';
 import OwnerMsgCard from './OwnerMsgCard';
 import ReceiverMsgCard from './ReceiverMsgCard';
 import UserCard from './UserCard';
-import { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useSearchParams } from 'next/navigation';
-import { cn } from '@/lib/utils';
 import UserSearchContainer from './UserSearchContainer';
-import { useAppSelector } from '@/redux/hooks';
-import { useSocket } from '@/providers/SocketProvider';
-import useMultipleFileUpload from '@/hooks/useMultipleFileUpload';
 import CustomAvatar from '@/components/shared/custom-avatar';
 import { MessageImageUpload } from '@/components/ui/core/UploadMessageImage';
+import { cn } from '@/lib/utils';
+import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { useSocket } from '@/providers/SocketProvider';
+import useMultipleFileUpload from '@/hooks/useMultipleFileUpload';
+import { useForm } from 'react-hook-form';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useGetProductByIdQuery } from '@/redux/features/product/productApi';
+import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
 
 export interface UploadedImage {
   id: string;
@@ -27,10 +29,10 @@ export interface UploadedImage {
 }
 
 const MessageContainer = () => {
-  const [images, setImages] = useState<UploadedImage[]>([]);
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const { socket } = useSocket();
   const user = useAppSelector(selectCurrentUser);
+  const [images, setImages] = useState<UploadedImage[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [messages, setMessages] = useState<any[]>([]);
   const [onlineUser, setOnlineUser] = useState<string[]>([]);
@@ -39,157 +41,84 @@ const MessageContainer = () => {
   const [chatId, setChatId] = useState<string>('');
   const [isActive, setIsActive] = useState(false);
   const [wantTOSearch, setWantTOSearch] = useState(false);
-  const selectedUserIdFrom = useSearchParams().get('selectedUserId');
-  const { register, handleSubmit, reset } = useForm();
   const chatBoxRef = useRef<HTMLDivElement>(null);
-  const [upload] = useMultipleFileUpload();
 
-  // ========================= Listen for received messages ===========================
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId');
+  const productId = searchParams.get('productId');
+  const serviceId = searchParams.get('serviceId');
+  const selectedUserIdFrom = searchParams.get('selectedUserId');
+
+  const router = useRouter();
+  const [upload] = useMultipleFileUpload();
+  const { register, handleSubmit, reset } = useForm();
+
+  // ========================= Fetch product/service info =========================
+  const { data: productData } = useGetProductByIdQuery(productId!, {
+    skip: !productId,
+  });
+
+  const { data: serviceData } = useGetServiceByIdQuery(serviceId!, {
+    skip: !serviceId,
+  });
+
+  // ========================= Redirect vendor =========================
+  useEffect(() => {
+    if (userId) {
+      router.replace(
+        `/user/message?selectedUserId=${userId}${productId ? `&productId=${productId}` : ''}`,
+      );
+    }
+  }, [userId, productId, router]);
+
+  // ========================= Socket listeners =========================
   useEffect(() => {
     if (!socket || !user?.userId) return;
 
-    const handleMessage = (res: any) => {
-      setMessages(res);
-    };
-
+    // received messages
+    const handleMessage = (res: any) => setMessages(res);
     socket.on('message', handleMessage);
 
-    if (selectedUserId) {
-      socket.emit('message-page', selectedUserId);
-    }
-
-    return () => {
-      socket.off('message', handleMessage);
-    };
-  }, [socket, selectedUserId, user?.userId]);
-
-  // ========================= Listen for new message ===========================
-  useEffect(() => {
-    if (!socket || !user?.userId || !chatId) return;
-
-    const handleNewMessage = (res: any) => {
+    // new messages
+    const handleNewMessage = (res: any) =>
       setMessages((prev) => [...prev, res]);
-    };
+    if (chatId) socket.on(`new-message::${chatId}`, handleNewMessage);
 
-    socket.on(`new-message::${chatId}`, handleNewMessage);
-
-    return () => {
-      socket.off(`new-message::${chatId}`, handleNewMessage);
-    };
-  }, [socket, chatId, user?.userId]);
-
-  // ========================= Listen for online users ===========================
-  useEffect(() => {
-    if (!socket || !user?.userId) return;
-
-    const handleOnlineUser = (res: any) => {
-      setOnlineUser(res);
-    };
-
+    // online users
+    const handleOnlineUser = (res: any) => setOnlineUser(res);
     socket.on('onlineUser', handleOnlineUser);
 
-    return () => {
-      socket.off('onlineUser', handleOnlineUser);
-    };
-  }, [socket, user?.userId]);
-
-  // ========================= Listen for user details ===========================
-  useEffect(() => {
-    if (!socket || !user?.userId) return;
-
-    const handleUserDetails = (res: any) => {
-      setUserDetails(res);
-    };
-
+    // user details
+    const handleUserDetails = (res: any) => setUserDetails(res);
     socket.on('user-details', handleUserDetails);
 
-    return () => {
-      socket.off('user-details', handleUserDetails);
-    };
-  }, [socket, user?.userId]);
-
-  // ========================= Listen for chat list ===========================
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleChatList = (res: any) => {
-      setChatListData(res);
-    };
-
+    // chat list
+    const handleChatList = (res: any) => setChatListData(res);
     socket.on('chat-list', handleChatList);
 
     setTimeout(() => {
-      socket.emit('my-chat-list', {}, (res: any) => {
-        setChatListData(res?.message || []);
-      });
+      socket.emit('my-chat-list', {}, (res: any) =>
+        setChatListData(res?.message || []),
+      );
     }, 500);
 
     return () => {
+      socket.off('message', handleMessage);
+      if (chatId) socket.off(`new-message::${chatId}`, handleNewMessage);
+      socket.off('onlineUser', handleOnlineUser);
+      socket.off('user-details', handleUserDetails);
       socket.off('chat-list', handleChatList);
     };
-  }, [socket]);
+  }, [socket, user?.userId, chatId]);
 
-  // ========================= Emit seen message ===========================
+  // ========================= Seen messages =========================
   useEffect(() => {
     if (socket && user?.userId && chatId) {
       socket.emit('seen', { chatId });
     }
   }, [socket, user, chatId]);
 
-  // ========================= Handle send message ===========================
-  const handleSendMessage = async (data: any) => {
-    if (!socket || !user?.userId || !selectedUserId) return;
-
-    try {
-      let uploadedUrls: string[] = [];
-
-      // Step 1: Upload images (if any)
-      if (uploadedImages.length > 0) {
-        const files = uploadedImages.map((img) => img.file);
-        const result = await upload(files); // useMultipleFileUpload
-        uploadedUrls = result.map((r: any) => r.url); // based on your API response
-      }
-
-      // Step 2: Build payload
-      const payload: any = {
-        receiver: selectedUserId,
-        text: data?.message || '',
-        imageUrl: uploadedUrls, // ✅ Real URLs from backend
-        sender: user.userId,
-        chatId,
-        createdAt: new Date().toISOString(),
-      };
-
-      console.log(payload);
-
-      // Step 3: Optimistic UI update
-      setMessages((prev) => [...prev, payload]);
-
-      // Step 4: Emit message to socket
-      socket.emit('send-message', payload, (res: any) => {
-        console.log('Message sent:', res);
-      });
-
-      // Step 5: Reset input + previews
-      reset();
-      setUploadedImages([]);
-      setImages([]);
-    } catch (err) {
-      console.error('Message send failed:', err);
-    }
-  };
-
-  // ========================= Image management ===========================
-  const handleImagesChange = (newImages: UploadedImage[]) =>
-    setImages(newImages);
-
-  const removeImage = (id: string) => {
-    const updated = uploadedImages.filter((image) => image.id !== id);
-    setUploadedImages(updated);
-    handleImagesChange(updated);
-  };
-
-  // ========================= Active user check ===========================
+  // ========================= Active user =========================
   useEffect(() => {
     if (userDetails && onlineUser) {
       // @ts-ignore
@@ -197,16 +126,13 @@ const MessageContainer = () => {
     }
   }, [userDetails, onlineUser]);
 
-  // ========================= Selected user management ===========================
+  // ========================= Selected user management =========================
   useEffect(() => {
-    if (selectedUserIdFrom) {
-      setSelectedUserId(selectedUserIdFrom);
-    } else {
-      setSelectedUserId('');
-    }
+    if (selectedUserIdFrom) setSelectedUserId(selectedUserIdFrom);
+    else setSelectedUserId('');
   }, [selectedUserIdFrom]);
 
-  // ========================= Set chatId ===========================
+  // ========================= Set chatId =========================
   useEffect(() => {
     const foundChat = chatListData?.find(
       (chatList: any) =>
@@ -215,14 +141,54 @@ const MessageContainer = () => {
     if (foundChat) setChatId(foundChat.chat?._id);
   }, [selectedUserId, chatListData]);
 
-  // ========================= Scroll to bottom ===========================
+  // ========================= Scroll to bottom =========================
   useEffect(() => {
-    if (chatBoxRef.current) {
+    if (chatBoxRef.current)
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
-    }
   }, [messages]);
 
-  // ========================= Render ===========================
+  // ========================= Handle send message =========================
+  const handleSendMessage = async (data: any) => {
+    if (!socket || !user?.userId || !selectedUserId) return;
+
+    try {
+      let uploadedUrls: string[] = [];
+      if (uploadedImages.length > 0) {
+        const files = uploadedImages.map((img) => img.file);
+        const result = await upload(files);
+        uploadedUrls = result.map((r: any) => r.url);
+      }
+
+      const payload: any = {
+        receiver: selectedUserId,
+        text: data?.message || '',
+        imageUrl: uploadedUrls,
+        sender: user.userId,
+        chatId,
+        createdAt: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, payload]);
+      socket.emit('send-message', payload);
+
+      reset();
+      setUploadedImages([]);
+      setImages([]);
+    } catch (err) {
+      console.error('Message send failed:', err);
+    }
+  };
+
+  // ========================= Image management =========================
+  const handleImagesChange = (newImages: UploadedImage[]) =>
+    setImages(newImages);
+  const removeImage = (id: string) => {
+    const updated = uploadedImages.filter((image) => image.id !== id);
+    setUploadedImages(updated);
+    handleImagesChange(updated);
+  };
+
+  // ========================= Render =========================
   return (
     <div className="mx-auto flex h-[90vh] w-full max-w-6xl rounded-xl bg-white shadow-lg overflow-hidden">
       {/* Left Sidebar */}
@@ -232,7 +198,6 @@ const MessageContainer = () => {
           selectedUserId ? 'hidden lg:flex lg:w-[30%]' : 'w-full lg:w-[30%]',
         )}
       >
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4">
           <h4 className="text-2xl font-medium text-gray-800">Messages</h4>
           <Button
@@ -245,7 +210,6 @@ const MessageContainer = () => {
           </Button>
         </div>
 
-        {/* Search */}
         <div className="p-4">
           {wantTOSearch ? (
             <UserSearchContainer setWantTOSearch={setWantTOSearch} />
@@ -258,7 +222,6 @@ const MessageContainer = () => {
           )}
         </div>
 
-        {/* Chat List */}
         <div className="scroll-hide flex-1 overflow-y-auto px-4 pb-6">
           {chatListData?.length === 0 ? (
             <p className="text-center text-gray-500 mt-10">No recent chats</p>
@@ -282,7 +245,6 @@ const MessageContainer = () => {
 
       {/* Chat Section */}
       <div className="flex flex-1 flex-col bg-white">
-        {/* When no user selected */}
         {!selectedUserId ? (
           <div className="flex flex-1 items-center justify-center text-gray-500 text-lg font-medium">
             <MessageCircleMore className="mr-2 text-gray-400" />
@@ -316,6 +278,50 @@ const MessageContainer = () => {
                 </div>
               </div>
             </div>
+
+            {(productData?.data || serviceData?.data) && (
+              <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex items-center gap-3">
+                {/* Image */}
+                <Image
+                  src={
+                    productData?.data
+                      ? productData.data?.images?.[0]?.url || '/placeholder.png'
+                      : serviceData?.data?.images?.[0]?.url ||
+                        '/placeholder.png'
+                  }
+                  alt="product/service"
+                  width={100}
+                  height={100}
+                  className="rounded-md object-cover"
+                />
+
+                {/* Text Info */}
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 truncate">
+                    {productData?.data
+                      ? productData.data.name
+                      : serviceData?.data?.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 line-clamp-2">
+                    {productData?.data
+                      ? productData.data.description || 'No description'
+                      : serviceData?.data?.description || 'No description'}
+                  </p>
+
+                  {/* Price */}
+                  {productData?.data ? (
+                    <p className="text-primary font-medium mt-1">
+                      ${productData.data.price.toFixed(2)}
+                    </p>
+                  ) : serviceData?.data &&
+                    serviceData.data.savedServices?.length ? (
+                    <p className="text-primary font-medium mt-1">
+                      ${serviceData.data.savedServices[0].finalPrice}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            )}
 
             {/* Messages */}
             <div

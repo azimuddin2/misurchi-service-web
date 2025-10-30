@@ -11,10 +11,7 @@ import {
 import { useAppSelector } from '@/redux/hooks';
 import { setLanguage } from '@/redux/features/language/languageSlice';
 
-const languages = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
-];
+const languages = [{ code: 'en', name: 'English', flag: '🇺🇸' }];
 
 export default function LanguageSettings() {
   const dispatch = useDispatch();

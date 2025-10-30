@@ -177,7 +177,7 @@ const ChangePassword = () => {
             content={
               <div className="flex justify-center items-center space-x-2 font-semibold">
                 {isSubmitting ? 'Updating Password...' : 'Update Password'}
-                <ArrowRight />
+                <ArrowRight className="ml-2" />
               </div>
             }
           />

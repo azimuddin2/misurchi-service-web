@@ -89,6 +89,7 @@ export function AddService() {
 
     const modifiedData = {
       vendor: vendor?._id,
+      user: user?.userId,
       ...serviceData,
     };
 

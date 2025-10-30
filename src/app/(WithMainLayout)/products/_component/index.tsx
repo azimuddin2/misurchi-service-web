@@ -12,21 +12,26 @@ import AddReview from './add-review';
 import ViewReviews from './view-reviews';
 import Spinner from '@/components/shared/Spinner';
 import { Progress } from '@/components/ui/progress';
-import { useAppDispatch } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { addToCart } from '@/redux/features/cart/cartSlice';
 import { toast } from 'sonner';
 import { TReview } from '@/types/review.type';
 import FollowButton from '@/components/modules/follow-button';
+import { useRouter } from 'next/navigation';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 type Props = {
   productId: string;
 };
 
 const ProductDetails = ({ productId }: Props) => {
+  const router = useRouter();
   const [quantity, setQuantity] = useState<number>(1);
   const { data, isLoading, refetch } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
   const vendorId = product?.vendor._id as string;
+  const userId = product?.user._id as string;
+  const user = useAppSelector(selectCurrentUser);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -61,6 +66,10 @@ const ProductDetails = ({ productId }: Props) => {
     if (!product) return; // guard clause
     dispatch(addToCart(product));
     toast.success('Product successfully added to cart.', { duration: 3000 });
+  };
+
+  const handleMessageVendor = () => {
+    router.push(`/user/message?userId=${userId}&productId=${productId}`);
   };
 
   if (isLoading) {
@@ -264,7 +273,11 @@ const ProductDetails = ({ productId }: Props) => {
               </span>
             </Button>
 
-            <Button className="w-full text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
+            <Button
+              disabled={!user?.userId}
+              onClick={handleMessageVendor}
+              className="w-full text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+            >
               <Send className="w-5 h-5" />
               <span className="uppercase text-sm font-semibold">Message</span>
             </Button>

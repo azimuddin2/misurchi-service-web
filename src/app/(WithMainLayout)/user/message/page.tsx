@@ -3,7 +3,7 @@ import MessageContainer from '@/components/modules/message/MessageContainer';
 
 const MessagePage = () => {
   return (
-    <div>
+    <div className="mb-10">
       <MessageContainer />
     </div>
   );

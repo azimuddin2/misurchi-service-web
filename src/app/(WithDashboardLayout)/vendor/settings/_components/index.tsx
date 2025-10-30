@@ -4,6 +4,7 @@ import ChangePassword from '@/components/modules/settings/change-password';
 import BusinessPreferences from './business-preferences';
 import Notifications from '@/components/modules/settings/notifications';
 import LanguageSettings from '@/components/modules/settings/language-settings';
+import BankAccount from './bank-account';
 
 const Settings = () => {
   return (
@@ -12,6 +13,7 @@ const Settings = () => {
       <Notifications />
       <BusinessPreferences />
       <LanguageSettings />
+      <BankAccount />
     </div>
   );
 };
