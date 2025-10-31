@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { CalendarDaysIcon, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import noDataImg from '@/assets/images/no-data.jpg';
 import Image from 'next/image';
 import {
   useGetBookingByIdQuery,
@@ -188,11 +187,10 @@ const RescheduleSet = ({ id }: Props) => {
               return (
                 <Card
                   key={duration}
-                  className={`flex-1 cursor-pointer rounded-lg transition mb-3 lg:mb-0 ${
-                    selectedDuration === duration
+                  className={`flex-1 cursor-pointer rounded-lg transition mb-3 lg:mb-0 ${selectedDuration === duration
                       ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white shadow'
                       : 'bg-white hover:bg-gray-50'
-                  }`}
+                    }`}
                   onClick={() => setSelectedDuration(duration)}
                 >
                   <CardContent className="text-center">
@@ -224,17 +222,15 @@ const RescheduleSet = ({ id }: Props) => {
                   {serviceItem.slots.map((slot: TSlot) => (
                     <Card
                       key={slot.time}
-                      className={`p-4 capitalize rounded transition ${
-                        slot.status === 'booked'
+                      className={`p-4 capitalize rounded transition ${slot.status === 'booked'
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-white cursor-pointer hover:bg-green-50'
-                      } ${
-                        selectedSlot?.serviceItemId ===
+                        } ${selectedSlot?.serviceItemId ===
                           serviceItem.serviceItemId &&
-                        selectedSlot.time === slot.time
+                          selectedSlot.time === slot.time
                           ? 'border-2 border-green-500 bg-green-100'
                           : ''
-                      }`}
+                        }`}
                       onClick={() =>
                         slot.status === 'available' &&
                         setSelectedSlot({
@@ -258,8 +254,8 @@ const RescheduleSet = ({ id }: Props) => {
             Service not available on this day
           </p>
           <Image
-            src={noDataImg}
-            alt="No Data"
+            src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+            alt="No results"
             width={100}
             height={100}
             className="mx-auto"
