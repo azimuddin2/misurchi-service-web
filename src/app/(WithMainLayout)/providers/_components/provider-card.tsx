@@ -6,21 +6,45 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AppButton } from '@/components/shared/app-button';
+import coverImg from '@/assets/images/cover-img.png';
+import { useGetAllReviewByUserQuery } from '@/redux/features/review/reviewApi';
+import Spinner from '@/components/shared/Spinner';
+import { TReview } from '@/types/review.type';
 
 type ProviderCardProps = {
   vendor: TVendorUser;
 };
 
 const ProviderCard = ({ vendor }: ProviderCardProps) => {
+  const { data, isLoading } = useGetAllReviewByUserQuery({
+    vendorId: vendor._id,
+  });
+
+  const reviews: TReview[] = data?.data || [];
+
+  const reviewCount = reviews.length;
+
+  const averageRating =
+    reviewCount > 0
+      ? reviews.reduce((acc, review) => acc + (review.rating || 0), 0) /
+        reviewCount
+      : 0;
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg hover:scale-[1.01] rounded-xl p-0">
-      {/* Cover + Profile */}
       <div className="relative w-full h-36 bg-gray-100">
+        {/* Cover Image */}
         <img
-          src="https://i.postimg.cc/PqwGnzj2/bfaefb25f7f03744d79c6c214b7e94efb3cf3c14.jpg"
+          src={vendor?.coverImage || coverImg.src}
           alt="provider cover"
           className="w-full h-full object-cover"
         />
+
+        {/* Profile Avatar */}
         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
           <Avatar className="mx-auto w-20 h-20">
             <AvatarImage src={vendor?.image} />
@@ -31,25 +55,33 @@ const ProviderCard = ({ vendor }: ProviderCardProps) => {
         </div>
       </div>
 
-      <CardContent className="pt-12 pb-4 text-center space-y-3">
+      <CardContent className="pt-6 pb-4 text-center space-y-3">
         {/* Name + Rating */}
         <div>
           <h4 className="font-semibold text-lg text-gray-800">
             {vendor.businessName}
           </h4>
-          <div className="flex justify-center items-center gap-1 text-yellow-500 text-sm">
+          <div className="flex items-center justify-center gap-1">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} size={16} fill="currentColor" />
+              <Star
+                key={i}
+                size={18}
+                fill={
+                  i < Math.round(averageRating) ? 'currentColor' : 'transparent'
+                }
+                stroke="currentColor"
+                className="text-yellow-500"
+              />
             ))}
-            <span className="text-gray-500 ml-1 text-xs">(10 reviews)</span>
+            <span className="ml-1 text-gray-500 text-sm">
+              ({reviewCount} reviews)
+            </span>
           </div>
         </div>
 
         {/* Description */}
         <p className="text-sm text-gray-600 line-clamp-3">
-          Fashion lover 💫 | Curating the best of chic and street style ✨ | 10%
-          of my sales go to supporting youth education 📚 | Join me on this
-          stylish journey!
+          {vendor?.description}
         </p>
 
         {/* Action Button */}

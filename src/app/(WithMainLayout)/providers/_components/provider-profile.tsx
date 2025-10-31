@@ -16,8 +16,6 @@ import {
 } from 'lucide-react';
 import bannerImg from '@/assets/images/banner.png';
 import Image from 'next/image';
-import { AppButton } from '@/components/shared/app-button';
-import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProviderProducts from './provider-products';
 import ProviderServices from './provider-services';
@@ -26,16 +24,24 @@ import { format } from 'date-fns';
 import Spinner from '@/components/shared/Spinner';
 import { useGetVendorUserByIdQuery } from '@/redux/features/vendor/vendorApi';
 import FollowButton from '@/components/modules/follow-button';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 type Props = {
   providerId: string;
 };
 
 const ProviderProfile = ({ providerId }: Props) => {
+  const router = useRouter();
   const { data, isLoading } = useGetVendorUserByIdQuery(providerId);
   const vendorUser: TVendorUser | undefined = data?.data;
 
   const vendorId = vendorUser?._id as string;
+  const userId = vendorUser?.userId._id;
+
+  const handleMessageVendor = () => {
+    router.push(`/user/message?userId=${userId}`);
+  };
 
   if (isLoading) {
     return <Spinner />;
@@ -81,20 +87,16 @@ const ProviderProfile = ({ providerId }: Props) => {
                 </div>
                 {/* Button */}
                 <div className="mt-4 sm:mt-0 flex items-center gap-2">
-                  <AppButton
-                    className="text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
-                    content={
-                      <Link
-                        href={`/`}
-                        className="flex justify-center items-center space-x-1 font-semibold"
-                      >
-                        <Send size={24} />
-                        <span className="uppercase text-sm font-semibold">
-                          Message
-                        </span>
-                      </Link>
-                    }
-                  />
+                  <Button
+                    disabled={!userId}
+                    onClick={handleMessageVendor}
+                    className="text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6  cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+                  >
+                    <Send className="w-5 h-5" />
+                    <span className="uppercase text-sm font-semibold">
+                      Message
+                    </span>
+                  </Button>
 
                   <FollowButton
                     vendorId={vendorId}

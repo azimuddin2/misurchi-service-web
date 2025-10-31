@@ -11,7 +11,7 @@ export const ClientFeedbackCard = ({ review }: TReviewProps) => {
       {/* client thougts about you */}
       <div className="space-y-2 pb-2">
         <h4 className="font-medium text-xl text-gray-800">
-          {review.vendor.businessName}
+          {review?.vendor?.businessName}
         </h4>
         <p className="text-sm text-gray-400 font-normal">{review.review}</p>
       </div>

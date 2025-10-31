@@ -8,6 +8,7 @@ import ProviderCard from './provider-card';
 import { TVendorUser } from '@/types';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllVendorUserQuery } from '@/redux/features/vendor/vendorApi';
+import Spinner from '@/components/shared/Spinner';
 
 const Providers = () => {
   const router = useRouter();
@@ -55,6 +56,10 @@ const Providers = () => {
     setSearch(searchParams.get('searchTerm') || '');
   }, [searchParams]);
 
+  if (isLoading) {
+    return <Spinner />;
+  }
+
   return (
     <div className="container mx-2 lg:mx-auto">
       <div className="lg:flex items-center justify-between">
@@ -82,7 +87,7 @@ const Providers = () => {
             <p className="text-base font-semibold text-gray-700">
               Top Rated Providers
             </p>
-            <Switch className="data-[state=checked]:bg-[#3DB39E]" />
+            <Switch className="data-[state=checked]:bg-green-500" />
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllServicesByUserQuery } from '@/redux/features/service/serviceApi';
 import { TService } from '@/types/service.type';
 import { Search } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -94,9 +95,16 @@ const ProviderServices = ({ vendorId }: Props) => {
                 <ServiceCard key={service._id} service={service} />
               ))
             ) : (
-              <p className="col-span-full h-screen text-center text-gray-500">
-                No listings found matching your search.
-              </p>
+              <div className="flex flex-col justify-center items-center py-16 text-center">
+                <Image
+                  src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                  alt="No results"
+                  width={120}
+                  height={120}
+                  className="mb-3 opacity-80"
+                />
+                <p className="text-gray-500 text-sm">No results found</p>
+              </div>
             )}
           </div>
         </div>

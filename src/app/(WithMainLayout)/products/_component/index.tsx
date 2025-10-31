@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useGetProductByIdQuery } from '@/redux/features/product/productApi';
 import { TProduct } from '@/types/product.type';
-import { MapPin, Minus, Plus, Send, ShoppingCart } from 'lucide-react';
+import { MapPin, Send, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
@@ -26,7 +26,7 @@ type Props = {
 
 const ProductDetails = ({ productId }: Props) => {
   const router = useRouter();
-  const [quantity, setQuantity] = useState<number>(1);
+  // const [quantity, setQuantity] = useState<number>(1);
   const { data, isLoading, refetch } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
   const vendorId = product?.vendor._id as string;
@@ -238,7 +238,7 @@ const ProductDetails = ({ productId }: Props) => {
 
             {/* Quantity & Stock */}
             <div className="my-2 font-medium flex justify-between items-center p-5">
-              <div className="flex items-center gap-1">
+              {/* <div className="flex items-center gap-1">
                 <p className="text-gray-600 text-base mr-2">Quantity </p>
                 <Button
                   onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}
@@ -255,7 +255,11 @@ const ProductDetails = ({ productId }: Props) => {
                 >
                   <Plus className="w-4 h-4" />
                 </Button>
-              </div>
+              </div> */}
+
+              <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
+                Available Product: {product?.quantity}
+              </p>
               <p className="rounded-full px-4 py-1 bg-gray-100 capitalize">
                 Status: {product?.status}
               </p>

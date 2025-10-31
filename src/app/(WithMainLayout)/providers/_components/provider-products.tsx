@@ -7,6 +7,7 @@ import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllProductsByUserQuery } from '@/redux/features/product/productApi';
 import { TProduct } from '@/types/product.type';
 import { Search } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -97,9 +98,16 @@ const ProviderProducts = ({ vendorId }: Props) => {
                 <ProductCard key={product._id} product={product} />
               ))
             ) : (
-              <p className="col-span-full h-screen text-center text-gray-500">
-                No product found matching your search.
-              </p>
+              <div className="flex flex-col justify-center items-center py-16 text-center">
+                <Image
+                  src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                  alt="No results"
+                  width={120}
+                  height={120}
+                  className="mb-3 opacity-80"
+                />
+                <p className="text-gray-500 text-sm">No results found</p>
+              </div>
             )}
           </div>
         </div>
