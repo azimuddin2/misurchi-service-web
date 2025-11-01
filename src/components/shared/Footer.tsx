@@ -1,10 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import logo from '@/assets/icons/Logo_light.png';
 import Image from 'next/image';
 import facebookIcon from '@/assets/icons/facebook.png';
 import instagramIcon from '@/assets/icons/instagram.png';
 import xIcon from '@/assets/icons/x.png';
-import linkdinIcon from '@/assets/icons/linkdin.png';
+import linkedinIcon from '@/assets/icons/linkdin.png';
 
 export const Footer = () => {
   return (
@@ -24,10 +26,38 @@ export const Footer = () => {
 
         {/* Social Links */}
         <div className="flex justify-center gap-6">
-          <Image src={facebookIcon} alt="facebook" />
-          <Image src={instagramIcon} alt="instagram" />
-          <Image src={xIcon} alt="x" />
-          <Image src={linkdinIcon} alt="linkdin" />
+          <Link
+            href={'https://www.facebook.com/share/1BTrFQtoF2/?mibextid=wwXIfr'}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image src={facebookIcon} alt="facebook" />
+          </Link>
+          <Link
+            href={
+              'https://www.instagram.com/smevine_?igsh=MW40MzI4YTQyNHZlZQ%3D%3D&utm_source=qr'
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image src={instagramIcon} alt="instagram" />
+          </Link>
+          <Link
+            href={'https://x.com/smevine_?s=11&t=eTXhTt3CIzwBAc1Ri-mzjA'}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image src={xIcon} alt="x" />
+          </Link>
+          <Link
+            href={
+              'https://www.linkedin.com/in/smevine-84b393395?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app'
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image src={linkedinIcon} alt="linkedin" />
+          </Link>
         </div>
 
         <hr className="bg-gray-900 my-6" />

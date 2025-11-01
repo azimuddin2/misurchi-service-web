@@ -29,8 +29,10 @@ import {
 import LocationMap from '@/components/shared/location-map';
 import CoverImageUploader from '@/components/ui/core/CoverImageUploader';
 import CoverImagePreview from '@/components/ui/core/CoverImageUploader/CoverImagePreview';
+import { useRouter } from 'next/navigation';
 
-const UserProfilePage = () => {
+const UserProfile = () => {
+  const router = useRouter();
   const user = useAppSelector(selectCurrentUser);
   const email = user?.email as string;
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -162,15 +164,15 @@ const UserProfilePage = () => {
         </div>
         {/* Share Button */}
         <div className="mt-3 mb-6 text-center">
-          <AppButton
-            className="w-4/5 lg:w-2/6 text-gray-50 border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] hover:bg-green-500/80"
-            content={
-              <div className="flex justify-center items-center space-x-2 font-semibold text-black">
-                <p className="uppercase">Register as a service provider</p>
-                <ArrowRight />
-              </div>
-            }
-          />
+          <button
+            className="flex items-center justify-center w-4/5 lg:w-2/6 mx-auto text-black border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] hover:bg-green-500/80 p-4 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+            onClick={() => router.push('/signup/vendor')}
+          >
+            <p className="uppercase font-semibold mr-2">
+              Register as a service provider
+            </p>
+            <ArrowRight size={18} />
+          </button>
         </div>
       </div>
 
@@ -335,4 +337,4 @@ const UserProfilePage = () => {
   );
 };
 
-export default UserProfilePage;
+export default UserProfile;

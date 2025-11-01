@@ -1,8 +1,11 @@
+'use client';
+
 import Container from '@/components/shared/Container';
 import profileIcon from '@/assets/icons/profile.png';
 import exploreIcon from '@/assets/icons/explore.png';
 import connectIcon from '@/assets/icons/connect.png';
 import Image from 'next/image';
+import CountUp from 'react-countup';
 
 export const KnowAboutUs = () => {
   return (
@@ -75,7 +78,10 @@ const StepCountShow = () => {
       {/* stats number 1 */}
       <div className="flex justify-center items-center">
         <div className="space-y-3 p-4">
-          <h3 className="text-5xl font-bold text-gray-950">500K+</h3>
+          <h3 className="text-5xl font-bold text-gray-950">
+            <CountUp end={500} duration={1.5} separator="," />
+            k+
+          </h3>
           <p className="text-[#212529] w-[60%]">
             Messages exchanged between providers & users
           </p>
@@ -86,7 +92,10 @@ const StepCountShow = () => {
       {/* stats number 2 */}
       <div className="flex justify-center items-center">
         <div className="space-y-3 p-4">
-          <h3 className="text-5xl font-bold text-gray-950">40K+</h3>
+          <h3 className="text-5xl font-bold text-gray-950">
+            <CountUp end={40} duration={1.5} separator="," />
+            k+
+          </h3>
           <p className="text-[#212529] w-[60%]">
             Messages exchanged between providers & users
           </p>
@@ -97,7 +106,10 @@ const StepCountShow = () => {
       {/* stats number 3 */}
       <div className="flex justify-center items-center">
         <div className="space-y-3 p-4">
-          <h3 className="text-5xl font-bold text-gray-950">17K+</h3>
+          <h3 className="text-5xl font-bold text-gray-950">
+            <CountUp end={17} duration={1.5} separator="," />
+            K+
+          </h3>
           <p className="text-[#212529] w-[60%]">
             Messages exchanged between providers & users
           </p>
@@ -108,7 +120,9 @@ const StepCountShow = () => {
       {/* stats number 4 */}
       <div className="flex justify-center items-center">
         <div className="space-y-3 p-4">
-          <h3 className="text-5xl font-bold text-gray-950">97%</h3>
+          <h3 className="text-5xl font-bold text-gray-950">
+            <CountUp end={97} duration={1.5} separator="," />%
+          </h3>
           <p className="text-[#212529] w-[60%]">
             Messages exchanged between providers & users
           </p>

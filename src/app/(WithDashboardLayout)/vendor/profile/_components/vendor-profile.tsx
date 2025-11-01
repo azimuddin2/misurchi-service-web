@@ -135,6 +135,13 @@ const VendorProfile = () => {
     }
   };
 
+  const handleShare = () => {
+    navigator.share({
+      title: vendorUser?.businessName,
+      url: `/providers/${vendorUser?._id}`,
+    });
+  };
+
   if (isLoading) {
     return <Spinner />;
   }
@@ -193,17 +200,15 @@ const VendorProfile = () => {
           </div>
         </div>
         {/* Share Button */}
-        {/* <div className="mt-3 mb-6 text-center">
-          <AppButton
-            className="w-4/5 lg:w-2/6 text-gray-50 border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] hover:bg-green-500/80"
-            content={
-              <div className="flex justify-center items-center space-x-2 font-semibold text-black">
-                <p className="uppercase">SHARE YOUR PROFILE</p>
-                <ArrowRight />
-              </div>
-            }
-          />
-        </div> */}
+        <div className="mt-3 mb-6 text-center">
+          <button
+            className="flex items-center justify-center w-4/5 lg:w-2/6 mx-auto text-black border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] hover:bg-green-500/80 p-4 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+            onClick={handleShare}
+          >
+            <p className="uppercase font-semibold mr-2">SHARE YOUR PROFILE</p>
+            <ArrowRight size={18} />
+          </button>
+        </div>
       </div>
 
       <Form {...form}>

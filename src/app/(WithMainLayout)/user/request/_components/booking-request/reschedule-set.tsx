@@ -187,10 +187,11 @@ const RescheduleSet = ({ id }: Props) => {
               return (
                 <Card
                   key={duration}
-                  className={`flex-1 cursor-pointer rounded-lg transition mb-3 lg:mb-0 ${selectedDuration === duration
+                  className={`flex-1 cursor-pointer rounded-lg transition mb-3 lg:mb-0 ${
+                    selectedDuration === duration
                       ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white shadow'
                       : 'bg-white hover:bg-gray-50'
-                    }`}
+                  }`}
                   onClick={() => setSelectedDuration(duration)}
                 >
                   <CardContent className="text-center">
@@ -222,15 +223,17 @@ const RescheduleSet = ({ id }: Props) => {
                   {serviceItem.slots.map((slot: TSlot) => (
                     <Card
                       key={slot.time}
-                      className={`p-4 capitalize rounded transition ${slot.status === 'booked'
+                      className={`p-4 capitalize rounded transition ${
+                        slot.status === 'booked'
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-white cursor-pointer hover:bg-green-50'
-                        } ${selectedSlot?.serviceItemId ===
+                      } ${
+                        selectedSlot?.serviceItemId ===
                           serviceItem.serviceItemId &&
-                          selectedSlot.time === slot.time
+                        selectedSlot.time === slot.time
                           ? 'border-2 border-green-500 bg-green-100'
                           : ''
-                        }`}
+                      }`}
                       onClick={() =>
                         slot.status === 'available' &&
                         setSelectedSlot({

@@ -53,6 +53,15 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
+
+    getUserById: builder.query<TResponse<IUser>, string>({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['User'],
+    }),
   }),
 });
 
@@ -60,4 +69,5 @@ export const {
   useGetUserProfileQuery,
   useUpdateUserProfileMutation,
   useGetAllUsersQuery,
+  useGetUserByIdQuery,
 } = userApi;

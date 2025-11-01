@@ -42,6 +42,12 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
     }
   };
 
+  // ✅ Handle user click (open inbox + close search)
+  const handleUserClick = (userId: string) => {
+    updateSearchParams({ selectedUserId: userId });
+    setWantTOSearch(false); // close search container
+  };
+
   return (
     <div className="scroll-hide max-h-[80vh] min-h-[70vh] space-y-5 overflow-auto bg-primary-blue/10 px-2 rounded-lg">
       {/* Search input */}
@@ -80,7 +86,7 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
           <div
             key={user._id}
             className="flex gap-x-3 items-center cursor-pointer rounded-md p-2 hover:bg-gray-100 transition-colors"
-            onClick={() => updateSearchParams({ selectedUserId: user._id })}
+            onClick={() => handleUserClick(user._id)} // ✅ fixed line
           >
             <CustomAvatar
               img={user.image}
@@ -104,7 +110,7 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
         <Empty message="No user found" />
       )}
 
-      {/* Load More Button - Smart UX */}
+      {/* Load More Button */}
       {page < meta.totalPage && (
         <div className="flex justify-center mt-4">
           <Button
@@ -138,7 +144,7 @@ const UserSearchContainer = ({ setWantTOSearch }: any) => {
               </>
             ) : (
               <>
-                <User className="h-4 w-4" /> {/* ✅ Lucide icon */}
+                <User className="h-4 w-4" />
                 Load More ({users.length}/{meta.totalPage || '?'})
               </>
             )}
