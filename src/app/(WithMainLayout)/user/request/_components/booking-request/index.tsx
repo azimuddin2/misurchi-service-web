@@ -109,48 +109,92 @@ const BookingsRequest = () => {
       header: 'Price',
       cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
     },
+
     {
       accessorKey: 'action',
       header: 'Action',
-      cell: ({ row }) => (
-        <div className="flex items-center space-x-3">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="sm"
-                  className="text-green-500 capitalize hover:text-green-600 rounded-full bg-green-100 hover:bg-green-200 h-10 w-10 cursor-pointer"
-                  onClick={() => {
-                    setSelectedRescheduleBooking(row.original);
-                    setRescheduleModalOpen(true);
-                  }}
-                >
-                  <CalendarClock className="text-green-600" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="uppercase">Reschedule</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+      cell: ({ row }) => {
+        const booking = row.original as TBooking;
+        const status = booking.status;
+        const requestType = booking.request?.type ?? 'none';
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="sm"
-                  className="text-red-500 capitalize hover:text-red-600 rounded-full bg-red-100 hover:bg-red-200 h-10 w-10 cursor-pointer"
-                  onClick={() => {
-                    setSelectedCancelBooking(row.original);
-                    setCancelModalOpen(true);
-                  }}
-                >
-                  <CalendarX className="text-red-500 text-lg" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="uppercase">Cancel</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      ),
+        const showReschedule =
+          status === 'pending' ||
+          status === 'confirmed' ||
+          status === 'ongoing';
+        const showCancel =
+          status === 'pending' ||
+          status === 'confirmed' ||
+          status === 'ongoing';
+        const isRequestPending =
+          requestType !== 'none' && booking.request?.vendorApproved === false;
+
+        return (
+          <div className="flex flex-col gap-2 w-[220px] min-w-[220px]">
+            {/* Top row: buttons */}
+            <div className="flex items-center gap-2">
+              {showReschedule && !isRequestPending && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        className="text-green-500 capitalize hover:text-green-600 rounded-full bg-green-100 hover:bg-green-200 h-10 w-10 cursor-pointer"
+                        onClick={() => {
+                          setSelectedRescheduleBooking(booking);
+                          setRescheduleModalOpen(true);
+                        }}
+                      >
+                        <CalendarClock className="text-green-600" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="uppercase">
+                      Reschedule
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+
+              {showCancel && !isRequestPending && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        className="text-red-500 capitalize hover:text-red-600 rounded-full bg-red-100 hover:bg-red-200 h-10 w-10 cursor-pointer"
+                        onClick={() => {
+                          setSelectedCancelBooking(booking);
+                          setCancelModalOpen(true);
+                        }}
+                      >
+                        <CalendarX className="text-red-500 text-lg" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="uppercase">
+                      Cancel
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+
+            {/* Bottom row: status messages */}
+            <div className="flex flex-col gap-1 break-words">
+              {isRequestPending && (
+                <span className="text-yellow-600 font-medium text-sm">
+                  {`Request (${requestType}) pending vendor approval`}
+                </span>
+              )}
+              {requestType !== 'none' &&
+                booking.request?.vendorApproved === true && (
+                  <span className="text-green-600 font-medium text-sm">
+                    {`Request (${requestType}) approved`}
+                  </span>
+                )}
+            </div>
+          </div>
+        );
+      },
     },
   ];
 

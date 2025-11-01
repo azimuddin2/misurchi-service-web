@@ -19,11 +19,15 @@ import { bookingSchema } from './bookingValidation';
 import { toast } from 'sonner';
 import { useAddBookingMutation } from '@/redux/features/booking/bookingApi';
 import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
+import { useGetUserByIdQuery } from '@/redux/features/user/userApi';
 
 const Booking = () => {
   const user = useAppSelector(selectCurrentUser);
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const { data: userData } = useGetUserByIdQuery(user?.userId as string);
+  const userInfo = userData?.data;
 
   // ✅ Always provide fallback (never null)
   const serviceId = searchParams.get('serviceId') ?? '';
@@ -38,9 +42,9 @@ const Booking = () => {
   const form = useForm({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      name: user?.name ?? '',
-      email: user?.email ?? '',
-      phone: '',
+      name: userInfo?.fullName ?? '',
+      email: userInfo?.email ?? '',
+      phone: userInfo?.phone ?? '',
       serviceName,
       duration,
       price: price.toString(), // ✅ always a string in form state

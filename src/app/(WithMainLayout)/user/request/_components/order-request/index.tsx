@@ -9,7 +9,7 @@ import { MSWTable } from '@/components/ui/core/MSWTable';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useGetOrdersByEmailQuery } from '@/redux/features/order/orderApi';
-import { TOrder } from '@/types/order.type';
+import { TOrder, TOrderStatus } from '@/types/order.type';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import CancelledModal from './cancelled-modal';
@@ -154,48 +154,59 @@ const OrdersRequest = () => {
         const request = row.original.request;
         const vendorApproved = request?.vendorApproved;
         const requestType = request?.type ?? 'none';
+        const status = row.original.status as TOrderStatus;
+
+        // Helper function to render action buttons
+        const renderActionButtons = () => {
+          // Cancel button for pending or shipped
+          if (status === 'pending' || status === 'shipped') {
+            return (
+              <Button
+                size="sm"
+                variant="outline"
+                className="border border-red-400 rounded text-red-500 capitalize hover:text-red-600"
+                onClick={() => {
+                  setSelectedCancelOrder(row.original);
+                  setCancelModalOpen(true);
+                }}
+              >
+                Cancel
+              </Button>
+            );
+          }
+
+          // Return button for delivered
+          if (status === 'delivered') {
+            return (
+              <Button
+                size="sm"
+                variant="outline"
+                className="capitalize rounded border-green-500 text-green-500 hover:text-green-600"
+                onClick={() => {
+                  setSelectedReturnOrder(row.original);
+                  setReturnModalOpen(true);
+                }}
+              >
+                Return
+              </Button>
+            );
+          }
+
+          return null;
+        };
 
         return (
           <div className="flex flex-col gap-2">
-            {/* Case 1: No request yet → only show buttons */}
+            {/* Case 1: No request yet → show buttons */}
             {requestType === 'none' && (
               <div className="flex items-center gap-2">
-                {/* Cancel button */}
-                {row.original.status === 'pending' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border border-red-400 rounded text-red-500 capitalize hover:text-red-600"
-                    onClick={() => {
-                      setSelectedCancelOrder(row.original);
-                      setCancelModalOpen(true);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                )}
-
-                {/* Return button */}
-                {row.original.status !== 'pending' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="capitalize rounded border-green-500 text-green-500 hover:text-green-600"
-                    onClick={() => {
-                      setSelectedReturnOrder(row.original);
-                      setReturnModalOpen(true);
-                    }}
-                  >
-                    Return
-                  </Button>
-                )}
+                {renderActionButtons()}
               </div>
             )}
 
-            {/* Case 2: Request already submitted → only show status */}
+            {/* Case 2: Request exists → show vendor approval & type */}
             {requestType !== 'none' && (
               <div className="flex flex-col gap-1">
-                {/* Vendor approval status */}
                 {vendorApproved === false && (
                   <span className="text-yellow-600 font-medium text-sm">
                     Pending Vendor Approval
@@ -207,7 +218,6 @@ const OrdersRequest = () => {
                   </span>
                 )}
 
-                {/* Request type message */}
                 <span className="text-gray-500 text-sm capitalize">
                   Request already {requestType}
                 </span>
