@@ -271,7 +271,6 @@ const ManageOrderProducts = () => {
         );
       },
     },
-
     {
       accessorKey: 'request',
       header: 'Request Action',
@@ -333,7 +332,6 @@ const ManageOrderProducts = () => {
                       size="sm"
                       variant="outline"
                       className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
-                      disabled={vendorApproved === false}
                     >
                       Reject
                     </Button>

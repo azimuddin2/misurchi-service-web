@@ -8,13 +8,7 @@ import { TBooking } from '@/types/booking.type';
 import Image from 'next/image';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { format, parseISO } from 'date-fns';
-import {
-  CheckCircle,
-  ChevronDown,
-  FolderSymlink,
-  Search,
-  XCircle,
-} from 'lucide-react';
+import { CheckCircle, FolderSymlink, Search, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -22,7 +16,6 @@ import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import {
   useGetAllBookingsByUserQuery,
   useUpdateBookingRequestApprovalMutation,
-  useUpdateBookingStatusMutation,
 } from '@/redux/features/booking/bookingApi';
 import { Input } from '@/components/ui/input';
 import MSWPagination from '@/components/ui/core/MSWPagination';
@@ -33,20 +26,6 @@ import {
 } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-
-const statusOptions = [
-  { label: 'Pending', key: 'pending' },
-  { label: 'Ongoing', key: 'ongoing' },
-  { label: 'Confirmed', key: 'confirmed' },
-  { label: 'Cancelled', key: 'cancelled' },
-  { label: 'Completed', key: 'completed' },
-];
 
 const ManageBookingServices = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -125,8 +104,6 @@ const ManageBookingServices = () => {
   const [updateBookingRequestApproval] =
     useUpdateBookingRequestApprovalMutation();
 
-  const [updateBookingStatus] = useUpdateBookingStatusMutation();
-
   const handleVendorApproval = async (bookingId: string, approved: boolean) => {
     const toastId = toast.loading('Updating status...');
 
@@ -145,48 +122,26 @@ const ManageBookingServices = () => {
     }
   };
 
-  const handleStatusUpdate = async (orderId: string, status: string) => {
-    const toastId = toast.loading('Updating status...');
-
-    const updateStatus = { status };
-
-    try {
-      const res = await updateBookingStatus({
-        id: orderId,
-        status: updateStatus,
-      }).unwrap();
-
-      toast.success(res.message || 'Status updated successfully');
-      refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Status update failed');
-    } finally {
-      toast.dismiss(toastId);
-    }
-  };
-
   const columns: ColumnDef<TBooking>[] = [
     {
       accessorKey: 'service',
       header: 'Service',
-      size: 260, // wider for image + text
       cell: ({ row }) => {
         const service = row.original.service;
+        console.log(service);
         const imageUrl = service?.images?.[0]?.url || '/placeholder.png';
         return (
-          <div className="flex items-start space-x-3 w-[280px]">
+          <div className="flex items-start space-x-3">
             <Image
               src={imageUrl}
               alt={service?.name || 'Service'}
-              width={80}
-              height={80}
-              className="w-20 h-24 rounded-sm object-cover border"
+              width={100}
+              height={100}
+              className="w-24 h-28 rounded-sm object-cover border"
             />
-            <div className="flex flex-col justify-between text-sm">
-              <p className="truncate font-medium">{row.original.serviceName}</p>
-              <p className="text-gray-500 truncate text-xs">
-                Service ID: {row.original.serviceId}
-              </p>
+            <div>
+              <p className="truncate">{row.original.serviceName}</p>
+              <p className="truncate">ServiceId: {row.original.serviceId}</p>
             </div>
           </div>
         );
@@ -195,9 +150,8 @@ const ManageBookingServices = () => {
     {
       accessorKey: 'email',
       header: 'Buyer Info',
-      size: 180,
       cell: ({ row }) => (
-        <div className="w-[170px] truncate">
+        <div>
           <p className="text-base font-medium">{row.original.name}</p>
           <p className="text-sm text-gray-500">{row.original.email}</p>
           <p className="text-sm text-gray-500">{row.original.phone}</p>
@@ -207,136 +161,81 @@ const ManageBookingServices = () => {
     {
       accessorKey: 'date',
       header: 'Date & Time',
-      size: 130,
       cell: ({ row }) => (
-        <div className="w-[130px]">
+        <div>
           <p>{format(new Date(row.original.date), 'dd MMM, yyyy')}</p>
-          <p className="text-sm text-gray-500 truncate">{row.original.time}</p>
+          <p className="truncate">{row.original.time}</p>
         </div>
       ),
     },
     {
       accessorKey: 'duration',
       header: 'Duration',
-      size: 100,
       cell: ({ row }) => (
-        <span className="truncate block w-[80px]">
-          {row.original.duration}s
-        </span>
+        <span className="truncate">{row.original.duration}s</span>
       ),
     },
     {
       accessorKey: 'paymentType',
       header: 'Payment Type',
-      size: 120,
       cell: ({ row }) => (
-        <span className="capitalize block w-[110px] truncate">
-          Pay {row.original.paymentType}
-        </span>
+        <span className="capitalize">Pay {row.original.paymentType}</span>
       ),
     },
     {
       accessorKey: 'price',
       header: 'Price',
-      size: 80,
       cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
     },
-    {
-      accessorKey: 'status',
-      header: 'Booking Status',
-      size: 150,
-      cell: ({ row }) => {
-        const status = row.original.status;
-        const statusTextColorMap: Record<string, string> = {
-          pending: 'text-yellow-600 border-yellow-600',
-          ongoing: 'text-blue-600 border-blue-600',
-          confirmed: 'text-indigo-600 border-indigo-600',
-          cancelled: 'text-red-600 border-red-600',
-          completed: 'text-green-600 border-green-600',
-        };
-        const statusColor = statusTextColorMap[status] || 'text-gray-700';
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={`flex items-center justify-between gap-2 capitalize px-3 py-1 border rounded-sm bg-white text-sm w-[130px] ${statusColor}`}
-            >
-              {status}
-              <ChevronDown className="w-4 h-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40">
-              {statusOptions.map((option) => (
-                <DropdownMenuItem
-                  onClick={() =>
-                    option.key !== status && // ✅ only allow change if different
-                    handleStatusUpdate(row.original._id, option.key)
-                  }
-                  key={option.key}
-                  disabled={option.key === status}
-                  className={`capitalize px-3 py-2 ${
-                    option.key === status
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'hover:bg-gray-100'
-                  }`}
-                >
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    },
-
     {
       accessorKey: 'request',
       header: 'Request Action',
       cell: ({ row }) => {
         const request = row.original.request || {};
-        const vendorApproved = request.vendorApproved; // true | false | undefined
+        const vendorApproved = request.vendorApproved;
         const requestType = request.type ?? 'none';
 
+        // Current user
+        const user = useAppSelector(selectCurrentUser);
         const isVendor = user?.role === 'vendor';
         const isBuyer = user?.role === 'buyer';
 
-        const handleApproval = (approved: boolean) => {
-          handleVendorApproval(row.original._id, approved);
-        };
-
-        // Check if a request exists
-        const hasRequest = requestType !== 'none';
-
         return (
           <div className="flex flex-col gap-2">
-            {/* No request submitted */}
-            {!hasRequest && (
+            {/* Case 1: No request submitted */}
+            {requestType === 'none' && (
               <span className="text-gray-400 text-sm italic">
                 No request submitted
               </span>
             )}
 
-            {/* Vendor action buttons (only if request exists and vendor hasn't acted) */}
-            {hasRequest && isVendor && vendorApproved === undefined && (
+            {/* Case 2: Vendor must act */}
+            {requestType !== 'none' && isVendor && (
               <div className="flex items-center gap-2">
+                {/* Approve button with Popover */}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       size="sm"
                       variant="outline"
                       className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded"
+                      disabled={vendorApproved === true}
                     >
                       Approve
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-56">
                     <p className="text-sm font-medium mb-2">
-                      Confirm approval?
+                      Confirm approval for this request?
                     </p>
                     <div className="flex justify-end gap-2">
                       <Button
                         size="sm"
                         variant="outline"
                         className="border-green-600 rounded text-green-600 cursor-pointer hover:bg-white hover:text-green-700"
-                        onClick={() => handleApproval(true)}
+                        onClick={() =>
+                          handleVendorApproval(row.original._id, true)
+                        }
                       >
                         Yes, Approve
                       </Button>
@@ -344,26 +243,30 @@ const ManageBookingServices = () => {
                   </PopoverContent>
                 </Popover>
 
+                {/* Reject button with Popover */}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       size="sm"
                       variant="outline"
                       className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
+                      // disabled={vendorApproved === false}
                     >
                       Reject
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-56">
                     <p className="text-sm font-medium mb-2">
-                      Confirm rejection?
+                      Confirm rejection for this request?
                     </p>
                     <div className="flex justify-end gap-2">
                       <Button
                         size="sm"
                         variant="outline"
                         className="border-red-500 rounded text-red-500 cursor-pointer bg-white hover:bg-white hover:text-red-700"
-                        onClick={() => handleApproval(false)}
+                        onClick={() =>
+                          handleVendorApproval(row.original._id, false)
+                        }
                       >
                         Yes, Reject
                       </Button>
@@ -373,25 +276,35 @@ const ManageBookingServices = () => {
               </div>
             )}
 
-            {/* Vendor already acted */}
-            {vendorApproved === true && (
-              <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
-                Vendor <CheckCircle className="w-4 h-4" /> Approved (
-                {requestType})
-              </span>
-            )}
-            {vendorApproved === false && (
-              <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
-                Vendor <XCircle className="w-4 h-4" /> Rejected (Cancelled)
-              </span>
+            {/* Case 3: Vendor already acted */}
+            {requestType !== 'none' && vendorApproved === true && (
+              <>
+                <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
+                  Vendor <CheckCircle className="w-4 h-4" />
+                  Approved ({requestType})
+                </span>
+                <span className="text-sm">Buyer Request ({requestType})</span>
+              </>
             )}
 
-            {/* Buyer sees pending */}
-            {isBuyer && hasRequest && vendorApproved === undefined && (
-              <span className="text-yellow-600 font-medium text-sm">
-                Pending Vendor Approval
-              </span>
+            {requestType !== 'none' && vendorApproved === false && (
+              <>
+                <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
+                  Vendor <XCircle className="w-4 h-4" />
+                  Rejected ({requestType})
+                </span>
+                <span className="text-sm">Buyer Request ({requestType})</span>
+              </>
             )}
+
+            {/* Case 4: Buyer sees pending */}
+            {requestType !== 'none' &&
+              isBuyer &&
+              vendorApproved === undefined && (
+                <span className="text-yellow-600 font-medium text-sm">
+                  Pending Vendor Approval
+                </span>
+              )}
           </div>
         );
       },
