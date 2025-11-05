@@ -81,7 +81,7 @@ const Banner = () => {
         <style jsx>{`
           .animate-marquee {
             display: inline-block;
-            animation: marquee 25s linear infinite;
+            animation: marquee 60s linear infinite;
             white-space: nowrap;
           }
 

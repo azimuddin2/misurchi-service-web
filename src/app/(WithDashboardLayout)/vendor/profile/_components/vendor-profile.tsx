@@ -489,6 +489,7 @@ const VendorProfile = () => {
                 <FormControl>
                   <textarea
                     {...field}
+                    required
                     rows={8}
                     className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"
                     placeholder="Enter description here..."
