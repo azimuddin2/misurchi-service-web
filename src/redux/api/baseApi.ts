@@ -90,6 +90,9 @@ export const baseApi = createApi({
     'Dashboard',
     'Follow',
     'StripeAccount',
+    'Privacy',
+    'Policy',
+    'Terms',
   ],
   endpoints: () => ({}),
 });
