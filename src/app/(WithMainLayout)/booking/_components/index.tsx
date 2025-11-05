@@ -20,13 +20,17 @@ import { toast } from 'sonner';
 import { useAddBookingMutation } from '@/redux/features/booking/bookingApi';
 import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
 import { useGetUserByIdQuery } from '@/redux/features/user/userApi';
+import Spinner from '@/components/shared/Spinner';
+import { useEffect } from 'react';
 
 const Booking = () => {
   const user = useAppSelector(selectCurrentUser);
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const { data: userData } = useGetUserByIdQuery(user?.userId as string);
+  const { data: userData, isLoading } = useGetUserByIdQuery(
+    user?.userId as string,
+  );
   const userInfo = userData?.data;
 
   // ✅ Always provide fallback (never null)
@@ -42,17 +46,34 @@ const Booking = () => {
   const form = useForm({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      name: userInfo?.fullName ?? '',
-      email: userInfo?.email ?? '',
-      phone: userInfo?.phone ?? '',
+      name: '',
+      email: '',
+      phone: '',
       serviceName,
       duration,
-      price: price.toString(), // ✅ always a string in form state
+      price: price.toString(),
       date,
       time,
       paymentType: 'full',
     },
   });
+
+  // ✅ When userInfo loads, update form values dynamically
+  useEffect(() => {
+    if (userInfo) {
+      form.reset({
+        name: userInfo.fullName ?? '',
+        email: userInfo.email ?? '',
+        phone: userInfo.phone ?? '',
+        serviceName,
+        duration,
+        price: price.toString(),
+        date,
+        time,
+        paymentType: 'full',
+      });
+    }
+  }, [userInfo, form, serviceName, duration, price, date, time]);
 
   const { data } = useGetServiceByIdQuery(service);
   const vendor = data?.data?.vendor?._id;
@@ -85,6 +106,10 @@ const Booking = () => {
       toast.dismiss(toastId);
     }
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="shadow p-5 lg:p-10 rounded">

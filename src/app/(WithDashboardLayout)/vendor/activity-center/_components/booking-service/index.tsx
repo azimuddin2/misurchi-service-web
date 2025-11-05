@@ -196,7 +196,6 @@ const ManageBookingServices = () => {
         const requestType = request.type ?? 'none';
 
         // Current user
-        const user = useAppSelector(selectCurrentUser);
         const isVendor = user?.role === 'vendor';
         const isBuyer = user?.role === 'buyer';
 

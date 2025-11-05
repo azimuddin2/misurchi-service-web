@@ -8,13 +8,33 @@ const notificationApi = baseApi.injectEndpoints({
     getAllNotifications: builder.query<
       TResponse<TNotification[]>,
       {
+        receiver: string;
         page?: number | string;
         limit?: number | string;
         query?: Record<string, string | string[] | undefined>;
       }
     >({
-      query: ({ page = 1, limit = 10 }) => ({
-        url: `/notifications?page=${page}&limit=${limit}`,
+      query: ({ page = 1, limit = 10, receiver }) => {
+        const params = new URLSearchParams();
+        params.append('page', page.toString());
+        params.append('limit', limit.toString());
+
+        if (receiver) {
+          params.append('receiver', receiver); // pass userId in query
+        }
+
+        return {
+          url: `/notifications?${params.toString()}`,
+          method: 'GET',
+          credentials: 'include',
+        };
+      },
+      providesTags: ['Notification'],
+    }),
+
+    getNotificationById: builder.query<TResponse<TNotification>, string>({
+      query: (id) => ({
+        url: `/notifications/${id}`,
         method: 'GET',
         credentials: 'include',
       }),
@@ -45,6 +65,7 @@ const notificationApi = baseApi.injectEndpoints({
 
 export const {
   useGetAllNotificationsQuery,
+  useGetNotificationByIdQuery,
   useMarkAsDoneMutation,
   useDeleteNotificationsMutation,
 } = notificationApi;
