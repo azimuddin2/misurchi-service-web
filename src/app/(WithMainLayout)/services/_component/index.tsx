@@ -17,6 +17,7 @@ import FollowButton from '@/components/modules/follow-button';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import Spinner from '@/components/shared/Spinner';
 
 type Props = {
   serviceId: string;
@@ -24,7 +25,7 @@ type Props = {
 
 const ServiceDetails = ({ serviceId }: Props) => {
   const router = useRouter();
-  const { data, refetch } = useGetServiceByIdQuery(serviceId);
+  const { data, refetch, isLoading } = useGetServiceByIdQuery(serviceId);
   const service: TService | undefined = data?.data;
   const vendorId = service?.vendor._id as string;
   const userId = service?.user._id as string;
@@ -59,6 +60,10 @@ const ServiceDetails = ({ serviceId }: Props) => {
   const handleMessageVendor = () => {
     router.push(`/user/message?userId=${userId}&serviceId=${serviceId}`);
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="my-20">
