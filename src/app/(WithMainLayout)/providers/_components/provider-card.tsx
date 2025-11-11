@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AppButton } from '@/components/shared/app-button';
 import coverImg from '@/assets/images/cover-img.png';
 import { useGetAllReviewByUserQuery } from '@/redux/features/review/reviewApi';
-import Spinner from '@/components/shared/Spinner';
 import { TReview } from '@/types/review.type';
 
 type ProviderCardProps = {
@@ -16,7 +15,7 @@ type ProviderCardProps = {
 };
 
 const ProviderCard = ({ vendor }: ProviderCardProps) => {
-  const { data, isLoading } = useGetAllReviewByUserQuery({
+  const { data } = useGetAllReviewByUserQuery({
     vendorId: vendor._id,
   });
 
@@ -29,10 +28,6 @@ const ProviderCard = ({ vendor }: ProviderCardProps) => {
       ? reviews.reduce((acc, review) => acc + (review.rating || 0), 0) /
         reviewCount
       : 0;
-
-  if (isLoading) {
-    return <Spinner />;
-  }
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg hover:scale-[1.01] rounded-xl p-0">

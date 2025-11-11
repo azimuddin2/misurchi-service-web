@@ -12,6 +12,7 @@ import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { useEffect, useState } from 'react';
 
 const Pricing = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -19,14 +20,28 @@ const Pricing = () => {
   const subscriptionPlans = data?.data || [];
 
   const router = useRouter();
-  const [addSubPayment, { isLoading: isPaying }] = useAddSubPaymentMutation();
+  const [addSubPayment] = useAddSubPaymentMutation();
+  const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
   const handleSubscribe: SubmitHandler<FieldValues> = async (plan) => {
-    try {
-      const payload: any = {
-        plan: plan._id,
-      };
+    // 🧭 If user not logged in → redirect to login with "redirect" param
+    if (!user?.email) {
+      router.push(`/login?redirectPath=/pricing`);
+      return;
+    }
 
+    // 🚫 Only vendors can subscribe
+    if (user?.role !== 'vendor') {
+      alert('Only vendors can subscribe to a plan.');
+      return;
+    }
+
+    try {
+      setLoadingPlanId(plan._id); // ✅ show loading only for clicked plan
+
+      const payload = { plan: plan._id };
+
+      // 🆓 Free plan
       if (plan.cost === 0) {
         const res = await addSubPayment(payload).unwrap();
         if (res.success) {
@@ -36,13 +51,16 @@ const Pricing = () => {
         return;
       }
 
-      // Paid plan → Stripe checkout
+      // 💳 Paid plan → Stripe checkout redirect URL
       const res = await addSubPayment(payload).unwrap();
       if (res?.data && typeof res.data === 'string') {
         window.location.href = res.data;
       }
     } catch (err: any) {
-      console.error('Subscription error:', err);
+      console.error('❌ Subscription error:', err);
+      alert('Something went wrong while processing your subscription.');
+    } finally {
+      setLoadingPlanId(null); // ✅ reset loading after specific button completes
     }
   };
 
@@ -74,7 +92,7 @@ const Pricing = () => {
                 {plan.description}
               </p>
 
-              <div className="bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white text-center py-4 rounded-md mb-8">
+              <div className="bg-gradient-to-t to-green-800 from-green-500/70 text-white text-center py-4 rounded-md mb-8">
                 {plan.cost === 0 ? (
                   <span className="text-3xl font-bold">Free</span>
                 ) : (
@@ -173,14 +191,21 @@ const Pricing = () => {
 
               <button
                 onClick={() => handleSubscribe(plan)}
-                disabled={!user?.email || user?.role !== 'vendor' || isPaying}
-                className={`w-full text-center cursor-pointer border border-gray-300 rounded-md py-3 px-4 font-medium transition-colors ${
-                  !user?.email || user?.role !== 'vendor' || isPaying
+                disabled={loadingPlanId === plan._id}
+                className={`w-full text-center border border-gray-300 rounded-md py-3 px-4 font-medium transition-colors ${
+                  loadingPlanId === plan._id
                     ? 'opacity-50 cursor-not-allowed'
                     : 'hover:bg-gray-50'
                 }`}
               >
-                Get Started <ArrowRight className="inline-block ml-2 h-4 w-4" />
+                {loadingPlanId === plan._id ? (
+                  'Processing...'
+                ) : (
+                  <>
+                    Get Started{' '}
+                    <ArrowRight className="inline-block ml-2 h-4 w-4" />
+                  </>
+                )}
               </button>
             </div>
           ))}

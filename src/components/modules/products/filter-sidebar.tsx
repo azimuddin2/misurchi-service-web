@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { X, Filter, CircleX } from 'lucide-react';
@@ -10,6 +9,8 @@ import { useGetAllProductTypeQuery } from '@/redux/features/productType/productT
 
 export default function FilterSidebar() {
   const [price, setPrice] = useState<[number, number]>([0, 5000]);
+  const [minPriceInput, setMinPriceInput] = useState<string>('');
+  const [maxPriceInput, setMaxPriceInput] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRecommended, setSelectedRecommended] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -18,33 +19,6 @@ export default function FilterSidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  // Utility to update URL query params
-  const updateQueryParam = (key: string, values: string[]) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    // remove old values
-    params.delete(key);
-
-    // add new values
-    values.forEach((v) => params.append(key, v));
-
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-
-  const toggleSelection = (
-    value: string,
-    selected: string[],
-    setSelected: (vals: string[]) => void,
-    queryKey: string,
-  ) => {
-    const newSelected = selected.includes(value)
-      ? selected.filter((v) => v !== value)
-      : [...selected, value];
-
-    setSelected(newSelected);
-    updateQueryParam(queryKey, newSelected);
-  };
 
   const recommendedOptions = [
     'All',
@@ -67,9 +41,92 @@ export default function FilterSidebar() {
   const { data } = useGetAllProductTypeQuery({});
   const productTypes = data?.data || [];
 
+  // ----------------------
+  // Update URL Query Params for multi-select
+  // ----------------------
+  const updateQueryParam = (key: string, values: string[] | string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (!values || (Array.isArray(values) && values.length === 0)) {
+      params.delete(key);
+    } else {
+      params.delete(key);
+      if (Array.isArray(values)) {
+        params.set(key, values.join(',')); // multi-select stored as comma-separated
+      } else {
+        params.set(key, values);
+      }
+    }
+
+    params.set('page', '1'); // reset page on any filter change
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  // ----------------------
+  // Toggle multi-select
+  // ----------------------
+  const toggleSelection = (
+    value: string,
+    selected: string[],
+    setSelected: (vals: string[]) => void,
+    queryKey: string,
+  ) => {
+    let newSelected: string[];
+
+    if (value === 'All') {
+      newSelected = [];
+    } else {
+      if (selected.includes(value)) {
+        newSelected = selected.filter((v) => v !== value);
+      } else {
+        newSelected = [...selected.filter((v) => v !== 'All'), value];
+      }
+    }
+
+    setSelected(newSelected);
+    updateQueryParam(queryKey, newSelected.length > 0 ? newSelected : null);
+  };
+
+  // ----------------------
+  // Apply Price Filter
+  // ----------------------
+  const handleApplyPrice = () => {
+    if (
+      minPriceInput !== '' &&
+      maxPriceInput !== '' &&
+      Number(minPriceInput) <= Number(maxPriceInput)
+    ) {
+      updateQueryParam('minPrice', minPriceInput);
+      updateQueryParam('maxPrice', maxPriceInput);
+      setPrice([Number(minPriceInput), Number(maxPriceInput)]);
+    }
+  };
+
+  // ----------------------
+  // Initialize from URL
+  // ----------------------
+  useEffect(() => {
+    const sp = Object.fromEntries(Array.from(searchParams.entries()));
+
+    // Price
+    if (sp.minPrice && sp.maxPrice) {
+      setMinPriceInput(sp.minPrice);
+      setMaxPriceInput(sp.maxPrice);
+      setPrice([Number(sp.minPrice), Number(sp.maxPrice)]);
+    }
+
+    // Multi-select fields
+    setSelectedProducts(sp.productType?.split(',') || []);
+    setSelectedRecommended(sp.recommended?.split(',') || []);
+    setSelectedDiscounts(sp.discount?.split(',') || []);
+  }, [searchParams]);
+
+  // ----------------------
+  // Render
+  // ----------------------
   return (
     <>
-      {/* Mobile toggle */}
+      {/* Mobile Toggle */}
       <div className="md:hidden mb-4">
         <Button
           variant="outline"
@@ -83,12 +140,8 @@ export default function FilterSidebar() {
 
       {/* Sidebar */}
       <div
-        className={`
-          fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-lg transform 
-          transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:relative md:translate-x-0 md:shadow-none md:w-64 md:block
-        `}
+        className={`fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:shadow-none md:w-64 md:block`}
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-2 p-4 border-b">
@@ -162,24 +215,48 @@ export default function FilterSidebar() {
             ))}
           </div>
 
-          {/* Price */}
+          {/* Price Range */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3">Price</h2>
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span>${price[0]}</span>
-              <span>${price[1]}</span>
+            <h2 className="text-lg font-semibold mb-3">Price Range</h2>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                placeholder="Min"
+                value={minPriceInput}
+                onChange={(e) => setMinPriceInput(e.target.value)}
+                className="border rounded px-2 py-1 w-1/2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-900"
+              />
+              <span className="text-gray-400">-</span>
+              <input
+                type="number"
+                placeholder="Max"
+                value={maxPriceInput}
+                onChange={(e) => setMaxPriceInput(e.target.value)}
+                className="border rounded px-2 py-1 w-1/2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-900"
+              />
             </div>
-            <Slider
-              max={5000}
-              step={5}
-              value={price}
-              onValueChange={(value: any) => {
-                const priceRange = `${value[0]}-${value[1]}`;
-                setPrice(value);
-                updateQueryParam('price', [priceRange]);
+            <Button
+              onClick={() => {
+                if (
+                  minPriceInput !== '' &&
+                  maxPriceInput !== '' &&
+                  Number(minPriceInput) <= Number(maxPriceInput)
+                ) {
+                  // **Send separately to backend**
+                  updateQueryParam('minPrice', minPriceInput);
+                  updateQueryParam('maxPrice', maxPriceInput);
+                  setPrice([Number(minPriceInput), Number(maxPriceInput)]);
+                }
               }}
-              className="w-full"
-            />
+              className="mt-3 w-full bg-sky-900 hover:bg-sky-950 text-white text-sm rounded-sm"
+              disabled={
+                minPriceInput === '' ||
+                maxPriceInput === '' ||
+                Number(minPriceInput) > Number(maxPriceInput)
+              }
+            >
+              Apply
+            </Button>
           </div>
 
           {/* Discount */}

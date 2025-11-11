@@ -73,7 +73,7 @@ export default function Header() {
         </Link>
       )}
 
-      {user?.role === 'user' && (
+      {(!user || user?.role === 'user') && (
         <div
           className="relative cursor-pointer"
           onClick={() => router.push('/cart')}

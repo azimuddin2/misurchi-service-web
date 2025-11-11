@@ -28,11 +28,10 @@ const productApi = baseApi.injectEndpoints({
         if (!query) query = {};
 
         // ===== Price range =====
-        if (query.price) {
-          const [minPrice, maxPrice] = query.price.toString().split('-');
-          if (minPrice) params.append('minPrice', minPrice);
-          if (maxPrice) params.append('maxPrice', maxPrice);
-        }
+        if (query.minPrice)
+          params.append('minPrice', query.minPrice.toString());
+        if (query.maxPrice)
+          params.append('maxPrice', query.maxPrice.toString());
 
         // ===== Discount =====
         if (query.discount) {

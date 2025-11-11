@@ -51,7 +51,10 @@ const UserProfile = () => {
       lastName: '',
       email: '',
       phone: '',
-      location: '',
+      location: {
+        streetAddress: '',
+        coordinates: { lat: 0, lng: 0 },
+      },
     },
   });
 
@@ -74,35 +77,36 @@ const UserProfile = () => {
   } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    const formData = new FormData();
+    console.log(data);
+    // const formData = new FormData();
 
-    // Backend expects JSON string for other fields
-    formData.append('data', JSON.stringify(data));
+    // // Backend expects JSON string for other fields
+    // formData.append('data', JSON.stringify(data));
 
-    // Append profile image(s)
-    imageFiles.forEach((file) => {
-      formData.append('profile', file);
-    });
+    // // Append profile image(s)
+    // imageFiles.forEach((file) => {
+    //   formData.append('profile', file);
+    // });
 
-    // Append cover image(s)
-    coverImageFiles.forEach((file) => {
-      formData.append('coverImage', file);
-    });
+    // // Append cover image(s)
+    // coverImageFiles.forEach((file) => {
+    //   formData.append('coverImage', file);
+    // });
 
-    const toastId = toast.loading('Updating Profile...');
-    try {
-      const res = await updateUserProfile({
-        email: email,
-        body: formData,
-      }).unwrap();
+    // const toastId = toast.loading('Updating Profile...');
+    // try {
+    //   const res = await updateUserProfile({
+    //     email: email,
+    //     body: formData,
+    //   }).unwrap();
 
-      toast.success(res.message || 'Profile update successfully');
-      refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update profile');
-    } finally {
-      toast.dismiss(toastId);
-    }
+    //   toast.success(res.message || 'Profile update successfully');
+    //   refetch();
+    // } catch (error: any) {
+    //   toast.error(error?.data?.message || 'Failed to update profile');
+    // } finally {
+    //   toast.dismiss(toastId);
+    // }
   };
 
   if (isLoading) {
@@ -287,15 +291,19 @@ const UserProfile = () => {
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    {/* Input */}
                     <Input
                       type="text"
                       placeholder="Enter your location"
                       {...field}
-                      value={field.value || ''}
+                      value={field.value?.streetAddress || ''}
+                      onChange={(e) =>
+                        form.setValue('location', {
+                          ...field.value,
+                          streetAddress: e.target.value,
+                        })
+                      }
                       className="bg-[#f5f5f5] py-6 pr-10 border-none rounded-sm"
                     />
-                    {/* Icon */}
                     <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                   </div>
                 </FormControl>
@@ -305,7 +313,10 @@ const UserProfile = () => {
           />
 
           {/* Google Map Preview */}
-          <LocationMap location={form.watch('location')} />
+          <LocationMap
+            streetAddress={form.watch('location.streetAddress') || ''}
+            coordinates={form.watch('location.coordinates') || null}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
             {/* Submit Button */}

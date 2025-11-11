@@ -64,39 +64,53 @@ const Banner = () => {
       </div>
 
       {/* Marquee Footer */}
-      <div className="bg-[#052F4A] text-white py-4 w-full font-semibold tracking-wide overflow-hidden">
-        <div className="animate-marquee whitespace-nowrap text-base sm:text-lg md:text-xl">
-          {Array(12)
-            .fill(
-              <>
-                CRYSTAL CLEANERS{' '}
-                <span className="text-[#FF7D00] text-2xl mx-2">•</span>
-              </>,
-            )
-            .map((item, i) => (
-              <span key={i}>{item}</span>
+      <div className="w-full overflow-hidden bg-[#052F4A] py-4 relative">
+        <div className="marquee flex">
+          {/** Duplicate content for seamless scroll */}
+          {Array(2)
+            .fill(0)
+            .map((_, idx) => (
+              <div key={idx} className="flex whitespace-nowrap">
+                {Array(12)
+                  .fill(0)
+                  .map((_, i) => (
+                    <span
+                      key={i}
+                      className="flex items-center mx-4 text-base sm:text-lg md:text-xl font-semibold text-white"
+                    >
+                      CRYSTAL CLEANERS
+                      <span className="text-[#FF7D00] text-2xl mx-2">•</span>
+                    </span>
+                  ))}
+              </div>
             ))}
         </div>
 
         <style jsx>{`
-          .animate-marquee {
-            display: inline-block;
+          .marquee {
+            display: flex;
+            width: max-content;
             animation: marquee 60s linear infinite;
-            white-space: nowrap;
           }
 
           @keyframes marquee {
             0% {
-              transform: translateX(100%);
+              transform: translateX(0%);
             }
             100% {
-              transform: translateX(-100%);
+              transform: translateX(-50%);
+            }
+          }
+
+          @media (max-width: 1024px) {
+            .marquee {
+              animation-duration: 40s;
             }
           }
 
           @media (max-width: 640px) {
-            .animate-marquee {
-              animation-duration: 25s; /* slower on small screens */
+            .marquee {
+              animation-duration: 25s;
             }
           }
         `}</style>

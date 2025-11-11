@@ -156,7 +156,7 @@ export default function About() {
           <div className="mt-8 space-y-2">
             <div className="text-xl text-gray-500">Simple & Fast</div>
             <Link
-              href="/join"
+              href="/user-role"
               className="text-gray-800 font-bold underline underline-offset-8 text-3xl"
             >
               Join Us In Our Mission
