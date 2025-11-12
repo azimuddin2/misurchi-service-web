@@ -19,11 +19,12 @@ import { Progress } from '@/components/ui/progress';
 import { TService } from '@/types/service.type';
 import { toast } from 'sonner';
 import {
-  useAddServiceMutation,
   useGetServiceByIdQuery,
+  useUpdateServiceMutation,
 } from '@/redux/features/service/serviceApi';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { useRouter } from 'next/navigation';
 
 const steps = [
   {
@@ -51,6 +52,7 @@ type Props = {
 };
 
 const UpdateService = ({ serviceId }: Props) => {
+  const router = useRouter();
   const user = useAppSelector(selectCurrentUser);
   const [currentStep, setCurrentStep] = useState(1);
   const [serviceData, setServiceData] = useState<any>({});
@@ -95,7 +97,7 @@ const UpdateService = ({ serviceId }: Props) => {
     }
   }, [service]);
 
-  const [addService] = useAddServiceMutation();
+  const [updateService] = useUpdateServiceMutation();
 
   //Todo: Database Save data
   const handleDataSave = async () => {
@@ -114,18 +116,23 @@ const UpdateService = ({ serviceId }: Props) => {
       formData.append('images', file);
     });
 
-    // const toastId = toast.loading('Adding service...');
+    console.log(formData);
 
-    // try {
-    //     const res = await addService(formData).unwrap();
-    //     console.log(res);
-    //     toast.success(res.message || 'Service added successfully');
-    //     // router.push(`/vendor/manage-offering/view-product/${res.data?._id}`);
-    // } catch (error: any) {
-    //     toast.error(error?.data?.message || 'Failed to add service');
-    // } finally {
-    //     toast.dismiss(toastId);
-    // }
+    const toastId = toast.loading('Updating service...');
+
+    try {
+      const res = await updateService({
+        id: service?._id as string,
+        body: formData,
+      }).unwrap();
+      console.log(res);
+      toast.success(res.message || 'Service updated successfully');
+      router.push(`/vendor/manage-offering/view-service/${res.data?._id}`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to add service');
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   return (

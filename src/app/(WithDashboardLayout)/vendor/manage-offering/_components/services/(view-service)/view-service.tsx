@@ -28,7 +28,7 @@ const ViewService = ({ serviceId }: Props) => {
   // When data is loaded, set the first image as default
   useEffect(() => {
     if (service?.images?.length) {
-      setSelectedImage(service.images[0].url);
+      setSelectedImage(service.images[0]?.url);
     }
   }, [service]);
 
@@ -72,14 +72,17 @@ const ViewService = ({ serviceId }: Props) => {
                 key={index}
                 type="button"
                 className={`border-2 rounded-md p-1 transition ${
-                  selectedImage === image.url
+                  selectedImage === image?.url
                     ? 'border-green-800'
                     : 'border-gray-300'
                 }`}
-                onClick={() => setSelectedImage(image.url)}
+                onClick={() => setSelectedImage(image?.url)}
               >
                 <Image
-                  src={image.url}
+                  src={
+                    image?.url ||
+                    'https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg'
+                  }
                   alt={`Thumbnail ${index + 1}`}
                   width={100}
                   height={100}

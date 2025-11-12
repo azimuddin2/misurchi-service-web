@@ -1,19 +1,15 @@
 'use client';
 
-import type React from 'react';
 import { useEffect, useState } from 'react';
-import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectContent,
+  SelectItem,
 } from '@/components/ui/select';
 import {
   ArrowRight,
@@ -22,7 +18,6 @@ import {
   PlusCircle,
   Edit,
   Trash2,
-  DollarSign,
   CheckCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -34,13 +29,17 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { AppButton } from '@/components/shared/app-button';
-import { Badge } from '@/components/ui/badge';
-import { ServiceStatus } from '@/constants/service';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AppButton } from '@/components/shared/app-button';
+import { ServiceStatus } from '@/constants/service';
 import { TImage, TServicePricing } from '@/types/service.type';
 import { useGetAllServiceTypeQuery } from '@/redux/features/serviceType/serviceTypeApi';
+import { Badge } from '@/components/ui/badge';
 
+// ---------------- Schema ----------------
 const serviceSchema = z.object({
   name: z.string({ required_error: 'Service name is required' }),
   type: z.string({ required_error: 'Service type is required' }),
@@ -49,267 +48,214 @@ const serviceSchema = z.object({
     price: z.string({ required_error: 'Price is required' }),
     discount: z.string().optional(),
   }),
-  status: z.enum([...ServiceStatus] as [string, ...string[]], {
-    required_error: 'Product status is required',
-  }),
+  status: z.enum([...ServiceStatus] as [string, ...string[]]),
   description: z
-    .string({ required_error: 'Description is required' })
+    .string()
     .min(100, 'Description must be at least 100 characters'),
 });
 
+// ---------------- Component ----------------
 interface ServiceDetailsStepProps {
   data: any;
   onNext: (data: any) => void;
 }
 
 export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
-  const [deleteKey, setDeleteKey] = useState<string[]>([]);
-  const [images, setImages] = useState<string[]>(data?.images || []);
-  const [imageFiles, setImageFiles] = useState<File[] | []>(
-    data?.imageFiles || [],
-  );
-  const [savedServices, setSavedServices] = useState<TServicePricing[]>(
-    data?.savedServices || [],
-  );
+  const [images, setImages] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [savedServices, setSavedServices] = useState<TServicePricing[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  // Duration options in minutes
-  const durations = Array.from({ length: 48 }, (_, i) => (i + 1) * 30);
+  const [deleteKey, setDeleteKey] = useState<string[]>([]);
 
   const { data: serviceTypeData } = useGetAllServiceTypeQuery({});
+  const durations = Array.from({ length: 48 }, (_, i) => (i + 1) * 30);
 
-  // React Hook Form initialization
   const form = useForm({
     resolver: zodResolver(serviceSchema),
     defaultValues: {
-      name: data?.name,
-      type: data?.type,
-      pricing: {
-        duration: data?.pricing?.duration,
-        price: data?.pricing?.price,
-        discount: data?.pricing?.discount,
-      },
-      status: data?.status,
-      description: data?.description,
+      name: '',
+      type: '',
+      pricing: { duration: '30 min', price: '', discount: 'none' },
+      status: ServiceStatus[0],
+      description: '',
     },
   });
 
-  // Pre-fill form when data changes
+  // ---------------- Prefill existing data ----------------
   useEffect(() => {
-    if (data) {
-      form.reset({
-        name: data.name || '',
-        type: data.type || '',
-        description: data.description || '',
-        status: data?.status,
-        pricing: {
-          duration: data.pricing?.duration || '',
-          price: data.pricing?.price?.toString() || '', // convert number → string
-          discount: data.pricing?.discount?.toString() || '',
-        },
-      });
-
-      const imageUrls =
-        data.images?.map((img: { url: string; key: string }) => img.url) || [];
-      setImages(imageUrls);
-    }
+    if (!data) return;
+    form.reset({
+      name: data.name || '',
+      type: data.type || '',
+      description: data.description || '',
+      status: data.status || ServiceStatus[0],
+      pricing: {
+        duration: data.pricing?.duration || '30 min',
+        price: data.pricing?.price?.toString() || '',
+        discount: data.pricing?.discount || 'none',
+      },
+    });
+    setImages(data.images?.map((img: TImage) => img?.url) || []);
+    setImageFiles(data.imageFiles || []);
+    setSavedServices(data.savedServices || []);
   }, [data, form]);
 
-  // Calculate final price after discount
+  // ---------------- Helper ----------------
   const calculateFinalPrice = (price: string, discount: string) => {
-    const numPrice = Number.parseFloat(price) || 0;
-    if (!discount || discount === 'none') return numPrice.toFixed(2);
-
-    const discountPercent = Number.parseInt(discount.replace('%', '')) || 0;
+    const numPrice = parseFloat(price) || 0;
+    if (!discount || discount === 'none')
+      return {
+        original: numPrice.toFixed(2),
+        discount: '0.00',
+        final: numPrice.toFixed(2),
+      };
+    const discountPercent = parseInt(discount.replace('%', '')) || 0;
     const discountAmount = (numPrice * discountPercent) / 100;
     const finalPrice = numPrice - discountAmount;
     return {
       original: numPrice.toFixed(2),
       discount: discountAmount.toFixed(2),
       final: finalPrice.toFixed(2),
-      percentage: discountPercent,
     };
   };
 
-  // Save or update a pricing entry
+  // ---------------- Service Entry ----------------
   const saveServiceEntry = () => {
-    const duration = form.getValues('pricing.duration');
-    const price = form.getValues('pricing.price');
-    const discount = form.getValues('pricing.discount') || 'none';
-
-    if (!duration || !price || Number.parseFloat(price) <= 0) {
+    const { duration, price, discount } = form.getValues('pricing');
+    if (!price || parseFloat(price) <= 0) {
       form.setError('pricing.price', { message: 'Please enter a valid price' });
       return;
     }
-
-    const priceCalc = calculateFinalPrice(price, discount);
-    const finalPrice =
-      typeof priceCalc === 'string' ? priceCalc : priceCalc.final;
-
+    const { final } = calculateFinalPrice(price, discount || 'none');
     const newEntry: TServicePricing = {
       id: editingId || Date.now().toString(),
       duration,
       price,
-      discount,
-      finalPrice,
+      discount: discount || 'none',
+      finalPrice: final,
     };
-
     if (editingId) {
-      // Update existing entry
       setSavedServices((prev) =>
-        prev.map((entry) => (entry.id === editingId ? newEntry : entry)),
+        prev.map((e) => (e.id === editingId ? newEntry : e)),
       );
       setEditingId(null);
-    } else {
-      // Add new entry
-      setSavedServices((prev) => [...prev, newEntry]);
-    }
+    } else setSavedServices((prev) => [...prev, newEntry]);
 
-    // Reset form pricing fields
     form.setValue('pricing.duration', '30 min');
-    form.setValue('pricing.discount', '');
+    form.setValue('pricing.discount', 'none');
   };
 
-  // Edit a saved pricing entry
   const editServiceEntry = (entry: TServicePricing) => {
-    form.setValue('pricing.duration', entry.duration);
-    form.setValue('pricing.price', entry.price);
-    form.setValue('pricing.discount', entry.discount);
+    form.setValue('pricing', {
+      duration: entry.duration,
+      price: entry.price,
+      discount: entry.discount,
+    });
     setEditingId(entry.id);
   };
 
-  // Delete a saved pricing entry
-  const deleteServiceEntry = (id: string) => {
-    setSavedServices((prev) => prev.filter((entry) => entry.id !== id));
+  const deleteServiceEntry = (id: string) =>
+    setSavedServices((prev) => prev.filter((e) => e.id !== id));
+
+  // ---------------- Image Upload ----------------
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const arrFiles = Array.from(files);
+    setImageFiles((prev) => [...prev, ...arrFiles]);
+    arrFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result)
+          setImages((prev) => [...prev, event.target!.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
-  // Handle image upload and preview
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      setImageFiles((prev) => [...prev, ...fileArray]);
-
-      // Generate image preview
-      fileArray.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target?.result) {
-            setImages((prev) => [...prev, e.target!.result as string]);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  };
-
-  // Remove uploaded image by index
   const removeImage = (index: number) => {
     const imageUrl = images[index];
-
-    // Check if the image exists in backend images
     const existingImage = data?.images?.find(
-      (img: TImage) => img.url === imageUrl,
+      (img: TImage) => img?.url === imageUrl,
     );
-    if (existingImage) {
-      // Add the key to deleteKeys
-      setDeleteKey((prev) => [...prev, existingImage.key]);
-    }
-
-    // Remove from preview and files
+    if (existingImage) setDeleteKey((prev) => [...prev, existingImage.key]);
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle form submission
+  // ---------------- Submit ----------------
   const onSubmit: SubmitHandler<FieldValues> = (formData) => {
     let finalSavedServices = [...savedServices];
-
-    // Auto-save pricing if none exist
-    if (
-      savedServices.length === 0 &&
-      formData.pricing.price &&
-      Number.parseFloat(formData.pricing.price) > 0
-    ) {
-      const priceCalc = calculateFinalPrice(
+    if (savedServices.length === 0 && formData.pricing.price) {
+      const { final } = calculateFinalPrice(
         formData.pricing.price,
         formData.pricing.discount || 'none',
       );
-      const finalPrice =
-        typeof priceCalc === 'string' ? priceCalc : priceCalc.final;
-
-      const autoSavedEntry: TServicePricing = {
-        id: Date.now().toString(),
-        duration: formData.pricing.duration,
-        price: formData.pricing.price,
-        discount: formData.pricing.discount || 'none',
-        finalPrice,
-      };
-
-      finalSavedServices = [autoSavedEntry];
+      finalSavedServices = [
+        {
+          id: Date.now().toString(),
+          duration: formData.pricing.duration,
+          price: formData.pricing.price,
+          discount: formData.pricing.discount || 'none',
+          finalPrice: final,
+        },
+      ];
     }
-
-    // Pass all data to parent component
     onNext({
       ...formData,
       images,
       imageFiles,
-      deleteKey, // include deleted keys for backend
+      deleteKey,
       savedServices: finalSavedServices,
     });
   };
 
-  // Watch price and discount to show price preview
   const watchedPrice = form.watch('pricing.price');
   const watchedDiscount = form.watch('pricing.discount');
   const pricePreview = watchedPrice
     ? calculateFinalPrice(watchedPrice, watchedDiscount || 'none')
     : null;
 
+  // ---------------- UI ----------------
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Service Images */}
+        {/* Images */}
         <div className="space-y-4">
-          <FormLabel className="text-base font-medium">
-            Service Images
-          </FormLabel>
+          <FormLabel>Service Images</FormLabel>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {images.map((image, index) => (
+            {images.map((img, idx) => (
               <motion.div
-                key={index}
+                key={idx}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="relative group"
               >
                 <img
-                  src={image || '/placeholder.svg'}
-                  alt={`Service ${index + 1}`}
-                  className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                  src={img}
+                  alt={`Service ${idx}`}
+                  className="w-full h-24 object-cover rounded-lg border"
                 />
                 <button
                   type="button"
-                  onClick={() => removeImage(index)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => removeImage(idx)}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </motion.div>
             ))}
-            {/* Image upload input */}
-            <div className="relative w-full h-24 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 transition-colors">
+            <div className="relative w-full h-24 border-2 border-dashed rounded-lg">
               <input
                 type="file"
                 multiple
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="text-center">
-                  <Upload className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-                  <span className="text-xs text-gray-500">Add Image</span>
-                </div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <Upload className="w-6 h-6 text-gray-400" />
+                <span className="text-xs text-gray-500">Add Image</span>
               </div>
             </div>
           </div>
@@ -343,23 +289,18 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="!text-gray-700 !text-sm font-medium">
-                Service Type
-              </FormLabel>
+              <FormLabel>Service Type</FormLabel>
               <FormControl>
                 <Select
-                  defaultValue={field.value || data?.type}
-                  onValueChange={field.onChange}
+                  value={field.value || undefined}
+                  onValueChange={(v) => field.onChange(v)}
                 >
                   <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
                     <SelectValue placeholder="Select service type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem disabled value="none">
-                      Please Select Type
-                    </SelectItem>
                     {serviceTypeData?.data?.map((type) => (
-                      <SelectItem key={type._id} value={`${type.name}`}>
+                      <SelectItem key={type._id} value={type.name}>
                         {type.name}
                       </SelectItem>
                     ))}
@@ -371,41 +312,32 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
           )}
         />
 
+        {/* Pricing */}
         <div className="shadow p-5 rounded-lg bg-white">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800">
-            Service Pricing
-          </h3>
-
-          {/* Duration */}
+          <h3 className="text-xl mb-3">Service Pricing</h3>
           <FormField
             control={form.control}
             name="pricing.duration"
             render={({ field }) => (
-              <FormItem className="mb-4">
-                <FormLabel className="!text-gray-700 !text-sm font-medium">
-                  Duration
-                </FormLabel>
+              <FormItem>
+                <FormLabel>Duration</FormLabel>
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={(v) => field.onChange(v)}
+                  >
                     <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
                       <SelectValue placeholder="Select duration" />
                     </SelectTrigger>
                     <SelectContent>
-                      {durations.map((mins) => {
-                        const hrs = mins / 60;
-                        return (
-                          <SelectItem
-                            key={mins}
-                            value={`${hrs >= 1 ? hrs + ' hr' : mins + ' min'}`}
-                          >
-                            {hrs >= 1
-                              ? hrs % 1 === 0
-                                ? `${hrs} ${hrs === 1 ? 'hour' : 'hours'}`
-                                : `${hrs} hours`
-                              : `${mins} minutes`}
-                          </SelectItem>
-                        );
-                      })}
+                      {durations.map((m) => (
+                        <SelectItem
+                          key={m}
+                          value={m >= 60 ? `${m / 60} hr` : `${m} min`}
+                        >
+                          {m >= 60 ? `${m / 60} hr` : `${m} min`}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -414,30 +346,20 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
             )}
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            {/* Price */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
             <FormField
               control={form.control}
               name="pricing.price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="!text-gray-700 !text-sm font-medium">
-                    Price
-                  </FormLabel>
+                  <FormLabel>Price</FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm pl-8"
                       {...field}
-                      value={field.value || ''}
                       type="number"
                       step="0.01"
-                      min="0"
                       placeholder="250.00"
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3ctext x='12' y='50%25' dy='0.35em' fontFamily='system-ui' fontSize='14' fill='%236b7280'%3e%24%3c/text%3e%3c/svg%3e")`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'left center',
-                      }}
+                      className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm"
                     />
                   </FormControl>
                   <FormMessage />
@@ -445,30 +367,26 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
               )}
             />
 
-            {/* Discount Percentage */}
             <FormField
               control={form.control}
               name="pricing.discount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="!text-gray-700 !text-sm font-medium">
-                    Discount Percentage
-                  </FormLabel>
+                  <FormLabel>Discount</FormLabel>
                   <FormControl>
                     <Select
                       value={field.value || 'none'}
-                      onValueChange={field.onChange}
+                      onValueChange={(v) => field.onChange(v)}
                     >
                       <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
                         <SelectValue placeholder="Select discount" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">No Discount</SelectItem>
-                        {/* Generate discounts from 5% to 100% in steps of 5 */}
                         {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map(
-                          (percent) => (
-                            <SelectItem key={percent} value={`${percent}%`}>
-                              {percent}% Off
+                          (p) => (
+                            <SelectItem key={p} value={`${p}%`}>
+                              {p}% Off
                             </SelectItem>
                           ),
                         )}
@@ -481,143 +399,94 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
             />
           </div>
 
-          {watchedPrice && Number.parseFloat(watchedPrice) > 0 && (
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg mb-4 border border-green-200">
-              <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Price Preview
-              </h4>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-600">Original Price:</span>
-                  <span className="font-medium">
-                    ${Number.parseFloat(watchedPrice).toFixed(2)}
-                  </span>
-                </div>
-                {watchedDiscount &&
-                  watchedDiscount !== 'none' &&
-                  typeof pricePreview === 'object' && (
-                    <>
-                      <div className="flex justify-between items-center text-sm text-red-600">
-                        <span>Discount ({watchedDiscount}):</span>
-                        <span>-${pricePreview?.discount}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-sm text-green-600">
-                        <span>You Save:</span>
-                        <span className="font-semibold">
-                          ${pricePreview?.discount}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                <div className="flex justify-between items-center font-bold text-lg text-green-800 border-t pt-2 mt-2">
-                  <span>Final Price:</span>
-                  <span>
-                    $
-                    {typeof pricePreview === 'string'
-                      ? pricePreview
-                      : pricePreview?.final}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
           <Button
             type="button"
             onClick={saveServiceEntry}
-            className="uppercase w-full text-[#000000] border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] p-5 cursor-pointer text-sm shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500 font-semibold hover:bg-gradient-to-t hover:to-[#c0eae5] hover:from-[#a8d5d0]"
+            className="mt-5 uppercase w-full text-[#000000] border-gray-800 bg-gradient-to-t to-[#d6fbf7] from-[#c0eae5] p-5 cursor-pointer text-sm shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500 font-semibold hover:bg-gradient-to-t hover:to-[#c0eae5] hover:from-[#a8d5d0]"
           >
             <PlusCircle className="w-4 h-4 mr-2" />
             {editingId ? 'Update Service' : 'Save Service'}
           </Button>
         </div>
 
+        {/* Saved Services */}
         {savedServices.length > 0 && (
           <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border border-green-200">
             <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
               Saved Service Options ({savedServices.length})
             </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full bg-white rounded-lg overflow-hidden shadow-sm">
-                <thead>
-                  <tr className="bg-gradient-to-r from-green-100 to-blue-100">
-                    <th className="text-left p-4 font-semibold text-gray-700">
-                      Duration
-                    </th>
-                    <th className="text-left p-4 font-semibold text-gray-700">
-                      Original Price
-                    </th>
-                    <th className="text-left p-4 font-semibold text-gray-700">
-                      Discount
-                    </th>
-                    <th className="text-left p-4 font-semibold text-gray-700">
-                      Final Price
-                    </th>
-                    <th className="text-left p-4 font-semibold text-gray-700">
-                      Actions
-                    </th>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gradient-to-r from-green-100 to-blue-100">
+                  <th className="text-left p-4 font-semibold text-gray-700">
+                    Duration
+                  </th>
+                  <th className="text-left p-4 font-semibold text-gray-700">
+                    Original Price
+                  </th>
+                  <th className="text-left p-4 font-semibold text-gray-700">
+                    Discount
+                  </th>
+                  <th className="text-left p-4 font-semibold text-gray-700">
+                    Final Price
+                  </th>
+                  <th className="text-left p-4 font-semibold text-gray-700">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {savedServices.map((entry, index) => (
+                  <tr
+                    key={entry.id}
+                    className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors`}
+                  >
+                    <td className="p-4 font-medium">{entry.duration}</td>
+                    <td className="p-4">
+                      ${Number.parseFloat(entry.price).toFixed(2)}
+                    </td>
+                    <td className="p-4">
+                      {entry.discount === 'none' ? (
+                        <Badge variant="outline">No Discount</Badge>
+                      ) : (
+                        <Badge
+                          variant="secondary"
+                          className="bg-red-100 text-red-700"
+                        >
+                          {entry.discount}
+                        </Badge>
+                      )}
+                    </td>
+                    <td className="p-4 font-bold text-green-700">
+                      ${entry.finalPrice}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => editServiceEntry(entry)}
+                          className="h-8 w-8 p-0 hover:bg-blue-100"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => deleteServiceEntry(entry.id)}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {savedServices.map((entry, index) => (
-                    <tr
-                      key={entry.id}
-                      className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors`}
-                    >
-                      <td className="p-4 font-medium">{entry.duration}</td>
-                      <td className="p-4">
-                        ${Number.parseFloat(entry.price).toFixed(2)}
-                      </td>
-                      <td className="p-4">
-                        {entry.discount === 'none' ? (
-                          <Badge variant="outline">No Discount</Badge>
-                        ) : (
-                          <Badge
-                            variant="secondary"
-                            className="bg-red-100 text-red-700"
-                          >
-                            {entry.discount}
-                          </Badge>
-                        )}
-                      </td>
-                      <td className="p-4 font-bold text-green-700">
-                        ${entry.finalPrice}
-                      </td>
-                      <td className="p-4">
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={() => editServiceEntry(entry)}
-                            className="h-8 w-8 p-0 hover:bg-blue-100"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={() => deleteServiceEntry(entry.id)}
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Total Options:</strong> {savedServices.length} pricing
-                configurations saved
-              </p>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 
@@ -634,18 +503,15 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                 {ServiceStatus.map((status) => (
                   <FormItem
                     key={status}
-                    className="flex items-center space-x-2 capitalize"
+                    className="flex items-center space-x-2"
                   >
                     <FormControl>
                       <Checkbox
                         checked={field.value === status}
-                        onCheckedChange={() => {
-                          // Set the selected status string
-                          field.onChange(status);
-                        }}
+                        onCheckedChange={() => field.onChange(status)}
                       />
                     </FormControl>
-                    <FormLabel className="font-normal">{status}</FormLabel>
+                    <FormLabel className="capitalize">{status}</FormLabel>
                   </FormItem>
                 ))}
               </div>

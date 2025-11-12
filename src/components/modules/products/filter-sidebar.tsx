@@ -30,7 +30,6 @@ export default function FilterSidebar() {
   ];
 
   const discounts = [
-    'All',
     '10% - 20% Off',
     '20% - 30% Off',
     '30% - 40% Off',

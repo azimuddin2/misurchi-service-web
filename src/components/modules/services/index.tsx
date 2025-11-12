@@ -9,6 +9,7 @@ import { TService } from '@/types/service.type';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useCallback, useEffect, useState } from 'react';
 import FilterSidebar from './filter-sidebar';
+import Image from 'next/image';
 
 const AllServices = () => {
   const router = useRouter();
@@ -18,37 +19,35 @@ const AllServices = () => {
     searchParams.get('searchTerm') || '',
   );
 
-  const page = searchParams.get('page') || 1;
-  const limit = searchParams.get('limit') || 9;
-  const searchTerm = searchParams.get('searchTerm') || '';
+  const page = searchParams.get('page') || '1';
+  const limit = searchParams.get('limit') || '9';
 
-  const type =
-    searchParams
-      .get('type')
-      ?.split(',')
-      .map((t) => decodeURIComponent(t)) || [];
+  // ✅ Get filters from URL
+  const queryParams = {
+    searchTerm: searchParams.get('searchTerm') || '',
+    type: searchParams.get('type') || '',
+    minPrice: searchParams.get('minPrice') || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+    minDiscount: searchParams.get('minDiscount') || '',
+    maxDiscount: searchParams.get('maxDiscount') || '',
+  };
 
   const { data, isLoading } = useGetAllServicesQuery({
     page,
     limit,
-    query: {
-      searchTerm,
-      type,
-    },
+    query: queryParams,
   });
 
   const services = data?.data || [];
   const meta = data?.meta || { totalPage: 1 };
 
+  // ✅ Update URL when filters change
   const updateSearchParams = useCallback(
     (newParams: Record<string, string | null | undefined>) => {
       const currentParams = new URLSearchParams(searchParams.toString());
       Object.entries(newParams).forEach(([key, value]) => {
-        if (!value) {
-          currentParams.delete(key);
-        } else {
-          currentParams.set(key, value);
-        }
+        if (!value) currentParams.delete(key);
+        else currentParams.set(key, value);
       });
       router.push(`?${currentParams.toString()}`);
     },
@@ -63,9 +62,7 @@ const AllServices = () => {
     setSearch(searchParams.get('searchTerm') || '');
   }, [searchParams]);
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  if (isLoading) return <Spinner />;
 
   return (
     <div className="mb-10">
@@ -73,7 +70,9 @@ const AllServices = () => {
         <div className="w-80">
           <FilterSidebar />
         </div>
+
         <div className="w-full lg:mb-0">
+          {/* ✅ Search box */}
           <div className="max-w-3xl relative">
             <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
               <input
@@ -92,15 +91,25 @@ const AllServices = () => {
             </div>
           </div>
 
+          {/* ✅ Services grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
             {services?.length > 0 ? (
               services?.map((service: TService) => (
                 <ServiceCard key={service._id} service={service} />
               ))
             ) : (
-              <p className="col-span-full h-screen text-center text-gray-500">
-                No listings found matching your search.
-              </p>
+              <div className="col-span-full h-screen text-center text-gray-500 my-20">
+                <Image
+                  src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                  alt="No results"
+                  width={100}
+                  height={100}
+                  className="mx-auto"
+                />
+                <p className="col-span-full text-center text-gray-500 capitalize">
+                  No service found matching your filters.
+                </p>
+              </div>
             )}
           </div>
         </div>

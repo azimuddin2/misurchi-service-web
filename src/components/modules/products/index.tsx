@@ -111,7 +111,9 @@ const AllProducts = () => {
                   height={100}
                   className="mx-auto"
                 />
-                <p>No product found matching your search.</p>
+                <p className="capitalize">
+                  No product found matching your search.
+                </p>
               </div>
             )}
           </div>
