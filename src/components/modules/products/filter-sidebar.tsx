@@ -9,8 +9,8 @@ import { useGetAllProductTypeQuery } from '@/redux/features/productType/productT
 
 export default function FilterSidebar() {
   const [price, setPrice] = useState<[number, number]>([0, 5000]);
-  const [minPriceInput, setMinPriceInput] = useState<string>('');
-  const [maxPriceInput, setMaxPriceInput] = useState<string>('');
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRecommended, setSelectedRecommended] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -41,7 +41,7 @@ export default function FilterSidebar() {
   const productTypes = data?.data || [];
 
   // ----------------------
-  // Update URL Query Params for multi-select
+  // Update URL Query Params
   // ----------------------
   const updateQueryParam = (key: string, values: string[] | string | null) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -49,7 +49,6 @@ export default function FilterSidebar() {
     if (!values || (Array.isArray(values) && values.length === 0)) {
       params.delete(key);
     } else {
-      params.delete(key);
       if (Array.isArray(values)) {
         params.set(key, values.join(',')); // multi-select stored as comma-separated
       } else {
@@ -57,7 +56,7 @@ export default function FilterSidebar() {
       }
     }
 
-    params.set('page', '1'); // reset page on any filter change
+    params.set('page', '1'); // reset page
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
@@ -90,14 +89,12 @@ export default function FilterSidebar() {
   // Apply Price Filter
   // ----------------------
   const handleApplyPrice = () => {
-    if (
-      minPriceInput !== '' &&
-      maxPriceInput !== '' &&
-      Number(minPriceInput) <= Number(maxPriceInput)
-    ) {
-      updateQueryParam('minPrice', minPriceInput);
-      updateQueryParam('maxPrice', maxPriceInput);
-      setPrice([Number(minPriceInput), Number(maxPriceInput)]);
+    if (minPrice && maxPrice && Number(minPrice) <= Number(maxPrice)) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('minPrice', minPrice);
+      params.set('maxPrice', maxPrice);
+      params.set('page', '1');
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     }
   };
 
@@ -109,8 +106,8 @@ export default function FilterSidebar() {
 
     // Price
     if (sp.minPrice && sp.maxPrice) {
-      setMinPriceInput(sp.minPrice);
-      setMaxPriceInput(sp.maxPrice);
+      setMinPrice(sp.minPrice);
+      setMaxPrice(sp.maxPrice);
       setPrice([Number(sp.minPrice), Number(sp.maxPrice)]);
     }
 
@@ -221,37 +218,24 @@ export default function FilterSidebar() {
               <input
                 type="number"
                 placeholder="Min"
-                value={minPriceInput}
-                onChange={(e) => setMinPriceInput(e.target.value)}
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
                 className="border rounded px-2 py-1 w-1/2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-900"
               />
               <span className="text-gray-400">-</span>
               <input
                 type="number"
                 placeholder="Max"
-                value={maxPriceInput}
-                onChange={(e) => setMaxPriceInput(e.target.value)}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
                 className="border rounded px-2 py-1 w-1/2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-900"
               />
             </div>
             <Button
-              onClick={() => {
-                if (
-                  minPriceInput !== '' &&
-                  maxPriceInput !== '' &&
-                  Number(minPriceInput) <= Number(maxPriceInput)
-                ) {
-                  // **Send separately to backend**
-                  updateQueryParam('minPrice', minPriceInput);
-                  updateQueryParam('maxPrice', maxPriceInput);
-                  setPrice([Number(minPriceInput), Number(maxPriceInput)]);
-                }
-              }}
+              onClick={handleApplyPrice}
               className="mt-3 w-full bg-sky-900 hover:bg-sky-950 text-white text-sm rounded-sm"
               disabled={
-                minPriceInput === '' ||
-                maxPriceInput === '' ||
-                Number(minPriceInput) > Number(maxPriceInput)
+                !minPrice || !maxPrice || Number(minPrice) > Number(maxPrice)
               }
             >
               Apply
