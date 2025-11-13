@@ -116,8 +116,6 @@ const UpdateService = ({ serviceId }: Props) => {
       formData.append('images', file);
     });
 
-    console.log(formData);
-
     const toastId = toast.loading('Updating service...');
 
     try {
@@ -125,6 +123,7 @@ const UpdateService = ({ serviceId }: Props) => {
         id: service?._id as string,
         body: formData,
       }).unwrap();
+
       console.log(res);
       toast.success(res.message || 'Service updated successfully');
       router.push(`/vendor/manage-offering/view-service/${res.data?._id}`);

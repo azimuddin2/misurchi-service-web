@@ -53,7 +53,7 @@ const MessageContainer = () => {
   const serviceId = searchParams.get('serviceId');
   const selectedUserIdFrom = searchParams.get('selectedUserId');
   const router = useRouter();
-  const [upload] = useMultipleFileUpload();
+  const [upload, isUploading, progress] = useMultipleFileUpload();
   const { register, handleSubmit, reset } = useForm();
 
   /* -------------------------------------------------------------------------- */
@@ -368,6 +368,7 @@ const MessageContainer = () => {
                     />
                     <div className="max-w-[75%] md:max-w-[60%]">
                       <ReceiverMsgCard
+                        date={message.createdAt}
                         message={message?.text}
                         files={
                           message?.imageUrl?.length ? message.imageUrl : null
@@ -383,6 +384,7 @@ const MessageContainer = () => {
                   >
                     <div className="max-w-[75%] md:max-w-[60%] flex flex-col items-end">
                       <OwnerMsgCard
+                        date={message.createdAt}
                         message={message?.text}
                         files={
                           message?.imageUrl?.length ? message.imageUrl : null
@@ -423,6 +425,16 @@ const MessageContainer = () => {
                       </button>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Progress Bar */}
+              {isUploading && (
+                <div className="w-full bg-gray-200 rounded h-2 my-2 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-t to-green-800 from-green-500/70 h-2 rounded transition-all duration-200"
+                    style={{ width: `${progress}%` }}
+                  />
                 </div>
               )}
 

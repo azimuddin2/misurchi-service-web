@@ -9,13 +9,26 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 interface OwnerMsgCardProps {
+  date: string;
   message: string;
   files?: any[];
 }
 
-const OwnerMsgCard = ({ message, files = [] }: OwnerMsgCardProps) => {
+const OwnerMsgCard = ({ date, message, files = [] }: OwnerMsgCardProps) => {
   const [imageUrl, setImageUrl] = useState('');
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
+
+  // 🔹 Format date to readable format
+  const formattedDate = date
+    ? new Date(date).toLocaleString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '';
 
   return (
     <>
@@ -67,6 +80,13 @@ const OwnerMsgCard = ({ message, files = [] }: OwnerMsgCardProps) => {
         {message && (
           <p className="break-words text-[15px] leading-relaxed tracking-wide">
             {message}
+          </p>
+        )}
+
+        {/* Formatted Date */}
+        {formattedDate && (
+          <p className="text-[11px] text-gray-300 mt-1 text-right">
+            {formattedDate}
           </p>
         )}
       </motion.div>
