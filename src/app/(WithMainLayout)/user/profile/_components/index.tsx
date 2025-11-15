@@ -78,35 +78,35 @@ const UserProfile = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
-    // const formData = new FormData();
+    const formData = new FormData();
 
-    // // Backend expects JSON string for other fields
-    // formData.append('data', JSON.stringify(data));
+    // Backend expects JSON string for other fields
+    formData.append('data', JSON.stringify(data));
 
-    // // Append profile image(s)
-    // imageFiles.forEach((file) => {
-    //   formData.append('profile', file);
-    // });
+    // Append profile image(s)
+    imageFiles.forEach((file) => {
+      formData.append('profile', file);
+    });
 
-    // // Append cover image(s)
-    // coverImageFiles.forEach((file) => {
-    //   formData.append('coverImage', file);
-    // });
+    // Append cover image(s)
+    coverImageFiles.forEach((file) => {
+      formData.append('coverImage', file);
+    });
 
-    // const toastId = toast.loading('Updating Profile...');
-    // try {
-    //   const res = await updateUserProfile({
-    //     email: email,
-    //     body: formData,
-    //   }).unwrap();
+    const toastId = toast.loading('Updating Profile...');
+    try {
+      const res = await updateUserProfile({
+        email: email,
+        body: formData,
+      }).unwrap();
 
-    //   toast.success(res.message || 'Profile update successfully');
-    //   refetch();
-    // } catch (error: any) {
-    //   toast.error(error?.data?.message || 'Failed to update profile');
-    // } finally {
-    //   toast.dismiss(toastId);
-    // }
+      toast.success(res.message || 'Profile update successfully');
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to update profile');
+    } finally {
+      toast.dismiss(toastId);
+    }
   };
 
   if (isLoading) {
