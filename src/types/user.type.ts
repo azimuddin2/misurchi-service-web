@@ -25,6 +25,11 @@ export interface IUser {
     expiresAt: Date;
     status: boolean;
   };
+  location?: {
+    type: string;
+    coordinates: number[]; // [lng, lat]
+    streetAddress?: string;
+  };
   isSubscribed: boolean;
   subscribed?: TSubscribed;
   _id: string;
@@ -53,5 +58,10 @@ export type TVendorUser = {
   coverImage?: string;
   createdAt: string;
   updatedAt: string;
+  location?: {
+    type: string;
+    coordinates: number[]; // [lng, lat]
+    streetAddress?: string;
+  };
   __v: number;
 };

@@ -40,6 +40,7 @@ import {
 } from '@/redux/features/vendor/vendorApi';
 import CoverImageUploader from '@/components/ui/core/CoverImageUploader';
 import CoverImagePreview from '@/components/ui/core/CoverImageUploader/CoverImagePreview';
+import LocationMap from '@/components/shared/location-map';
 
 const VendorProfile = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -69,6 +70,9 @@ const VendorProfile = () => {
       firstName: '',
       lastName: '',
       description: '',
+      latitude: '',
+      longitude: '',
+      streetAddress: '',
     },
   });
 
@@ -89,6 +93,14 @@ const VendorProfile = () => {
         firstName: vendorUser.firstName || '',
         lastName: vendorUser.lastName || '',
         description: vendorUser.description || '',
+
+        latitude: vendorUser.location?.coordinates?.[1]
+          ? String(vendorUser.location.coordinates[1])
+          : '',
+        longitude: vendorUser.location?.coordinates?.[0]
+          ? String(vendorUser.location.coordinates[0])
+          : '',
+        streetAddress: vendorUser.location?.streetAddress || '',
       });
       setCoverImagePreview(
         vendorUser.coverImage ? [vendorUser.coverImage] : [],
@@ -104,6 +116,8 @@ const VendorProfile = () => {
   const { register, setValue, control } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    console.log('Form Data:', data);
+
     const formData = new FormData();
 
     // Backend expects JSON string for other fields
@@ -136,7 +150,7 @@ const VendorProfile = () => {
   };
 
   const handleShare = () => {
-    navigator.share({
+    navigator?.share({
       title: vendorUser?.businessName,
       url: `/providers/${vendorUser?._id}`,
     });
@@ -299,7 +313,7 @@ const VendorProfile = () => {
             render={({ field }) => (
               <FormItem className="mb-5">
                 <FormLabel className="!text-gray-700 !text-base font-medium">
-                  Street
+                  Street Address
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -500,24 +514,26 @@ const VendorProfile = () => {
             )}
           />
 
-          <div className="mt-8 h-full rounded-lg overflow-hidden">
-            <div
-              style={{
-                width: '100%',
+          {/* Replace this static map */}
+          <div className="mt-8 space-y-2">
+            <label className="text-gray-700 text-base font-medium">
+              Business Location
+            </label>
+            <LocationMap
+              coordinates={
+                vendorUser?.location?.coordinates?.length === 2
+                  ? [
+                      vendorUser.location.coordinates[1], // lat
+                      vendorUser.location.coordinates[0], // lng
+                    ]
+                  : undefined
+              }
+              onLocationChange={({ lat, lng, address }) => {
+                setValue('latitude', String(lat));
+                setValue('longitude', String(lng));
+                setValue('streetAddress', address);
               }}
-            >
-              <iframe
-                width="100%"
-                height="400"
-                frameBorder="0"
-                scrolling="no"
-                src="https://maps.google.com/maps?width=100%25&amp;height=400&amp;hl=en&amp;q=123A,%20Washington,%20UK+(Soft%20Technology)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
-              >
-                <a href="https://www.gps.ie/collections/sports-gps/">
-                  Cycling gps
-                </a>
-              </iframe>
-            </div>
+            />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">

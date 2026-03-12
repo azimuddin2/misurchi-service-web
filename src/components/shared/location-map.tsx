@@ -1,86 +1,191 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import {
+  GoogleMap,
+  Marker,
+  useJsApiLoader,
+  Autocomplete,
+} from '@react-google-maps/api';
+import { useCallback, useRef, useState } from 'react';
+import { MapPin, Search, X } from 'lucide-react';
 
-type LocationMapProps = {
-  streetAddress?: string;
-  coordinates?: { lat: number; lng: number } | null;
-  zoom?: number;
-};
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
+interface LocationMapProps {
+  coordinates?: number[];
+  onLocationChange?: (data: {
+    lat: number;
+    lng: number;
+    address: string;
+  }) => void;
+  readonly?: boolean;
+}
 
 const LocationMap = ({
-  streetAddress,
   coordinates,
-  zoom = 14,
+  onLocationChange,
+  readonly = false,
 }: LocationMapProps) => {
-  const [mapUrl, setMapUrl] = useState('');
-  const [loading, setLoading] = useState(true);
+  const defaultCenter = {
+    lat: coordinates?.[0] ? Number(coordinates[0]) : 51.5074,
+    lng: coordinates?.[1] ? Number(coordinates[1]) : -0.1278,
+  };
 
-  // Your Google Maps Geocoding API key
-  const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const [markerPosition, setMarkerPosition] = useState(defaultCenter);
+  const [mapCenter, setMapCenter] = useState(defaultCenter); // 👈 new
+  const [selectedAddress, setSelectedAddress] = useState('');
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null); // 👈 new
 
-  useEffect(() => {
-    const generateMap = async () => {
-      setLoading(true);
+  console.log('LocationMap rendered with coordinates:', coordinates);
 
-      let lat = 0;
-      let lng = 0;
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+    libraries: ['places'],
+  });
 
-      if (coordinates?.lat && coordinates?.lng) {
-        lat = coordinates.lat;
-        lng = coordinates.lng;
-      } else if (
-        streetAddress &&
-        streetAddress.trim() !== '' &&
-        GOOGLE_MAPS_API_KEY
-      ) {
-        try {
-          const res = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-              streetAddress,
-            )}&key=${GOOGLE_MAPS_API_KEY}`,
-          );
-          const data = await res.json();
-          if (data.status === 'OK') {
-            lat = data.results[0].geometry.location.lat;
-            lng = data.results[0].geometry.location.lng;
-          }
-        } catch (err) {
-          console.error('Geocoding error:', err);
-        }
+  // 👈 map instance save korbe
+  const onLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+  }, []);
+
+  const onUnmount = useCallback(() => {
+    mapRef.current = null;
+  }, []);
+
+  const handleMapClick = useCallback(
+    (e: google.maps.MapMouseEvent) => {
+      if (readonly) return;
+      const lat = e.latLng?.lat();
+      const lng = e.latLng?.lng();
+      if (lat !== undefined && lng !== undefined) {
+        setMarkerPosition({ lat, lng });
+        setMapCenter({ lat, lng }); // 👈 center update
+
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode(
+          { location: { lat, lng } },
+          (results: any, status: any) => {
+            if (status === 'OK' && results[0]) {
+              const address = results[0].formatted_address;
+              setSelectedAddress(address);
+              if (inputRef.current) inputRef.current.value = address;
+              onLocationChange?.({ lat, lng, address });
+            }
+          },
+        );
+      }
+    },
+    [readonly, onLocationChange],
+  );
+
+  const handlePlaceChanged = () => {
+    const place = autocompleteRef.current?.getPlace();
+    if (place?.geometry?.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      const address = place.formatted_address || '';
+
+      setMarkerPosition({ lat, lng });
+      setMapCenter({ lat, lng }); // 👈 center update
+
+      // 👈 smooth pan + zoom in — Google Maps er moto
+      if (mapRef.current) {
+        mapRef.current.panTo({ lat, lng });
+        mapRef.current.setZoom(16);
       }
 
-      // fallback
-      if (lat === 0 && lng === 0) {
-        lat = 51.5074; // London default
-        lng = -0.1278;
-      }
+      setSelectedAddress(address);
+      onLocationChange?.({ lat, lng, address });
+    }
+  };
 
-      setMapUrl(
-        `https://maps.google.com/maps?q=${lat},${lng}&t=m&z=${zoom}&ie=UTF8&iwloc=A&output=embed`,
-      );
-      setLoading(false);
-    };
+  const handleClear = () => {
+    setSelectedAddress('');
+    if (inputRef.current) inputRef.current.value = '';
+  };
 
-    generateMap();
-  }, [streetAddress, coordinates, zoom]);
+  if (!isLoaded)
+    return (
+      <div className="h-[400px] flex items-center justify-center bg-gray-100 rounded-lg">
+        <MapPin className="animate-bounce text-gray-400" size={20} />
+        <span className="ml-2 text-gray-500">Loading map...</span>
+      </div>
+    );
 
   return (
-    <div className="mt-4 h-80 md:h-96 w-full rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-      {loading ? (
-        <div className="flex items-center justify-center h-full text-gray-500">
-          Loading map...
+    <div className="space-y-2">
+      {!readonly && (
+        <div className="relative">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            size={16}
+          />
+          <Autocomplete
+            onLoad={(ac) => (autocompleteRef.current = ac)}
+            onPlaceChanged={handlePlaceChanged}
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Search location or click on map..."
+              className="w-full pl-9 pr-9 py-3 bg-[#f5f5f5] border-none rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              onKeyDown={(e) => e.stopPropagation()} // 👈 form submit block korbe
+            />
+          </Autocomplete>
+          {selectedAddress && (
+            <button
+              onClick={handleClear}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
-      ) : (
-        <iframe
-          width="100%"
-          height="100%"
-          frameBorder="0"
-          scrolling="no"
-          loading="lazy"
-          src={mapUrl}
-          className="transition-all duration-300 ease-in-out"
+      )}
+
+      {selectedAddress && (
+        <div className="flex items-start gap-2 p-2 bg-green-50 rounded-sm border border-green-200">
+          <MapPin size={16} className="text-green-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-green-800">{selectedAddress}</p>
+        </div>
+      )}
+
+      <GoogleMap
+        mapContainerStyle={{
+          height: '400px',
+          width: '100%',
+          borderRadius: '5px',
+          cursor: readonly ? 'default' : 'crosshair',
+        }}
+        center={mapCenter} // 👈 dynamic center
+        zoom={14}
+        onLoad={onLoad} // 👈 map instance save
+        onUnmount={onUnmount}
+        onClick={handleMapClick}
+        options={{
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false,
+        }}
+      >
+        <Marker
+          position={markerPosition}
+          animation={window.google?.maps?.Animation?.DROP}
+          clickable={false}
         />
+      </GoogleMap>
+
+      {!readonly && (
+        <p className="text-xs text-gray-400 text-center">
+          📍 Search above or click on the map to set location
+        </p>
       )}
     </div>
   );

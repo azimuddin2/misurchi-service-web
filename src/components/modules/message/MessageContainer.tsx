@@ -22,7 +22,6 @@ import { useGetProductByIdQuery } from '@/redux/features/product/productApi';
 import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
 import { useGetUserByIdQuery } from '@/redux/features/user/userApi';
 
-// Type for uploaded images
 export interface UploadedImage {
   id: string;
   file: File;
@@ -31,11 +30,9 @@ export interface UploadedImage {
 }
 
 const MessageContainer = () => {
-  // 🔌 Initialize Socket & Redux user
   const { socket } = useSocket();
   const user = useAppSelector(selectCurrentUser);
 
-  // ⚙️ Local states
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
@@ -56,31 +53,27 @@ const MessageContainer = () => {
   const [upload, isUploading, progress] = useMultipleFileUpload();
   const { register, handleSubmit, reset } = useForm();
 
-  /* -------------------------------------------------------------------------- */
-  /*                               🔹 API Queries                               */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*                          API Queries                                */
+  /* ------------------------------------------------------------------ */
 
-  // 🧍 Fetch selected user details using REST (RTK Query)
   const { data: userData } = useGetUserByIdQuery(selectedUserId!, {
     skip: !selectedUserId,
   });
   const userDetails = userData?.data;
 
-  // 🛒 Fetch product details if productId exists
   const { data: productData } = useGetProductByIdQuery(productId!, {
     skip: !productId,
   });
 
-  // 🧾 Fetch service details if serviceId exists
   const { data: serviceData } = useGetServiceByIdQuery(serviceId!, {
     skip: !serviceId,
   });
 
-  /* -------------------------------------------------------------------------- */
-  /*                            🔹 Router & Redirection                         */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*                       Router & Redirection                          */
+  /* ------------------------------------------------------------------ */
 
-  // When userId param comes from another page, redirect with selectedUserId
   useEffect(() => {
     if (userId) {
       router.replace(
@@ -91,64 +84,124 @@ const MessageContainer = () => {
     }
   }, [userId, productId, router]);
 
-  /* -------------------------------------------------------------------------- */
-  /*                               🔹 Socket Logic                              */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*   ✅ SOCKET 1 — Chat List + Online                                  */
+  /* ------------------------------------------------------------------ */
 
   useEffect(() => {
     if (!socket || !user?.userId) return;
 
-    // 📩 Listen for chat messages
-    const handleMessage = (res: any) => setMessages(res);
-    socket.on('message', handleMessage);
+    const handleChatList = (res: any) => {
+      setChatListData(Array.isArray(res) ? res : []);
+    };
+    socket.on('chat-list', handleChatList);
 
-    // 🆕 Listen for new incoming messages (specific to current chat)
-    const handleNewMessage = (res: any) =>
-      setMessages((prev) => [...prev, res]);
-    if (chatId) socket.on(`new-message::${chatId}`, handleNewMessage);
-
-    // 🟢 Listen for online users update
     const handleOnlineUser = (res: any) => setOnlineUser(res);
     socket.on('onlineUser', handleOnlineUser);
 
-    // 💬 Listen for chat list updates
-    const handleChatList = (res: any) => setChatListData(res);
-    socket.on('chat-list', handleChatList);
+    const emitChatList = () => {
+      setTimeout(() => socket.emit('my-chat-list', {}), 500);
+    };
 
-    // 🔄 Fetch my chat list once
-    socket.emit('my-chat-list', {}, (res: any) =>
-      setChatListData(res?.message || []),
-    );
+    if (socket.connected) {
+      emitChatList();
+    } else {
+      socket.once('connect', emitChatList);
+    }
 
-    // 🧹 Cleanup listeners
+    socket.on('connect', emitChatList);
+
+    return () => {
+      socket.off('chat-list', handleChatList);
+      socket.off('onlineUser', handleOnlineUser);
+      socket.off('connect', emitChatList);
+    };
+  }, [socket, user?.userId]);
+
+  /* ------------------------------------------------------------------ */
+  /*   ✅ SOCKET 2 — Message History + New Message                       */
+  /*   (ekta useEffect-e — duplicate 'message' event problem fix)        */
+  /* ------------------------------------------------------------------ */
+
+  useEffect(() => {
+    if (!socket || !user?.userId || !selectedUserId) return;
+
+    // clear previous messages
+    setMessages([]);
+
+    // ✅ backend 'message-page' → 'message' event-e history pathay
+    socket.emit('message-page', selectedUserId);
+
+    // ✅ full history
+    const handleMessage = (res: any) => {
+      setMessages(Array.isArray(res) ? res : []);
+    };
+    socket.on('message', handleMessage);
+
+    // ✅ new message instant
+    const handleNewMessage = (res: any) => {
+      const senderId = res?.sender?._id?.toString() || res?.sender?.toString();
+      const receiverId =
+        res?.receiver?._id?.toString() || res?.receiver?.toString();
+
+      const isRelated =
+        senderId === selectedUserId ||
+        receiverId === selectedUserId ||
+        senderId === user.userId ||
+        receiverId === user.userId;
+
+      if (!isRelated) return;
+
+      setMessages((prev) => {
+        const isDuplicate = prev.some(
+          (m) => m._id && res._id && m._id?.toString() === res._id?.toString(),
+        );
+        if (isDuplicate) return prev;
+        return [...prev, res];
+      });
+
+      // chat list refresh
+      socket.emit('my-chat-list', {});
+    };
+    socket.on('new-message', handleNewMessage);
+
     return () => {
       socket.off('message', handleMessage);
-      if (chatId) socket.off(`new-message::${chatId}`, handleNewMessage);
-      socket.off('onlineUser', handleOnlineUser);
-      socket.off('chat-list', handleChatList);
+      socket.off('new-message', handleNewMessage);
     };
-  }, [socket, user?.userId, chatId]);
+  }, [socket, user?.userId, selectedUserId]);
 
-  // ✅ Mark all messages as seen when opening chat
+  /* ------------------------------------------------------------------ */
+  /*   ✅ SOCKET 3 — Seen                                                */
+  /* ------------------------------------------------------------------ */
+
   useEffect(() => {
-    if (socket && user?.userId && chatId) {
-      socket.emit('seen', { chatId });
-    }
-  }, [socket, user?.userId, chatId]);
+    if (!socket || !chatId) return;
+    socket.emit('seen', { chatId });
+  }, [socket, chatId]);
 
-  // 🟢 Active user check (online/offline indicator)
+  /* ------------------------------------------------------------------ */
+  /*                       Active User Check                             */
+  /* ------------------------------------------------------------------ */
+
   useEffect(() => {
     if (userDetails && onlineUser) {
       setIsActive(onlineUser.includes(userDetails._id));
     }
   }, [userDetails, onlineUser]);
 
-  // Set selected userId from query param
+  /* ------------------------------------------------------------------ */
+  /*                       Set Selected User                             */
+  /* ------------------------------------------------------------------ */
+
   useEffect(() => {
     if (selectedUserIdFrom) setSelectedUserId(selectedUserIdFrom);
   }, [selectedUserIdFrom]);
 
-  // Match chatId with selected user from chat list
+  /* ------------------------------------------------------------------ */
+  /*                    Match chatId from chat list                      */
+  /* ------------------------------------------------------------------ */
+
   useEffect(() => {
     const foundChat = chatListData?.find(
       (chat: any) => chat?.chat?.participants?.[0]?._id === selectedUserId,
@@ -156,7 +209,10 @@ const MessageContainer = () => {
     if (foundChat) setChatId(foundChat.chat?._id);
   }, [selectedUserId, chatListData]);
 
-  // Always scroll to bottom on message update
+  /* ------------------------------------------------------------------ */
+  /*                      Auto Scroll to Bottom                          */
+  /* ------------------------------------------------------------------ */
+
   useEffect(() => {
     chatBoxRef.current?.scrollTo({
       top: chatBoxRef.current.scrollHeight,
@@ -164,14 +220,13 @@ const MessageContainer = () => {
     });
   }, [messages]);
 
-  /* -------------------------------------------------------------------------- */
-  /*                             🔹 Send New Message                            */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*                        Send New Message                             */
+  /* ------------------------------------------------------------------ */
 
   const handleSendMessage = async (data: any) => {
     if (!socket || !user?.userId || !selectedUserId) return;
 
-    // 📤 Upload any attached images first
     let uploadedUrls: string[] = [];
     if (uploadedImages.length > 0) {
       const files = uploadedImages.map((img) => img.file);
@@ -179,9 +234,7 @@ const MessageContainer = () => {
       uploadedUrls = result.map((r: any) => r.url);
     }
 
-    // 🧾 Prepare message payload
     const payload = {
-      sender: user.userId,
       receiver: selectedUserId,
       text: data.message || '',
       imageUrl: uploadedUrls,
@@ -189,21 +242,20 @@ const MessageContainer = () => {
       createdAt: new Date().toISOString(),
     };
 
-    // 🕒 Optimistic UI update before sending
-    setMessages((prev) => [...prev, payload]);
+    // ❌ optimistic UI remove — new-message event-e ashbe
+    // setMessages((prev) => [...prev, { ...payload, sender: user.userId }]);
 
-    // 🚀 Send message to socket server
+    // ✅ just send
     socket.emit('send-message', payload);
 
-    // ♻️ Reset input and images
     setUploadedImages([]);
     setImages([]);
     reset();
   };
 
-  /* -------------------------------------------------------------------------- */
-  /*                             🔹 Image Handlers                              */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*                         Image Handlers                              */
+  /* ------------------------------------------------------------------ */
 
   const handleImagesChange = (newImages: UploadedImage[]) =>
     setImages(newImages);
@@ -214,20 +266,19 @@ const MessageContainer = () => {
     handleImagesChange(updated);
   };
 
-  /* -------------------------------------------------------------------------- */
-  /*                                 🔹 Render UI                               */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*                           Render UI                                 */
+  /* ------------------------------------------------------------------ */
 
   return (
     <div className="mx-auto flex h-[90vh] w-full lg:max-w-6xl rounded-xl bg-white shadow-lg overflow-hidden">
-      {/* --------------------------- Left Sidebar --------------------------- */}
+      {/* Left Sidebar */}
       <div
         className={cn(
           'flex flex-col border-r border-gray-200 bg-gray-50 transition-all duration-300',
           selectedUserId ? 'hidden lg:flex lg:w-[30%]' : 'w-full lg:w-[30%]',
         )}
       >
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4">
           <h4 className="text-2xl font-medium text-gray-800">Messages</h4>
           <Button
@@ -240,20 +291,21 @@ const MessageContainer = () => {
           </Button>
         </div>
 
-        {/* Search or User Search Container */}
         <div className="p-4">
           {wantTOSearch ? (
-            <UserSearchContainer setWantTOSearch={setWantTOSearch} />
+            <UserSearchContainer
+              setWantTOSearch={setWantTOSearch}
+              chatListData={chatListData} // 👈 add korun
+            />
           ) : (
             <Input
-              placeholder="Search people..."
-              className="w-full rounded-full border-gray-300 bg-white text-gray-800 focus:ring-2 focus:ring-primary-blue"
+              placeholder="Search People..."
+              className="w-full rounded-sm py-5 border-gray-300 bg-white text-gray-800 focus:ring-2 focus:ring-primary-blue"
               onFocus={() => setWantTOSearch(true)}
             />
           )}
         </div>
 
-        {/* Chat List */}
         <div className="scroll-hide flex-1 overflow-y-auto px-4 pb-6">
           {chatListData?.length === 0 ? (
             <p className="text-center text-gray-500 mt-10">No recent chats</p>
@@ -275,19 +327,24 @@ const MessageContainer = () => {
         </div>
       </div>
 
-      {/* --------------------------- Chat Section --------------------------- */}
+      {/* Chat Section */}
       <div className="flex flex-1 flex-col bg-white">
         {!selectedUserId ? (
-          // If no user selected
           <div className="flex flex-1 items-center justify-center text-gray-500 text-lg font-medium">
             <MessageCircleMore className="mr-2 text-gray-400" />
             Select a user to start chatting
           </div>
         ) : (
           <>
-            {/* --------------------- Chat Header --------------------- */}
+            {/* Chat Header */}
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
               <div className="flex items-center gap-x-3">
+                <button
+                  className="lg:hidden mr-2 text-gray-500 text-xl"
+                  onClick={() => setSelectedUserId('')}
+                >
+                  ←
+                </button>
                 <CustomAvatar
                   img={userDetails?.image}
                   name={userDetails?.fullName as string}
@@ -312,7 +369,7 @@ const MessageContainer = () => {
               </div>
             </div>
 
-            {/* ---------------- Product or Service Info ---------------- */}
+            {/* Product or Service Info */}
             {(productData?.data || serviceData?.data) && (
               <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex items-center gap-3">
                 <Image
@@ -352,14 +409,13 @@ const MessageContainer = () => {
               </div>
             )}
 
-            {/* --------------------- Messages List --------------------- */}
+            {/* Messages List */}
             <div
               ref={chatBoxRef}
               className="scroll-hide flex-1 space-y-3 overflow-y-auto bg-gray-50 px-6 py-4"
             >
               {messages?.map((message, index) =>
                 message.sender !== user?.userId ? (
-                  // Receiver Message
                   <div className="flex items-end gap-x-2" key={index}>
                     <CustomAvatar
                       img={userDetails?.image}
@@ -377,7 +433,6 @@ const MessageContainer = () => {
                     </div>
                   </div>
                 ) : (
-                  // Owner Message
                   <div
                     className="flex flex-row-reverse items-end gap-x-2"
                     key={index}
@@ -396,9 +451,8 @@ const MessageContainer = () => {
               )}
             </div>
 
-            {/* --------------------- Message Input --------------------- */}
+            {/* Message Input */}
             <div className="border-t border-gray-200 bg-white p-4">
-              {/* Preview Uploaded Images */}
               {uploadedImages?.length > 0 && (
                 <div className="mb-2 grid w-full gap-3 rounded-md bg-gray-100 p-3 sm:grid-cols-2 md:grid-cols-3">
                   {uploadedImages.map((image) => (
@@ -428,7 +482,6 @@ const MessageContainer = () => {
                 </div>
               )}
 
-              {/* Progress Bar */}
               {isUploading && (
                 <div className="w-full bg-gray-200 rounded h-2 my-2 overflow-hidden">
                   <div
@@ -438,7 +491,6 @@ const MessageContainer = () => {
                 </div>
               )}
 
-              {/* Message Form */}
               <form
                 onSubmit={handleSubmit(handleSendMessage)}
                 className="flex items-center gap-x-3"
