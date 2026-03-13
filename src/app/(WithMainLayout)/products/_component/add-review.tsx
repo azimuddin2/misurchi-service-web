@@ -28,8 +28,8 @@ type Props = {
 
 const reviewSchema = z.object({
   review: z
-    .string({ required_error: 'Review is required' })
-    .min(20, 'Review must be at least 20 characters long'),
+    .string({ required_error: 'Review message is required' })
+    .min(12, 'Review must be at least 12 characters long'),
 });
 
 const AddReview = ({ vendorId, productId, refetch }: Props) => {

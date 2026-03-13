@@ -2,13 +2,11 @@
 
 import CustomAvatar from '@/components/shared/custom-avatar';
 import Empty from '@/components/shared/empty';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUpdateSearchParams } from '@/hooks/useUpdateSearchParams';
 import { useGetAllUsersQuery } from '@/redux/features/user/userApi';
-import { IUser } from '@/types';
-import { User, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
+import { useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { format } from 'date-fns';
 

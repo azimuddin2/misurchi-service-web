@@ -94,7 +94,7 @@ const AddProduct = () => {
           <div className="mb-6">
             <div className="flex justify-between items-center">
               <p className="text-primary font-medium text-base mb-3">
-                Product Images/Videos
+                Product Images
               </p>
             </div>
             <div className="flex gap-4 ">

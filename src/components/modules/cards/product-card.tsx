@@ -122,7 +122,7 @@ const ProductCard = ({ product }: ProductProps) => {
             className="flex justify-center items-center space-x-1 font-semibold"
           >
             <span className="uppercase text-sm font-semibold mr-2">
-              Add to cart
+              SHOP NOW
             </span>
             <ArrowRight size={24} />
           </Link>
