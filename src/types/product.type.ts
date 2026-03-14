@@ -10,6 +10,11 @@ export type TProductType = {
   __v: number;
 };
 
+export type TImage = {
+  url: string;
+  key: string;
+};
+
 export type TProduct = {
   _id: string;
   vendor: TVendorUser;
@@ -22,6 +27,7 @@ export type TProduct = {
   price: number;
   discountPrice: string;
   colors: string[];
+  recommendedType: string[];
   size: string;
   status: 'Available' | 'Out of Stock' | 'TBC' | 'Discontinued';
   highlightStatus: string;
@@ -32,9 +38,4 @@ export type TProduct = {
   createdAt: string;
   updatedAt: string;
   __v: number;
-};
-
-export type TImage = {
-  url: string;
-  key: string;
 };

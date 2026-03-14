@@ -26,19 +26,27 @@ export const addProductSchema = z.object({
     .optional(),
 
   colors: z
-    .array(z.string())
-    .min(1, { message: 'At least one color is required' })
+    .array(
+      z
+        .string()
+        .min(1, 'At least one color is required')
+        .max(50, 'Color name is too long'),
+    )
     .nonempty({ message: 'At least one color is required' }),
 
-  size: z.string({
-    required_error: 'Size is required',
+  recommendedType: z.array(z.string()).optional(),
+
+  size: z.enum(['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'], {
+    required_error: 'Please select a size',
   }),
 
   status: z.enum([...ProductStatus] as [string, ...string[]], {
     required_error: 'Product status is required',
   }),
 
-  description: z.string({
-    required_error: 'Product description is required',
-  }),
+  description: z
+    .string({
+      required_error: 'Product description is required',
+    })
+    .min(500, 'Description must be at least 500 characters long'),
 });

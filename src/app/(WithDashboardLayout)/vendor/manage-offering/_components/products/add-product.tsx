@@ -34,12 +34,15 @@ import { ProductStatus } from '@/constants/product';
 import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
 import { ColorInput } from '@/components/ui/core/color-input';
+import RecommendedType from '@/components/modules/recommended-type';
 
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
+
+  const SIZE_OPTIONS = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
   const form = useForm({
     resolver: zodResolver(addProductSchema),
@@ -97,7 +100,7 @@ const AddProduct = () => {
                 Product Images
               </p>
             </div>
-            <div className="flex gap-4 ">
+            <div className="flex gap-4">
               <MSWImageUploader
                 setImageFiles={setImageFiles}
                 setImagePreview={setImagePreview}
@@ -146,7 +149,7 @@ const AddProduct = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="!text-gray-700 !text-sm font-medium">
-                    Product Type
+                    Product Category
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -154,11 +157,11 @@ const AddProduct = () => {
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
-                        <SelectValue placeholder="Select Product Type" />
+                        <SelectValue placeholder="Select Product Category" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem disabled value="none">
-                          Please Select Type
+                          Please Select Category
                         </SelectItem>
                         {productTypeData?.data?.map((productType) => (
                           <SelectItem
@@ -257,17 +260,48 @@ const AddProduct = () => {
               )}
             />
 
-            {/* Colors (custom input) */}
+            {/* Size */}
             <FormField
               control={form.control}
-              name="colors"
+              name="size"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="">
                   <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Colors
+                    Size
+                  </FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
+                        <SelectValue placeholder="Select Size" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {SIZE_OPTIONS.map((size) => (
+                        <SelectItem key={size} value={size}>
+                          {size}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Recommended Type */}
+            <FormField
+              control={form.control}
+              name="recommendedType"
+              render={({ field }) => (
+                <FormItem className="lg:mb-0">
+                  <FormLabel className="!text-gray-700 !text-sm font-medium">
+                    Recommended Type
                   </FormLabel>
                   <FormControl>
-                    <ColorInput
+                    <RecommendedType
                       value={field.value || []}
                       onChange={field.onChange}
                     />
@@ -276,30 +310,27 @@ const AddProduct = () => {
                 </FormItem>
               )}
             />
-
-            {/* Size */}
-            <FormField
-              control={form.control}
-              name="size"
-              render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Size
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Size"
-                      {...field}
-                      value={field.value || ''}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
+
+          {/* Colors (custom input) */}
+          <FormField
+            control={form.control}
+            name="colors"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="!text-gray-700 !text-base font-medium">
+                  Colors
+                </FormLabel>
+                <FormControl>
+                  <ColorInput
+                    value={field.value || []}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* Status */}
           <FormField
@@ -360,7 +391,9 @@ const AddProduct = () => {
             className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
             content={
               <div className="flex justify-center items-center space-x-2 font-semibold">
-                <p>{isSubmitting ? 'Saving...' : 'Save'}</p>
+                <p className=" font-medium">
+                  {isSubmitting ? 'Saving...' : 'SAVE'}
+                </p>
                 <ArrowRight />
               </div>
             }

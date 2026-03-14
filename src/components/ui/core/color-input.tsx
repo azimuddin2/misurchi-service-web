@@ -3,7 +3,19 @@
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+
+// Dynamic hex converter
+const toHex = (colorName: string): string => {
+  if (typeof window === 'undefined') return '#888888';
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 1;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return '#888888';
+  ctx.fillStyle = colorName.toLowerCase();
+  ctx.fillRect(0, 0, 1, 1);
+  const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+};
 
 export const ColorInput = ({
   value = [],
@@ -13,9 +25,9 @@ export const ColorInput = ({
   onChange: (val: string[]) => void;
 }) => {
   const [inputValue, setInputValue] = useState('');
-  const [pickerValue, setPickerValue] = useState('#000000');
 
-  const normalize = (color: string) => color.trim().toLowerCase();
+  const normalize = (color: string) =>
+    color.trim().charAt(0).toUpperCase() + color.trim().slice(1).toLowerCase();
 
   const addColor = (color: string) => {
     const normalized = normalize(color);
@@ -30,58 +42,45 @@ export const ColorInput = ({
   };
 
   return (
-    <div className="bg-[#f5f5f5] rounded-sm p-3 flex flex-wrap gap-2 min-h-[40px]">
-      {/* Existing colors as chips */}
+    <div className="border rounded-sm bg-[#f5f5f5] p-3 flex flex-wrap gap-2 min-h-[42px] focus-within:ring-2 focus-within:ring-ring transition border-none">
       {value.map((color) => (
-        <div
+        <span
           key={color}
-          className="flex items-center gap-2 px-3 py-1 rounded-md shadow border bg-white hover:shadow-md transition"
+          className="flex items-center bg-white gap-1.5 px-2 py-0.5 rounded-full text-sm font-medium  border"
         >
+          {/* ← Dynamic color dot */}
           <span
-            className="w-5 h-5 rounded-full border"
-            style={{ backgroundColor: color }}
+            className="w-3.5 h-3.5 rounded-full border border-gray-300"
+            style={{ backgroundColor: toHex(color) }}
           />
-          <span className="text-sm">{color}</span>
+          {color}
           <X
-            size={14}
-            className="cursor-pointer text-red-500 hover:text-red-700"
+            size={12}
+            className="cursor-pointer opacity-50 hover:opacity-100 text-red-600 transition"
             onClick={() => removeColor(color)}
           />
-        </div>
+        </span>
       ))}
 
-      {/* Text input for typing colors */}
       <Input
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={(e) => {
-          if (['Enter', ',', ' '].includes(e.key)) {
+          if (['Enter', ','].includes(e.key)) {
             e.preventDefault();
             addColor(inputValue);
           }
         }}
-        placeholder="Type color & press Enter"
-        className="border-none bg-transparent focus:ring-0 flex-1 min-w-[120px]"
+        onBlur={() => {
+          if (inputValue) addColor(inputValue);
+        }}
+        placeholder={
+          value.length === 0
+            ? 'Type Color Name & Press Enter...'
+            : 'Add more...'
+        }
+        className="border-none shadow-none focus-visible:ring-0 flex-1 min-w-[140px] h-7 p-0 text-sm"
       />
-
-      {/* Color picker */}
-      <div className="flex items-center gap-2">
-        <input
-          type="color"
-          value={pickerValue}
-          onChange={(e) => setPickerValue(e.target.value)}
-          className="w-10 h-10 border rounded cursor-pointer bg-white"
-        />
-        <Button
-          type="button"
-          variant="secondary"
-          className="bg-white rounded-sm"
-          size="sm"
-          onClick={() => addColor(pickerValue)}
-        >
-          Add
-        </Button>
-      </div>
     </div>
   );
 };
