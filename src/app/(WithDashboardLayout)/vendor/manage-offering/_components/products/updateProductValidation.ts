@@ -18,27 +18,32 @@ export const updateProductSchema = z.object({
     required_error: 'Price is required',
   }),
 
-  discountPrice: z
-    .string()
-    .min(0, 'Discount must be at least 0')
-    .max(100, "Discount can't exceed 100")
-    .nullable()
-    .optional(),
+  discountPrice: z.string().nullable().optional(),
 
   colors: z
     .array(z.string())
-    .min(1, { message: 'At least one color is required' })
-    .nonempty({ message: 'At least one color is required' }),
+    .min(1, { message: 'Please add at least one color' }),
 
-  size: z.string({
-    required_error: 'Size is required',
-  }),
+  recommendedType: z.array(z.string()).optional(),
+
+  size: z
+    .array(z.string())
+    .min(1, { message: 'Please select at least one size' }),
 
   status: z.enum([...ProductStatus] as [string, ...string[]], {
-    required_error: 'Product status is required',
+    required_error: 'Please select a product status',
   }),
 
-  description: z.string({
-    required_error: 'Product description is required',
-  }),
+  description: z
+    .string({
+      required_error: 'Product description is required',
+    })
+    .refine(
+      (val) =>
+        val
+          .replace(/<[^>]*>/g, '')
+          .replace(/&nbsp;/g, ' ')
+          .trim().length >= 500,
+      { message: 'Description must be at least 500 characters' },
+    ),
 });

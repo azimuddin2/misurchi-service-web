@@ -39,6 +39,9 @@ import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
 import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
 import { ColorInput } from '@/components/ui/core/color-input';
+import RecommendedType from '@/components/modules/recommended-type';
+import SizeSelect from '@/components/ui/core/size-select';
+import { TextEditor } from '@/components/ui/core/text-editor';
 
 type Props = {
   productId: string;
@@ -48,14 +51,13 @@ const UpdateProduct = ({ productId }: Props) => {
   const [deleteKeys, setDeleteKeys] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
+
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
 
   const { data: productTypeData } = useGetAllProductTypeQuery({});
-
   const { data, isLoading } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
-
   const [updateProduct] = useUpdateProductMutation();
 
   const form = useForm({
@@ -66,12 +68,18 @@ const UpdateProduct = ({ productId }: Props) => {
       quantity: '',
       price: '',
       discountPrice: '',
-      colors: [''],
-      size: '',
+      colors: [] as string[],
+      recommendedType: [] as string[],
+      size: [] as string[],
       status: '',
       description: '',
     },
   });
+
+  const {
+    control,
+    formState: { isSubmitting },
+  } = form;
 
   useEffect(() => {
     if (product) {
@@ -80,28 +88,25 @@ const UpdateProduct = ({ productId }: Props) => {
         productType: product.productType || '',
         quantity: String(product.quantity),
         price: String(product.price),
-        discountPrice: product.discountPrice || 'none', // backend value, e.g. "20%" or fallback
+        discountPrice: product.discountPrice || 'none',
         colors: product.colors || [],
-        size: product.size ?? '',
+        recommendedType: product.recommendedType || [],
+        size: Array.isArray(product.size)
+          ? product.size
+          : product.size
+            ? [product.size]
+            : [],
         status: product.status ?? '',
         description: product.description ?? '',
       });
-      const imageUrls =
-        product.images?.map((img: { url: string; key: string }) => img.url) ||
-        [];
-      setImagePreview(imageUrls);
+      setImagePreview(product.images?.map((img) => img.url) || []);
     }
   }, [product, form]);
-
-  const {
-    formState: { isSubmitting },
-  } = form;
 
   const handleDeleteImage = (key: string) => {
     setDeleteKeys((prev) => [...prev, key]);
     setImagePreview((prev) =>
       prev.filter((url) => {
-        // Remove the URL that matches the key
         const img = product?.images?.find((img) => img.key === key);
         return img?.url !== url;
       }),
@@ -117,32 +122,25 @@ const UpdateProduct = ({ productId }: Props) => {
     };
 
     const formData = new FormData();
-    formData.append('data', JSON.stringify(modifiedData)); //✅Backend expects JSON string
-    imageFiles.forEach((file) => {
-      formData.append('images', file); //✅Append multiple images
-    });
+    formData.append('data', JSON.stringify(modifiedData));
+    imageFiles.forEach((file) => formData.append('images', file));
 
     const toastId = toast.loading('Updating product...');
-
-    console.log(productId);
-
     try {
       const res = await updateProduct({
         id: productId,
         body: formData,
       }).unwrap();
-      toast.success(res.message || 'Product update successfully');
+      toast.success(res.message || 'Product updated successfully');
       router.push(`/vendor/manage-offering/view-product/${productId}`);
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to add product');
+      toast.error(error?.data?.message || 'Failed to update product');
     } finally {
       toast.dismiss(toastId);
     }
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  if (isLoading) return <Spinner />;
 
   return (
     <div className="bg-white rounded-lg flex-grow max-w-5xl p-4 lg:p-8 shadow">
@@ -152,10 +150,10 @@ const UpdateProduct = ({ productId }: Props) => {
           <div className="mb-6">
             <div className="flex justify-between items-center">
               <p className="text-primary font-medium text-base mb-3">
-                Product Images/Videos
+                Product Images
               </p>
             </div>
-            <div className="flex gap-4 ">
+            <div className="flex gap-4">
               <MSWImageUploader
                 setImageFiles={setImageFiles}
                 setImagePreview={setImagePreview}
@@ -167,13 +165,13 @@ const UpdateProduct = ({ productId }: Props) => {
                 setImageFiles={setImageFiles}
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}
-                currentImages={product?.images || []} // Pass existing images with {url, key}
-                handleDeleteImage={handleDeleteImage} // Your function to add keys to deletion list
+                currentImages={product?.images || []}
+                handleDeleteImage={handleDeleteImage}
               />
             </div>
           </div>
 
-          {/* data input fields */}
+          {/* Product Name */}
           <div className="">
             <FormField
               control={form.control}
@@ -206,19 +204,19 @@ const UpdateProduct = ({ productId }: Props) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="!text-gray-700 !text-sm font-medium">
-                    Product Type
+                    Product Category
                   </FormLabel>
                   <FormControl>
                     <Select
-                      defaultValue={field.value || product?.productType}
+                      value={field.value || 'none'}
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
-                        <SelectValue placeholder="Select Product Type" />
+                        <SelectValue placeholder="Select Product Category" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem disabled value="none">
-                          Please Select Type
+                          Please Select Category
                         </SelectItem>
                         {productTypeData?.data?.map((productType) => (
                           <SelectItem
@@ -293,7 +291,7 @@ const UpdateProduct = ({ productId }: Props) => {
                   </FormLabel>
                   <FormControl>
                     <Select
-                      value={field.value || 'none'} // uses backend value directly
+                      value={field.value || 'none'}
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
@@ -316,19 +314,19 @@ const UpdateProduct = ({ productId }: Props) => {
               )}
             />
 
-            {/* Colors (custom input) */}
+            {/* Size */}
             <FormField
               control={form.control}
-              name="colors"
+              name="size"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Colors
+                    Size
                   </FormLabel>
                   <FormControl>
-                    <ColorInput
-                      value={field.value || []} // ✅ always array
-                      onChange={field.onChange} // ✅ updates the form state
+                    <SizeSelect
+                      value={field.value || []}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -336,22 +334,19 @@ const UpdateProduct = ({ productId }: Props) => {
               )}
             />
 
-            {/* Size */}
+            {/* Recommended Type */}
             <FormField
               control={form.control}
-              name="size"
+              name="recommendedType"
               render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Size
+                <FormItem className="lg:mb-0">
+                  <FormLabel className="!text-gray-700 !text-sm font-medium">
+                    Recommended Type
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Size"
-                      {...field}
-                      value={field.value || ''}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
+                    <RecommendedType
+                      value={field.value || []}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -360,13 +355,33 @@ const UpdateProduct = ({ productId }: Props) => {
             />
           </div>
 
+          {/* Colors */}
+          <FormField
+            control={form.control}
+            name="colors"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="!text-gray-700 !text-base font-medium">
+                  Colors
+                </FormLabel>
+                <FormControl>
+                  <ColorInput
+                    value={field.value || []}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Status */}
           <FormField
             control={form.control}
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="!text-gray-700 !text-base font-medium">
+                <FormLabel className="!text-gray-700 !text-base font-medium mt-3">
                   Status Options
                 </FormLabel>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-5 lg:px-10 my-3">
@@ -378,10 +393,7 @@ const UpdateProduct = ({ productId }: Props) => {
                       <FormControl>
                         <Checkbox
                           checked={field.value === status}
-                          onCheckedChange={() => {
-                            // Set the selected status string
-                            field.onChange(status);
-                          }}
+                          onCheckedChange={() => field.onChange(status)}
                         />
                       </FormControl>
                       <FormLabel className="font-normal">{status}</FormLabel>
@@ -392,41 +404,41 @@ const UpdateProduct = ({ productId }: Props) => {
             )}
           />
 
-          {/*  Description */}
+          {/* Description */}
           <FormField
             control={form.control}
             name="description"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="!text-gray-700 !text-base font-medium">
-                  Description
+                  Product Description
                 </FormLabel>
-                <FormControl>
-                  <textarea
-                    {...field}
-                    rows={8}
-                    className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"
-                    placeholder="Enter description here..."
-                  />
-                </FormControl>
-                <FormMessage />
+                <TextEditor
+                  {...field}
+                  name="description"
+                  control={control}
+                  placeholder="Enter description here..."
+                  minHeight={300}
+                />
               </FormItem>
             )}
           />
 
-          {/* Submit Button */}
+          {/* Buttons */}
           <div className="grid grid-cols-2 gap-3">
             <AppButton
               className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
               content={
                 <div className="flex justify-center items-center space-x-2 font-semibold">
-                  <p>{isSubmitting ? 'Updateing...' : 'Update'}</p>
+                  <p className="font-medium">
+                    {isSubmitting ? 'Updating...' : 'Update'}
+                  </p>
                   <ArrowRight />
                 </div>
               }
             />
 
-            <div className="p-3 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80">
+            <div className="p-3 cursor-pointer text-sm mt-2 shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500 w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80">
               <Link
                 href={`/${user?.role || 'vendor'}/manage-offering`}
                 className="w-full inline-flex justify-center items-center space-x-1 font-semibold"
