@@ -36,9 +36,9 @@ export const addProductSchema = z.object({
 
   recommendedType: z.array(z.string()).optional(),
 
-  size: z.enum(['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'], {
-    required_error: 'Please select a size',
-  }),
+  size: z
+    .array(z.string({ required_error: 'Please select a size' }))
+    .min(1, 'At least one size is required'),
 
   status: z.enum([...ProductStatus] as [string, ...string[]], {
     required_error: 'Product status is required',

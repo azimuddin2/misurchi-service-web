@@ -35,14 +35,13 @@ import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
 import { ColorInput } from '@/components/ui/core/color-input';
 import RecommendedType from '@/components/modules/recommended-type';
+import SizeSelect from '@/components/ui/core/size-select';
 
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
-
-  const SIZE_OPTIONS = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
   const form = useForm({
     resolver: zodResolver(addProductSchema),
@@ -69,9 +68,9 @@ const AddProduct = () => {
     };
 
     const formData = new FormData();
-    formData.append('data', JSON.stringify(modifiedData)); //✅Backend expects JSON string
+    formData.append('data', JSON.stringify(modifiedData));
     imageFiles.forEach((file) => {
-      formData.append('images', file); //✅Append multiple images
+      formData.append('images', file);
     });
 
     console.log(imageFiles);
@@ -265,27 +264,16 @@ const AddProduct = () => {
               control={form.control}
               name="size"
               render={({ field }) => (
-                <FormItem className="">
+                <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium">
                     Size
                   </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
-                        <SelectValue placeholder="Select Size" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {SIZE_OPTIONS.map((size) => (
-                        <SelectItem key={size} value={size}>
-                          {size}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <SizeSelect
+                      value={field.value || []}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

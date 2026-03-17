@@ -167,7 +167,20 @@ const ViewProduct = ({ productId }: Props) => {
 
             <div className="my-2 font-medium flex justify-between items-center p-5">
               <span>Size</span>
-              <span className="font-medium">{product?.size}</span>
+              <div className="flex flex-wrap gap-1.5 justify-end">
+                {Array.isArray(product?.size) ? (
+                  product.size.map((s: string) => (
+                    <span
+                      key={s}
+                      className="px-2.5 py-0.5 rounded-sm bg-gray-100 border border-gray-200 text-xs font-medium text-gray-700"
+                    >
+                      {s}
+                    </span>
+                  ))
+                ) : (
+                  <span className="font-medium">{product?.size}</span>
+                )}
+              </div>
             </div>
 
             <div className="my-2 font-medium flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5 rounded-md">
