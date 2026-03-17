@@ -36,6 +36,7 @@ import { useGetAllProductTypeQuery } from '@/redux/features/productType/productT
 import { ColorInput } from '@/components/ui/core/color-input';
 import RecommendedType from '@/components/modules/recommended-type';
 import SizeSelect from '@/components/ui/core/size-select';
+import { TextEditor } from '@/components/ui/core/text-editor';
 
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -48,6 +49,7 @@ const AddProduct = () => {
   });
 
   const {
+    control,
     formState: { isSubmitting },
   } = form;
 
@@ -326,7 +328,7 @@ const AddProduct = () => {
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="!text-gray-700 !text-base font-medium">
+                <FormLabel className="!text-gray-700 !text-base font-medium mt-3">
                   Status Options
                 </FormLabel>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-5 lg:px-10 my-3">
@@ -352,24 +354,22 @@ const AddProduct = () => {
             )}
           />
 
-          {/*  Description */}
           <FormField
             control={form.control}
             name="description"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="!text-gray-700 !text-base font-medium">
-                  Description
+                  Product Description
                 </FormLabel>
-                <FormControl>
-                  <textarea
-                    {...field}
-                    rows={8}
-                    className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"
-                    placeholder="Enter description here..."
-                  />
-                </FormControl>
-                <FormMessage />
+                <TextEditor
+                  {...field}
+                  // value={field.value || ''}
+                  name="description"
+                  control={control}
+                  placeholder="Enter description here..."
+                  minHeight={300}
+                />
               </FormItem>
             )}
           />

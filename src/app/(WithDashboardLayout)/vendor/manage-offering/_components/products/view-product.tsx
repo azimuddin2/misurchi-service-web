@@ -161,7 +161,7 @@ const ViewProduct = ({ productId }: Props) => {
             </div>
 
             <div className="my-2 font-medium flex justify-between items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5">
-              <span>Product Type</span>
+              <span>Product Category</span>
               <span className="font-medium">{product?.productType}</span>
             </div>
 
@@ -237,7 +237,16 @@ const ViewProduct = ({ productId }: Props) => {
         <h5 className="text-lg font-medium uppercase border-b py-1">
           Description
         </h5>
-        <p className="mt-2 text-base text-gray-500">{product?.description}</p>
+        <div
+          className="mt-2 text-base text-gray-500 prose prose-sm max-w-none
+      [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+      [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+      [&_li]:my-0.5
+      [&_b]:font-semibold [&_strong]:font-semibold
+      [&_a]:text-blue-500 [&_a]:underline
+      [&_p]:my-1"
+          dangerouslySetInnerHTML={{ __html: product?.description || '' }}
+        />
       </div>
 
       {/* Review section */}
