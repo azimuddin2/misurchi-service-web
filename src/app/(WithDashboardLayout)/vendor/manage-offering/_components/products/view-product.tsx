@@ -238,7 +238,7 @@ const ViewProduct = ({ productId }: Props) => {
           Description
         </h5>
         <div
-          className="mt-2 text-base text-gray-500 prose prose-sm max-w-none
+          className="mt-4 text-base text-gray-500 prose prose-sm max-w-none
       [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
       [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
       [&_li]:my-0.5

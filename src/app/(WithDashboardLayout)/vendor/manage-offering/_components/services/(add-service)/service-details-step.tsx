@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -40,10 +39,13 @@ import { ServiceStatus } from '@/constants/service';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TServicePricing } from '@/types/service.type';
 import { useGetAllServiceTypeQuery } from '@/redux/features/serviceType/serviceTypeApi';
+import { TextEditor } from '@/components/ui/core/text-editor';
+import RecommendedType from '@/components/modules/recommended-type';
 
 const serviceSchema = z.object({
   name: z.string({ required_error: 'Service name is required' }),
   type: z.string({ required_error: 'Service type is required' }),
+  recommendedType: z.array(z.string()).optional(),
   pricing: z.object({
     duration: z.string({ required_error: 'Duration is required' }),
     price: z.string({ required_error: 'Price is required' }),
@@ -81,6 +83,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
     defaultValues: {
       name: data?.name,
       type: data?.type,
+      recommendedType: data?.recommendedType || [],
       pricing: {
         duration: data?.pricing?.duration,
         price: data?.pricing?.price,
@@ -90,6 +93,8 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
       description: data?.description,
     },
   });
+
+  const { control } = form;
 
   const calculateFinalPrice = (price: string, discount: string) => {
     const numPrice = Number.parseFloat(price) || 0;
@@ -297,7 +302,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="!text-gray-700 !text-sm font-medium">
-                Service Type
+                Service Category
               </FormLabel>
               <FormControl>
                 <Select
@@ -305,11 +310,11 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                   onValueChange={field.onChange}
                 >
                   <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
-                    <SelectValue placeholder="Select service type" />
+                    <SelectValue placeholder="Select service category" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem disabled value="none">
-                      Please Select Type
+                      Please Select Category
                     </SelectItem>
                     {serviceTypeData?.data?.map((type) => (
                       <SelectItem key={type._id} value={`${type.name}`}>
@@ -324,7 +329,27 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
           )}
         />
 
-        <div className="shadow p-5 rounded-lg bg-white">
+        {/* Recommended Type */}
+        <FormField
+          control={form.control}
+          name="recommendedType"
+          render={({ field }) => (
+            <FormItem className="lg:mb-0">
+              <FormLabel className="!text-gray-700 !text-sm font-medium">
+                Recommended Type
+              </FormLabel>
+              <FormControl>
+                <RecommendedType
+                  value={field.value || []}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="shadow p-5 rounded-lg bg-white mt-5">
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             Service Pricing
           </h3>
@@ -612,18 +637,17 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="!text-gray-700 !text-sm font-medium">
+              <FormLabel className="!text-gray-700 !text-base font-medium mb-1">
                 Service Description
               </FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  rows={12} // won't affect height due to default h-20
-                  className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full h-48"
-                  placeholder="Describe your service in detail..."
-                />
-              </FormControl>
-              <FormMessage />
+              <TextEditor
+                {...field}
+                // value={field.value || ''}
+                name="description"
+                control={control}
+                placeholder="Enter description here..."
+                minHeight={300}
+              />
             </FormItem>
           )}
         />

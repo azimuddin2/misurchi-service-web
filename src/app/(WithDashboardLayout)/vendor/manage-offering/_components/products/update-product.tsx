@@ -64,10 +64,10 @@ const UpdateProduct = ({ productId }: Props) => {
     resolver: zodResolver(updateProductSchema),
     defaultValues: {
       name: '',
-      productType: '',
+      productType: product?.productType || '',
       quantity: '',
       price: '',
-      discountPrice: '',
+      discountPrice: product?.discountPrice || '',
       colors: [] as string[],
       recommendedType: [] as string[],
       size: [] as string[],
@@ -221,9 +221,9 @@ const UpdateProduct = ({ productId }: Props) => {
                         {productTypeData?.data?.map((productType) => (
                           <SelectItem
                             key={productType._id}
-                            value={`${productType.name}`}
+                            value={`${productType?.name}`}
                           >
-                            {productType.name}
+                            {productType?.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
