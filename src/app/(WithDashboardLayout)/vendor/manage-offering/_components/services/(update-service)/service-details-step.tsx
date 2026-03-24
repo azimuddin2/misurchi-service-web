@@ -91,7 +91,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
     if (!data) return;
     form.reset({
       name: data.name || '',
-      type: data.type || '',
+      type: data?.type || '',
       recommendedType: data.recommendedType || [],
       description: data.description || '',
       status: data.status || ServiceStatus[0],
@@ -298,7 +298,7 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
               <FormLabel>Service Category</FormLabel>
               <FormControl>
                 <Select
-                  value={field.value || undefined}
+                  value={field.value || data?.type || ''}
                   onValueChange={(v) => field.onChange(v)}
                 >
                   <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">

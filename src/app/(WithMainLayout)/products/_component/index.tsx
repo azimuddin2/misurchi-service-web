@@ -208,13 +208,26 @@ const ProductDetails = ({ productId }: Props) => {
             </div>
 
             <div className="my-2 font-medium flex justify-between items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5">
-              <span>Product Type</span>
+              <span>Product Category</span>
               <span className="font-medium">{product?.productType}</span>
             </div>
 
             <div className="my-2 font-medium flex justify-between items-center p-5">
               <span>Size</span>
-              <span className="font-medium">{product?.size}</span>
+              <div className="flex flex-wrap gap-1.5 justify-end">
+                {Array.isArray(product?.size) ? (
+                  product.size.map((s: string) => (
+                    <span
+                      key={s}
+                      className="px-2.5 py-0.5 rounded-sm bg-gray-100 border border-gray-200 text-sm font-medium text-gray-700 cursor-pointer"
+                    >
+                      {s}
+                    </span>
+                  ))
+                ) : (
+                  <span className="font-medium">{product?.size}</span>
+                )}
+              </div>
             </div>
 
             <div className="my-2 font-medium flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5 rounded-md">
@@ -223,7 +236,7 @@ const ProductDetails = ({ productId }: Props) => {
                 {product?.colors?.map((color: string, index: number) => (
                   <span
                     key={index}
-                    className="flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border shadow-sm"
+                    className="flex cursor-pointer items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border shadow-sm"
                     style={{ backgroundColor: '#fff', color: '#000' }} // text color stays black
                   >
                     <span
@@ -294,7 +307,16 @@ const ProductDetails = ({ productId }: Props) => {
         <h5 className="text-lg font-medium uppercase border-b py-1">
           Description
         </h5>
-        <p className="mt-2 text-base text-gray-500">{product?.description}</p>
+        <div
+          className="mt-4 text-base text-gray-500 prose prose-sm max-w-none
+      [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+      [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+      [&_li]:my-0.5
+      [&_b]:font-semibold [&_strong]:font-semibold
+      [&_a]:text-blue-500 [&_a]:underline
+      [&_p]:my-1"
+          dangerouslySetInnerHTML={{ __html: product?.description || '' }}
+        />
       </div>
 
       {/* Review section */}

@@ -208,7 +208,7 @@ const UpdateProduct = ({ productId }: Props) => {
                   </FormLabel>
                   <FormControl>
                     <Select
-                      value={field.value || 'none'}
+                      value={field.value || product?.productType || 'none'}
                       onValueChange={field.onChange}
                     >
                       <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">

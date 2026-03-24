@@ -172,7 +172,7 @@ const ViewProduct = ({ productId }: Props) => {
                   product.size.map((s: string) => (
                     <span
                       key={s}
-                      className="px-2.5 py-0.5 rounded-sm bg-gray-100 border border-gray-200 text-xs font-medium text-gray-700"
+                      className="px-2.5 py-0.5 rounded-sm bg-gray-100 border border-gray-200 text-sm font-medium text-gray-700"
                     >
                       {s}
                     </span>

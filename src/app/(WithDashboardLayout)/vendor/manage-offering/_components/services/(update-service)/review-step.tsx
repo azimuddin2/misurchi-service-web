@@ -109,9 +109,23 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
                   </div>
                 </div>
                 <div className="bg-gradient-to-r from-gray-50 to-blue-50/50 p-6 rounded-xl border border-gray-100">
-                  <p className="text-gray-700 leading-relaxed text-base">
-                    {data.description}
-                  </p>
+                  <div
+                    className="text-base text-gray-600 prose prose-sm max-w-none
+      [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+      [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+      [&_li]:my-0.5
+      [&_b]:font-semibold [&_strong]:font-semibold
+      [&_a]:text-blue-500 [&_a]:underline
+      [&_p]:my-1 [&_p]:leading-relaxed
+      [&_h1]:text-xl [&_h1]:font-bold [&_h1]:text-gray-800 [&_h1]:mb-2
+      [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-gray-800 [&_h2]:mb-2
+      [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-gray-700
+      [&_blockquote]:border-l-4 [&_blockquote]:border-blue-200 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-500
+      [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:rounded [&_code]:text-sm [&_code]:text-gray-700"
+                    dangerouslySetInnerHTML={{
+                      __html: data?.description || '',
+                    }}
+                  />
                 </div>
               </div>
             </div>
