@@ -13,7 +13,7 @@ const ReviewCard = ({ review }: ReviewProps) => {
   return (
     <div className="mb-8">
       <div className="flex items-center gap-3">
-        <Avatar className="cursor-pointer border border-gray-300 h-14 w-14">
+        <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
           <AvatarImage src={review?.user?.image} />
           <AvatarFallback>{review?.user?.fullName?.slice(0, 1)}</AvatarFallback>
         </Avatar>

@@ -2,8 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import { TProduct } from '@/types/product.type';
 
-interface CartItem extends TProduct {
-  cartQuantity: number; // ✅ separate from product stock
+export interface CartItem extends TProduct {
+  cartQuantity: number;
+  selectedSize?: string | null;
+  selectedColor?: string | null;
 }
 
 interface CartState {
@@ -16,26 +18,50 @@ const initialState: CartState = {
   total: 0,
 };
 
-// ✅ Ensure numeric price before calculation
+// ✅ price calculation with discount
 const calculateTotal = (items: CartItem[]) =>
   items.reduce((acc, item) => {
-    const price = Number(item.discountPrice ?? item.price); // 👈 Convert to number
-    return acc + price * item.cartQuantity;
+    const price = Number(item.price || 0);
+    const discountPercent = Number(
+      (item.discountPrice || '0').replace('%', ''),
+    );
+
+    const finalPrice = price - (price * discountPercent) / 100;
+
+    return acc + finalPrice * item.cartQuantity;
   }, 0);
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addToCart: (state, action: PayloadAction<TProduct>) => {
+    // ✅ add to cart with size & color
+    addToCart: (
+      state,
+      action: PayloadAction<{
+        product: TProduct;
+        size?: string | null;
+        color?: string | null;
+      }>,
+    ) => {
+      const { product, size, color } = action.payload;
+
       const existingItem = state.items.find(
-        (item) => item._id === action.payload._id,
+        (item) =>
+          item._id === product._id &&
+          item.selectedSize === size &&
+          item.selectedColor === color,
       );
 
       if (existingItem) {
         existingItem.cartQuantity += 1;
       } else {
-        state.items.push({ ...action.payload, cartQuantity: 1 });
+        state.items.push({
+          ...product,
+          selectedSize: size,
+          selectedColor: color,
+          cartQuantity: 1,
+        });
       }
 
       state.total = calculateTotal(state.items);
@@ -43,17 +69,69 @@ const cartSlice = createSlice({
 
     updateQuantity: (
       state,
-      action: PayloadAction<{ id: string; cartQuantity: number }>,
+      action: PayloadAction<{
+        id: string;
+        size?: string | null;
+        color?: string | null;
+        cartQuantity: number;
+      }>,
     ) => {
-      const item = state.items.find((item) => item._id === action.payload.id);
+      const item = state.items.find(
+        (item) =>
+          item._id === action.payload.id &&
+          item.selectedSize === action.payload.size &&
+          item.selectedColor === action.payload.color,
+      );
+
       if (item) {
         item.cartQuantity = action.payload.cartQuantity;
       }
+
       state.total = calculateTotal(state.items);
     },
 
-    removeFromCart: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter((item) => item._id !== action.payload);
+    updateOptions: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        oldSize?: string | null;
+        oldColor?: string | null;
+        newSize?: string | null;
+        newColor?: string | null;
+      }>,
+    ) => {
+      const item = state.items.find(
+        (item) =>
+          item._id === action.payload.id &&
+          item.selectedSize === action.payload.oldSize &&
+          item.selectedColor === action.payload.oldColor,
+      );
+
+      if (item) {
+        item.selectedSize = action.payload.newSize ?? item.selectedSize;
+        item.selectedColor = action.payload.newColor ?? item.selectedColor;
+      }
+
+      state.total = calculateTotal(state.items);
+    },
+
+    removeFromCart: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        size?: string | null;
+        color?: string | null;
+      }>,
+    ) => {
+      state.items = state.items.filter(
+        (item) =>
+          !(
+            item._id === action.payload.id &&
+            item.selectedSize === action.payload.size &&
+            item.selectedColor === action.payload.color
+          ),
+      );
+
       state.total = calculateTotal(state.items);
     },
 
@@ -64,8 +142,13 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, updateQuantity, removeFromCart, clearCart } =
-  cartSlice.actions;
+export const {
+  addToCart,
+  updateQuantity,
+  removeFromCart,
+  clearCart,
+  updateOptions,
+} = cartSlice.actions;
 
 export const selectCartItems = (state: RootState) => state.cart.items;
 export const selectCartTotal = (state: RootState) => state.cart.total;

@@ -28,7 +28,7 @@ export type TProduct = {
   discountPrice: string;
   colors: string[];
   recommendedType: string[];
-  size: string;
+  size: string[];
   status: 'Available' | 'Out of Stock' | 'TBC' | 'Discontinued';
   highlightStatus: string;
   description: string;

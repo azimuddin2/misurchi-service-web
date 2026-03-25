@@ -88,8 +88,8 @@ const ViewProduct = ({ productId }: Props) => {
                 <Image
                   src={image.url}
                   alt={`Thumbnail ${index + 1}`}
-                  width={100}
-                  height={100}
+                  width={80}
+                  height={80}
                   className="rounded-md cursor-pointer object-cover"
                 />
               </button>

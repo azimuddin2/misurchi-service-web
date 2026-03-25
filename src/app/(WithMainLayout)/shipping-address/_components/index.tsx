@@ -66,7 +66,7 @@ const ShippingAddress = () => {
       },
     };
 
-    // console.log('Final Order Payload:', orderPayload);
+    console.log('Final Order Payload:', orderPayload);
 
     const toastId = toast.loading('Processing your order...');
     try {
@@ -229,10 +229,10 @@ const ShippingAddress = () => {
           Total Order Summary
         </h2>
         <div>
-          {checkoutPayload?.products?.map((product: Product) => (
+          {checkoutPayload?.products?.map((product: Product, index: number) => (
             <div
-              key={product.name}
-              className=" justify-between mb-3 border p-3 rounded bg-gray-50"
+              key={index}
+              className="justify-between mb-3 border p-3 rounded bg-gray-50"
             >
               <Image
                 src={product.image}
@@ -241,9 +241,29 @@ const ShippingAddress = () => {
                 height={50}
               />
               <h1 className="font-medium mt-1">{product.name}</h1>
-              <h4>Quantity: {product.quantity}</h4>
-              <h3>Price: {product.price}</h3>
-              <h3>Total Price: {product.price * product.quantity}</h3>
+              {/* Size & Color Design */}
+              <div className="flex gap-2 flex-wrap">
+                {product.size && (
+                  <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded flex items-center gap-1 font-medium">
+                    Size: {product.size}
+                  </span>
+                )}
+
+                {product.color && (
+                  <span className="px-2 py-1 text-xs bg-white text-gray-800 rounded flex items-center gap-1 font-medium">
+                    Color:
+                    <span
+                      className="w-3 h-3 rounded-full border border-gray-300 ml-1"
+                      style={{ backgroundColor: product.color }}
+                    ></span>
+                    {product.color}
+                  </span>
+                )}
+              </div>
+
+              <h4 className="mt-1">Quantity: {product.quantity}</h4>
+              <h3>Price: ${product.price}</h3>
+              <h3>Total Price: ${product.price * product.quantity}</h3>
             </div>
           ))}
         </div>

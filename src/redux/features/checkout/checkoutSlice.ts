@@ -7,6 +7,8 @@ export interface Product {
   quantity: number;
   price: number;
   discount: number;
+  size: string;
+  color: string;
 }
 
 interface CheckoutState {

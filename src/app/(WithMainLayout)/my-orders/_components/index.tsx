@@ -51,25 +51,54 @@ const MyOrders = () => {
       header: 'Products',
       cell: ({ row }) => {
         const products = row.original.products || [];
-        const visible = products.slice(0, 2);
 
         return (
-          <div className="lg:flex flex-col gap-2 w-fit">
-            {visible.map((p) => (
-              <div key={p.product} className="flex items-center gap-3">
+          <div className="flex flex-col gap-2 min-w-[260px] max-w-[320px]">
+            {products.map((product, index) => (
+              <div
+                key={index}
+                className="flex flex-col sm:flex-row gap-3 shadow-sm p-2 rounded-sm"
+              >
                 <Image
-                  src={p.image || '/placeholder.png'}
-                  alt={p.name}
-                  width={64}
-                  height={64}
-                  className="lg:w-24 lg:h-24 object-cover rounded border"
+                  src={product.image || '/placeholder.png'}
+                  alt={product.name}
+                  width={80}
+                  height={80}
+                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded border"
                 />
-                <div>
-                  <p className="text-base font-medium">{p.name}</p>
-                  <p className="text-sm text-gray-500">
-                    Quantity: {p.quantity}
+
+                <div className="flex-1">
+                  <p className="text-sm sm:text-base font-medium break-words">
+                    {product.name}
                   </p>
-                  <p className="text-sm text-gray-500">Price: ${p.price}</p>
+
+                  {/* Size & Color */}
+                  <div className="flex gap-2 flex-wrap my-1">
+                    {product.size && (
+                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded font-medium">
+                        Size: {product.size}
+                      </span>
+                    )}
+
+                    {product.color && (
+                      <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded flex items-center gap-1 font-medium">
+                        Color:
+                        <span
+                          className="w-3 h-3 rounded-full border border-gray-300 ml-1"
+                          style={{ backgroundColor: product.color }}
+                        />
+                        {product.color}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Quantity: {product.quantity}
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Price: ${product.price}
+                  </p>
                 </div>
               </div>
             ))}
@@ -77,41 +106,48 @@ const MyOrders = () => {
         );
       },
     },
+
     {
       accessorKey: 'vendor',
       header: 'Vendor Provider',
       cell: ({ row }) => (
-        <div>
-          <p className="text-base font-semibold">
+        <div className="min-w-[160px]">
+          <p className="text-sm sm:text-base font-semibold break-words">
             {row.original.vendor?.businessName}
           </p>
-          <p className="text-sm text-gray-500">{row.original.vendor?.email}</p>
+          <p className="text-xs sm:text-sm text-gray-500 break-words">
+            {row.original.vendor?.email}
+          </p>
         </div>
       ),
     },
+
     {
       accessorKey: 'createdAt',
       header: 'Date',
       cell: ({ row }) => (
-        <span className="text-base">
+        <span className="text-xs sm:text-base whitespace-nowrap">
           {format(new Date(row.original.createdAt), 'dd MMM, yyyy hh:mm a')}
         </span>
       ),
     },
+
     {
       accessorKey: 'totalPrice',
       header: 'SubTotal',
       cell: ({ row }) => (
-        <span className="font-semibold text-green-600">
+        <span className="font-semibold text-green-600 whitespace-nowrap">
           ${row.original.totalPrice.toFixed(2)}
         </span>
       ),
     },
+
     {
       accessorKey: 'status',
       header: 'Delivery Status',
       cell: ({ row }) => {
         const status = row.original.status;
+
         const statusMap: Record<string, { className: string; label: string }> =
           {
             pending: {
@@ -140,31 +176,34 @@ const MyOrders = () => {
         return (
           <Badge
             variant="outline"
-            className={`capitalize px-2 py-1 rounded-full ${badge.className}`}
+            className={`capitalize px-2 py-1 rounded-full whitespace-nowrap ${badge.className}`}
           >
             {badge.label}
           </Badge>
         );
       },
     },
+
     {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          {!row.original.isPaid === true ? (
+        <div className="flex items-center gap-2 min-w-[140px]">
+          {!row.original.isPaid ? (
             <Button
               onClick={() => handleCheckout(row.original)}
               disabled={isLoading}
               size="sm"
-              className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer"
+              className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer whitespace-nowrap"
             >
               Pay
             </Button>
           ) : (
             <div>
-              <h2 className="text-green-500">Paid</h2>
-              <p>Transaction ID: {row.original.trnId}</p>
+              <h2 className="text-green-500 text-sm">Paid</h2>
+              <p className="text-xs break-words">
+                Transaction ID: {row.original.trnId}
+              </p>
             </div>
           )}
         </div>

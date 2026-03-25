@@ -390,11 +390,6 @@ const MessageContainer = () => {
                       ? productData.data.name
                       : serviceData?.data?.name}
                   </h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">
-                    {productData?.data
-                      ? productData.data.description || 'No description'
-                      : serviceData?.data?.description || 'No description'}
-                  </p>
                   {productData?.data ? (
                     <p className="text-primary font-medium mt-1">
                       ${productData.data.price.toFixed(2)}

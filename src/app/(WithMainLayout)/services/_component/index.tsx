@@ -255,7 +255,16 @@ const ServiceDetails = ({ serviceId }: Props) => {
         <h5 className="text-lg font-medium uppercase border-b py-1">
           Description
         </h5>
-        <p className="mt-2 text-base text-gray-500">{service?.description}</p>
+        <div
+          className="mt-4 text-base text-gray-500 prose prose-sm max-w-none
+      [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+      [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+      [&_li]:my-0.5
+      [&_b]:font-semibold [&_strong]:font-semibold
+      [&_a]:text-blue-500 [&_a]:underline
+      [&_p]:my-1"
+          dangerouslySetInnerHTML={{ __html: service?.description || '' }}
+        />
       </div>
 
       <div className="lg:flex my-10 gap-4">
