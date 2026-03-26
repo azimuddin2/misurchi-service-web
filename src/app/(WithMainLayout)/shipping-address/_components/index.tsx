@@ -21,6 +21,26 @@ import Image from 'next/image';
 import { Product } from '@/redux/features/checkout/checkoutSlice';
 import { useAddOrderMutation } from '@/redux/features/order/orderApi';
 import { clearCart } from '@/redux/features/cart/cartSlice';
+import { useGetUserProfileQuery } from '@/redux/features/user/userApi';
+import Spinner from '@/components/shared/Spinner';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+
+const orderSchema = z.object({
+  name: z.string().min(1, { message: 'Name is required' }),
+  country: z
+    .string({ required_error: 'Country is required' })
+    .min(1, { message: 'Country is required' }),
+  state: z.string().min(1, { message: 'State is required' }),
+  city: z.string().optional(),
+  zipCode: z
+    .string({ required_error: 'Zip Code is required' })
+    .min(1, { message: 'Zip Code is required' }),
+  address: z
+    .string({ required_error: 'Delivery address is required' })
+    .min(1, { message: 'Delivery address is required' }),
+});
 
 const ShippingAddress = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -28,14 +48,12 @@ const ShippingAddress = () => {
   const checkoutPayload = useAppSelector((state) => state.checkout);
   const router = useRouter();
 
+  const { data: userData, isLoading } = useGetUserProfileQuery(
+    user?.email as string,
+  );
+
   const form = useForm({
-    defaultValues: {
-      name: user?.name || '',
-      email: user?.email,
-      phone: '',
-      address: '',
-      zipCode: '',
-    },
+    resolver: zodResolver(orderSchema),
   });
 
   const {
@@ -43,6 +61,14 @@ const ShippingAddress = () => {
   } = form;
 
   const { register, setValue, control } = form;
+
+  useEffect(() => {
+    if (userData?.data) {
+      setValue('name', userData.data.fullName);
+      setValue('email', userData.data.email || '');
+      setValue('phone', userData.data.phone || '');
+    }
+  }, [userData, setValue]);
 
   const [addOrder] = useAddOrderMutation();
 
@@ -53,7 +79,7 @@ const ShippingAddress = () => {
       buyer: user?.userId,
       customerName: data.name,
       customerEmail: user?.email,
-      customerPhone: data.phone,
+      customerPhone: userData?.data?.phone || data.phone,
       totalPrice: checkoutPayload.totalPrice,
       vendor: checkoutPayload.vendor,
       products: checkoutPayload.products,
@@ -81,6 +107,10 @@ const ShippingAddress = () => {
     }
   };
 
+  if (isLoading) {
+    return <Spinner />;
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 sm:p-6">
       <div className="md:col-span-2 space-y-6 shadow p-5 lg:p-10 rounded">
@@ -101,7 +131,7 @@ const ShippingAddress = () => {
                       <Input
                         type="text"
                         placeholder="Full Name"
-                        {...(field || user?.name)}
+                        {...field}
                         className="bg-[#f5f5f5] py-6 border-none rounded-sm"
                       />
                     </FormControl>
@@ -143,7 +173,7 @@ const ShippingAddress = () => {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          required
+                          disabled
                           type="text"
                           placeholder="Enter your phone number"
                           {...field}
@@ -175,7 +205,6 @@ const ShippingAddress = () => {
                     Zip Code
                   </FormLabel>
                   <Input
-                    required
                     type="text"
                     placeholder="Type Zip Code"
                     {...field}
@@ -198,11 +227,10 @@ const ShippingAddress = () => {
                   </FormLabel>
                   <FormControl>
                     <textarea
-                      required
                       {...field}
                       rows={8}
                       className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"
-                      placeholder="For Example: House# 123, Street# 123, ABC Road"
+                      placeholder="For Example: Road No- 10, House No- 20, Gulshan, Dhaka"
                     />
                   </FormControl>
                   <FormMessage />

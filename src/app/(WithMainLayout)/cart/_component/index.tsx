@@ -268,13 +268,13 @@ const Cart = () => {
                     {/* Selected size & color */}
                     <div className="flex gap-2 mt-1 flex-wrap">
                       {item.selectedSize && (
-                        <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full flex items-center gap-1 font-medium">
+                        <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-sm flex items-center gap-1 font-medium">
                           <span className="font-semibold">Size:</span>{' '}
                           {item.selectedSize}
                         </span>
                       )}
                       {item.selectedColor && (
-                        <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full flex items-center gap-1 font-medium">
+                        <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-sm flex items-center gap-1 font-medium">
                           <span className="font-semibold">Color:</span>
                           <span
                             className="w-3 h-3 rounded-full border border-gray-300 ml-1"
@@ -306,6 +306,7 @@ const Cart = () => {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                     <div className="flex items-center gap-2">
                       <Button
+                        className="cursor-pointer"
                         variant="outline"
                         size="icon"
                         onClick={() =>
@@ -323,6 +324,7 @@ const Cart = () => {
                       </Button>
                       <span className="px-1">{item.cartQuantity}</span>
                       <Button
+                        className="cursor-pointer"
                         variant="outline"
                         size="icon"
                         onClick={() =>

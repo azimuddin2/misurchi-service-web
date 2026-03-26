@@ -106,7 +106,9 @@ export default function CountryStateCitySelector({
         name="country"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Country</FormLabel>
+            <FormLabel className="!text-gray-700 !text-base font-medium">
+              Country
+            </FormLabel>
             <FormControl>
               <Select
                 value={selectedCountry}
@@ -140,7 +142,9 @@ export default function CountryStateCitySelector({
           name="state"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>State</FormLabel>
+              <FormLabel className="!text-gray-700 !text-base font-medium">
+                State
+              </FormLabel>
               <FormControl>
                 <Select
                   value={selectedState}
@@ -179,7 +183,9 @@ export default function CountryStateCitySelector({
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City</FormLabel>
+              <FormLabel className="!text-gray-700 !text-base font-medium">
+                City
+              </FormLabel>
               <FormControl>
                 <Select
                   value={selectedCity}

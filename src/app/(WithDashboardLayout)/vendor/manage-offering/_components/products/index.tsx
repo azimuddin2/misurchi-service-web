@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
+  AlertCircle,
   ChevronDown,
   Edit,
   Eye,
@@ -45,6 +46,7 @@ import {
 import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
 import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
+import { useGetUserProfileQuery } from '@/redux/features/user/userApi';
 
 const statusOptions = [
   { label: 'Available', key: 'Available' },
@@ -81,6 +83,14 @@ const ManageProducts = () => {
   const limit = searchParams.get('limit') || 10;
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
+
+  // Fetch user profile
+  const { data: userData } = useGetUserProfileQuery(user?.email as string, {
+    skip: !user?.email,
+  });
+
+  const stripeAccountId = userData?.data?.stripeAccountId;
+  const stripeOnboardingComplete = userData?.data?.stripeOnboardingComplete;
 
   const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
   const vendorId = vendorData?.data?._id as string;
@@ -401,8 +411,19 @@ const ManageProducts = () => {
 
   return (
     <div>
+      {(!stripeAccountId || !stripeOnboardingComplete) && (
+        <div className="mt-2 flex items-center gap-2 text-yellow-800 bg-yellow-50 p-3 rounded border border-yellow-200 text-sm">
+          <AlertCircle size={18} />
+          <span>
+            Complete your Stripe onboarding account to add products. Go to your
+            settings and click Continue Bank Account.
+          </span>
+        </div>
+      )}
+
       {/* Add Product Button */}
       <AppButton
+        disabled={!stripeAccountId || !stripeOnboardingComplete}
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
           <Link
