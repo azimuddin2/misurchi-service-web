@@ -1,83 +1,135 @@
-import { useEffect, useState } from 'react';
+'use client';
+
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
+import { useCreateStripeConnectAccountMutation } from '@/redux/features/stripe/stripeApi';
+import { useGetUserProfileQuery } from '@/redux/features/user/userApi';
+
 import {
-  useCreateVendorAccountMutation,
-  useGetVendorAccountStatusMutation,
-} from '@/redux/features/stripe/stripeApi';
-import { ArrowRight } from 'lucide-react';
+  ArrowRight,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  Info,
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 const BankAccount = () => {
   const user = useAppSelector(selectCurrentUser);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-  // Vendor profile fetch
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  // Fetch user profile
+  const { data: vendorData, isLoading: isVendorLoading } =
+    useGetUserProfileQuery(user?.email as string, {
+      skip: !user?.email,
+    });
 
-  // Stripe account creation
-  const [createVendorAccount, { isLoading: isCreating }] =
-    useCreateVendorAccountMutation();
+  const vendorId = vendorData?.data?._id;
+  const stripeAccountId = vendorData?.data?.stripeAccountId;
+  const stripeOnboardingComplete = vendorData?.data?.stripeOnboardingComplete;
 
-  // Stripe account status
-  const [getVendorAccountStatus] = useGetVendorAccountStatusMutation();
-  const [status, setStatus] = useState<string>('Loading...');
+  const [createStripeConnectAccount, { isLoading: isCreating }] =
+    useCreateStripeConnectAccountMutation();
 
-  // Fetch Stripe status when vendorId available
-  useEffect(() => {
-    const fetchStatus = async () => {
-      if (!vendorId) return;
-      try {
-        const res = await getVendorAccountStatus({ vendorId }).unwrap();
-        setStatus(res.data?.status ?? 'pending');
-      } catch (error) {
-        setStatus('pending');
-      }
-    };
-    fetchStatus();
-  }, [vendorId, getVendorAccountStatus]);
-
-  // Handle Stripe onboarding
+  // ─── Stripe Onboarding Handler ───
   const handleAddBankAccount = async () => {
-    if (!vendorId) return;
-
     try {
-      const result = await createVendorAccount({ vendorId }).unwrap();
+      const result = await createStripeConnectAccount().unwrap();
+      const stripeData = result?.data;
 
-      if (result.data?.onboardingUrl) {
-        window.location.href = result.data.onboardingUrl;
-      } else if (result.data?.existing) {
-        alert(result.data.message);
-        window.location.href = result.data.onboardingUrl;
+      // 1️⃣ New onboarding link
+      if (stripeData?.object === 'account_link' && stripeData?.url) {
+        toast.success('Redirecting to Stripe...');
+        window.location.href = stripeData.url;
+        return;
       }
-    } catch (error) {
-      alert('Failed to create Stripe account');
+
+      // 2️⃣ Already connected
+      if (stripeData?.object === 'already_connected') {
+        setAlertMessage('Stripe account already connected successfully.');
+        toast.success('Stripe account already connected');
+        return;
+      }
+
+      // 3️⃣ Unexpected response
+      setAlertMessage('Unable to generate Stripe onboarding link.');
+      toast.error('Stripe onboarding link not found');
+    } catch (err: any) {
+      const message =
+        err?.data?.message || 'Failed to connect Stripe. Please try again.';
+      setAlertMessage(message);
+      toast.error(message);
     }
   };
+
+  const isDisabled = isCreating || isVendorLoading || !vendorId;
+  const stripeConnected = Boolean(stripeAccountId);
 
   return (
     <div className="mt-5">
       <h1 className="text-2xl font-semibold">Bank Account</h1>
-      <div className="shadow p-5 rounded-sm mt-2">
-        <div className="flex justify-between px-10">
-          <h2 className="text-lg font-medium capitalize text-center">
-            Set Up Your Bank Account
-          </h2>
-          <p className="mt-3 text-center">
-            Status: <span className="font-semibold">{status}</span>
-          </p>
-        </div>
 
-        <button
-          onClick={handleAddBankAccount}
-          disabled={isCreating || !vendorId}
-          className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 p-3 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4 flex items-center justify-center shadow-gray-500"
-        >
-          <span className="uppercase text-sm font-semibold mr-2">
-            Add bank account
-          </span>
-          <ArrowRight size={18} />
-        </button>
+      <div className="shadow p-6 rounded-md mt-3 bg-white space-y-4">
+        {/* Title */}
+        <h2 className="text-lg font-medium">Set Up Your Stripe Bank Account</h2>
+        <p className="text-sm text-gray-500">
+          Connect your bank account via Stripe to receive payments securely. You
+          will be redirected to Stripe's onboarding page.
+        </p>
+
+        {/* 1️⃣ Stripe Connected & Onboarding Complete */}
+        {stripeConnected && stripeOnboardingComplete && (
+          <div className="flex items-center gap-2 bg-green-50 text-green-700 p-3 rounded-md border border-green-200">
+            <CheckCircle size={18} />
+            Stripe account connected successfully.
+          </div>
+        )}
+
+        {/* 2️⃣ Stripe Connected but Onboarding Incomplete */}
+        {stripeConnected && !stripeOnboardingComplete && (
+          <div className="flex items-center gap-2 bg-yellow-50 text-yellow-700 p-3 rounded-md border border-yellow-200">
+            <AlertCircle size={18} />
+            Stripe account exists but onboarding is incomplete. Please continue.
+          </div>
+        )}
+
+        {/* 3️⃣ Alert from API */}
+        {alertMessage && !stripeConnected && (
+          <div className="flex items-center gap-2 bg-yellow-50 text-yellow-700 p-3 rounded-md border border-yellow-200">
+            <AlertCircle size={18} />
+            {alertMessage}
+          </div>
+        )}
+
+        {/* 4️⃣ Button */}
+        {!stripeConnected || !stripeOnboardingComplete ? (
+          <button
+            onClick={handleAddBankAccount}
+            disabled={isDisabled}
+            className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 p-3 rounded-md border-b-4 border-r-4 shadow-md text-sm font-semibold uppercase flex justify-center items-center gap-2 cursor-pointer"
+          >
+            {isCreating ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Connecting...
+              </>
+            ) : (
+              <>
+                Add / Continue Bank Account
+                <ArrowRight size={18} />
+              </>
+            )}
+          </button>
+        ) : null}
+
+        {/* 5️⃣ Vendor Missing */}
+        {!isVendorLoading && !vendorId && (
+          <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-md border border-red-200">
+            <Info size={18} />
+            Vendor profile not found. Please complete your profile first.
+          </div>
+        )}
       </div>
     </div>
   );

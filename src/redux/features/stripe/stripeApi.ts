@@ -1,36 +1,26 @@
 import { baseApi } from '../../api/baseApi';
 import { TResponse } from '@/types';
 
+type TStripeConnectResponse = {
+  object: string;
+  url: string;
+  expires_at: number;
+  accountId: string;
+};
+
 export const stripeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Stripe account creation
-    createVendorAccount: builder.mutation<TResponse<any>, { vendorId: string }>(
-      {
-        query: ({ vendorId }) => ({
-          url: `/stripe/vendor/create-account`,
-          method: 'POST',
-          body: { vendorId },
-          credentials: 'include',
-        }),
-      },
-    ),
-
-    // Stripe account status (POST body)
-    getVendorAccountStatus: builder.mutation<
-      TResponse<any>,
-      { vendorId: string }
+    createStripeConnectAccount: builder.mutation<
+      TResponse<TStripeConnectResponse>,
+      void
     >({
-      query: ({ vendorId }) => ({
-        url: `/stripe/vendor/account-status`,
-        method: 'POST',
-        body: { vendorId },
+      query: () => ({
+        url: '/stripe/connect-account',
+        method: 'PATCH',
         credentials: 'include',
       }),
     }),
   }),
 });
 
-export const {
-  useCreateVendorAccountMutation,
-  useGetVendorAccountStatusMutation,
-} = stripeApi;
+export const { useCreateStripeConnectAccountMutation } = stripeApi;

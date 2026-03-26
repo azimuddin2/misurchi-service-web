@@ -33,6 +33,14 @@ export interface IUser {
   isSubscribed: boolean;
   subscribed?: TSubscribed;
   _id: string;
+
+  // 🔹 Stripe (Customer)
+  stripeCustomerId?: string | null;
+
+  // 🔹 Stripe (Vendor / Connect)
+  stripeAccountId?: string | null;
+  stripeOnboardingComplete?: boolean;
+
   createdAt: string;
   updatedAt: string;
   __v: number;
