@@ -200,8 +200,8 @@ const MyOrders = () => {
             </Button>
           ) : (
             <div>
-              <h2 className="text-green-500 text-sm">Paid</h2>
-              <p className="text-xs break-words">
+              <h2 className="text-green-500 text-base">Paid</h2>
+              <p className="text-sm break-words">
                 Transaction ID: {row.original.trnId}
               </p>
             </div>

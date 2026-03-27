@@ -50,6 +50,20 @@ const ProductCard = ({ product }: ProductProps) => {
             </div>
           )}
 
+        {/* Recommended Type Badges */}
+        {product.recommendedType.length > 0 && (
+          <div className="absolute bottom-12 right-2 z-10 items-end">
+            {product.recommendedType.map((type, index) => (
+              <span
+                key={index}
+                className="bg-[#E9F4FFCC] text-[#0D3C6B] text-xs font-semibold px-2 py-1 rounded mr-1 uppercase italic"
+              >
+                {type}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Product Name Overlay */}
         <div className="absolute bottom-0 bg-black/50 p-2 w-full text-gray-100 text-center text-lg z-10">
           <h1 className="truncate">{product?.name}</h1>

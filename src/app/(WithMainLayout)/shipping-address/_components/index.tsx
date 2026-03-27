@@ -54,6 +54,16 @@ const ShippingAddress = () => {
 
   const form = useForm({
     resolver: zodResolver(orderSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      country: '',
+      state: '',
+      city: '',
+      zipCode: '',
+      address: '',
+    },
   });
 
   const {
@@ -64,9 +74,9 @@ const ShippingAddress = () => {
 
   useEffect(() => {
     if (userData?.data) {
-      setValue('name', userData.data.fullName);
-      setValue('email', userData.data.email || '');
-      setValue('phone', userData.data.phone || '');
+      setValue('name', userData?.data?.fullName || '');
+      setValue('email', userData?.data?.email || '');
+      setValue('phone', userData?.data?.phone || '');
     }
   }, [userData, setValue]);
 
@@ -230,7 +240,7 @@ const ShippingAddress = () => {
                       {...field}
                       rows={8}
                       className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"
-                      placeholder="For Example: Road No- 10, House No- 20, Gulshan, Dhaka"
+                      placeholder="e.g. 123 Main St, Apt 4B, New York, NY 10001"
                     />
                   </FormControl>
                   <FormMessage />

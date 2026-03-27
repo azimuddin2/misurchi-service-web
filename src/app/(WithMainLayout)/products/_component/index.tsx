@@ -255,6 +255,7 @@ const ProductDetails = ({ productId }: Props) => {
                 Special Offer
               </span>
             )}
+
             <div className="flex items-center gap-2 mt-4">
               <StarRatings
                 rating={product?.avgRating ?? 0}
@@ -294,35 +295,61 @@ const ProductDetails = ({ productId }: Props) => {
             )}
           </div>
 
-          {/* ── Status + Quantity pills ── */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Status pill */}
-            <span
-              className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${cfg.badge}`}
-            >
-              <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
-              {cfg.icon}
-              {cfg.label}
-            </span>
-
-            {/* Quantity pill — only show when available */}
-            {status === 'Available' && product?.quantity !== undefined && (
+          <div className="lg:flex justify-between items-center">
+            {/* ── Status + Quantity pills ── */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Status pill */}
               <span
-                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${
-                  isLowStock
-                    ? 'bg-orange-50 text-orange-700 border-orange-200'
-                    : 'bg-gray-50 text-gray-600 border-gray-200'
-                }`}
+                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${cfg.badge}`}
               >
-                {isLowStock && (
-                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                )}
-                {isLowStock
-                  ? `Only ${product.quantity} left!`
-                  : `${product.quantity} in stock`}
+                <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
+                {cfg.icon}
+                {cfg.label}
               </span>
-            )}
+
+              {/* Quantity pill — only show when available */}
+              {status === 'Available' && product?.quantity !== undefined && (
+                <span
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${
+                    isLowStock
+                      ? 'bg-orange-50 text-orange-700 border-orange-200'
+                      : 'bg-gray-50 text-gray-600 border-gray-200'
+                  }`}
+                >
+                  {isLowStock && (
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  )}
+                  {isLowStock
+                    ? `Only ${product.quantity} left!`
+                    : `${product.quantity} in stock`}
+                </span>
+              )}
+            </div>
+
+            {/* Recommended Type Badges */}
+            <div>
+              {product?.recommendedType?.length && (
+                <div className="mt-3 right-2 z-10 items-end">
+                  {product?.recommendedType.map((type, index) => (
+                    <span
+                      key={index}
+                      className="bg-[#E9F4FFCC] text-[#0D3C6B] text-xs font-semibold px-2 py-1 rounded mr-2 uppercase ring-1 ring-[#d2dfeccc]"
+                    >
+                      {type}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Out of stock quantity banner */}
+          {status === 'Available' && product?.quantity === 0 && (
+            <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 font-medium">
+              <PackageX className="w-4 h-4 shrink-0" />
+              This product is currently out of stock.
+            </div>
+          )}
 
           {/* Low stock warning banner */}
           {isLowStock && (
@@ -377,7 +404,7 @@ const ProductDetails = ({ productId }: Props) => {
                       onClick={() =>
                         setSelectedSize(s === selectedSize ? null : s)
                       }
-                      className={`px-3 py-1 rounded-sm border-2 text-sm font-medium transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-sm border-1 text-sm font-medium transition-all cursor-pointer ${
                         selectedSize === s
                           ? 'bg-green-800 text-white border-green-800'
                           : 'bg-gray-100 border-gray-200 text-gray-700 hover:border-green-600'
@@ -410,10 +437,10 @@ const ProductDetails = ({ productId }: Props) => {
                     onClick={() =>
                       setSelectedColor(color === selectedColor ? null : color)
                     }
-                    className={`flex cursor-pointer items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium border-2 bg-white transition-all ${
+                    className={`flex cursor-pointer items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium  bg-white transition-all ${
                       selectedColor === color
-                        ? 'border-green-700'
-                        : 'border-gray-300 hover:border-green-600'
+                        ? 'border-green-700 border-2'
+                        : 'border-gray-300 hover:border-green-600 border-1'
                     } disabled:opacity-40 disabled:cursor-not-allowed`}
                     style={{ color: '#000' }}
                   >
@@ -452,7 +479,7 @@ const ProductDetails = ({ productId }: Props) => {
           <div className="space-y-3">
             <Button
               onClick={() => handleAddToCart(product)}
-              disabled={!canAddToCart}
+              disabled={!canAddToCart || product?.quantity === 0}
               className={`w-full flex items-center justify-center gap-2 py-6 rounded-sm text-sm font-semibold uppercase tracking-wide border-b-4 border-r-4 shadow-sm transition-all ${
                 canAddToCart
                   ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white border-green-900 hover:opacity-90 cursor-pointer'
@@ -494,7 +521,7 @@ const ProductDetails = ({ productId }: Props) => {
 
       {/* ── Reviews ── */}
       <div className="lg:flex my-10 gap-4">
-        <div className="lg:w-4/12 bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
+        <div className="w-full bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
           <h2 className="text-2xl mb-2">Average Rating</h2>
           <div className="flex items-center gap-2 mt-5">
             {product ? (
@@ -530,13 +557,13 @@ const ProductDetails = ({ productId }: Props) => {
             ))}
           </div>
         </div>
-        <div className="lg:w-3/4">
+        {/* <div className="lg:w-3/4">
           <AddReview
             vendorId={vendorId}
             productId={productId}
             refetch={refetch}
           />
-        </div>
+        </div> */}
       </div>
 
       <ViewReviews productId={productId} />
