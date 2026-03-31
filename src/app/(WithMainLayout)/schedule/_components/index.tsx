@@ -134,6 +134,7 @@ const Schedule = ({ id }: Props) => {
           onSelect={setSelectedDate}
           initialFocus
           showOutsideDays
+          disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
           className="w-full hover:bg-none"
           classNames={{
             months:

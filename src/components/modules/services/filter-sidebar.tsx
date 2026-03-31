@@ -165,7 +165,7 @@ export default function FilterSidebar() {
               <Button
                 onClick={() => router.push(pathname, { scroll: false })}
                 size="sm"
-                className="bg-red-400 hover:bg-red-500 text-white rounded flex items-center gap-1"
+                className="bg-red-400 hover:bg-red-500 text-white rounded flex items-center gap-1 cursor-pointer"
               >
                 Clear <CircleX size={20} />
               </Button>
@@ -183,6 +183,7 @@ export default function FilterSidebar() {
             {recommendedOptions.map((item) => (
               <div key={item} className="flex items-center gap-2 mb-1">
                 <Checkbox
+                  className="cursor-pointer"
                   checked={selectedRecommended.includes(item)}
                   onCheckedChange={() => toggleRecommended(item)}
                   id={`rec-${item}`}
@@ -199,10 +200,11 @@ export default function FilterSidebar() {
 
           {/* Service Type */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3">Service Type</h2>
+            <h2 className="text-lg font-semibold mb-3">Service Category</h2>
             {serviceTypes.map((type: any) => (
               <div key={type._id} className="flex items-center gap-2 mb-1">
                 <Checkbox
+                  className="cursor-pointer"
                   checked={selectedType.includes(type.name)}
                   onCheckedChange={() =>
                     toggleSelect(
@@ -243,7 +245,7 @@ export default function FilterSidebar() {
             </div>
             <Button
               onClick={handleApplyPrice}
-              className="mt-3 w-full bg-sky-900 hover:bg-sky-950 text-white text-sm rounded-sm"
+              className="mt-3 w-full bg-sky-900 hover:bg-sky-950 text-white text-sm rounded-sm cursor-pointer"
               disabled={
                 !minPrice || !maxPrice || Number(minPrice) > Number(maxPrice)
               }
@@ -258,6 +260,7 @@ export default function FilterSidebar() {
             {discountOptions.map((item) => (
               <div key={item.value} className="flex items-center gap-2 mb-1">
                 <Checkbox
+                  className="cursor-pointer"
                   checked={selectedDiscounts.includes(item.value)}
                   onCheckedChange={() => toggleDiscount(item.value)}
                   id={item.value}

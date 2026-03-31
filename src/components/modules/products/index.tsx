@@ -109,10 +109,11 @@ const AllProducts = () => {
                   alt="No results"
                   width={100}
                   height={100}
-                  className="mx-auto"
+                  className="mx-auto w-40"
                 />
                 <p className="capitalize">
-                  No product found matching your search.
+                  No Porduct found. Try changing your search keywords or filter
+                  options.
                 </p>
               </div>
             )}

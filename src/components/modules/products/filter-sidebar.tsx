@@ -166,6 +166,7 @@ export default function FilterSidebar() {
             {recommendedOptions.map((item) => (
               <div key={item} className="flex items-center gap-2 mb-1">
                 <Checkbox
+                  className="cursor-pointer"
                   checked={selectedRecommended.includes(item)}
                   onCheckedChange={() =>
                     toggleSelection(
@@ -189,10 +190,11 @@ export default function FilterSidebar() {
 
           {/* Product Types */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3">Product Types</h2>
+            <h2 className="text-lg font-semibold mb-3">Product Category</h2>
             {productTypes.map((type: any) => (
               <div key={type._id} className="flex items-center gap-2 mb-1">
                 <Checkbox
+                  className="cursor-pointer"
                   checked={selectedProducts.includes(type.name)}
                   onCheckedChange={() =>
                     toggleSelection(
@@ -233,7 +235,7 @@ export default function FilterSidebar() {
             </div>
             <Button
               onClick={handleApplyPrice}
-              className="mt-3 w-full bg-sky-900 hover:bg-sky-950 text-white text-sm rounded-sm"
+              className="mt-3 w-full bg-sky-900 hover:bg-sky-950 text-white text-sm rounded-sm cursor-pointer"
               disabled={
                 !minPrice || !maxPrice || Number(minPrice) > Number(maxPrice)
               }
@@ -248,6 +250,7 @@ export default function FilterSidebar() {
             {discounts.map((discount) => (
               <div key={discount} className="flex items-center gap-2 mb-1">
                 <Checkbox
+                  className="cursor-pointer"
                   checked={selectedDiscounts.includes(discount)}
                   onCheckedChange={() =>
                     toggleSelection(

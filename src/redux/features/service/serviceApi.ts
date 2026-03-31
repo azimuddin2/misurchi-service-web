@@ -36,22 +36,22 @@ const serviceApi = baseApi.injectEndpoints({
       query: ({ page = 1, limit = 10, query }) => {
         const params = new URLSearchParams();
 
-        // ✅ Price Range
+        if (query?.searchTerm)
+          params.append('searchTerm', query.searchTerm.toString());
+
+        if (query?.type) params.append('type', query.type.toString());
+
         if (query?.minPrice)
           params.append('minPrice', query.minPrice.toString());
+
         if (query?.maxPrice)
           params.append('maxPrice', query.maxPrice.toString());
 
-        // ✅ Type (multi-select)
-        if (query?.type) params.append('type', query.type.toString());
+        if (query?.minDiscount)
+          params.append('minDiscount', query.minDiscount.toString());
 
-        // ✅ Discount (multi-select)
-        if (query?.discount)
-          params.append('discount', query.discount.toString());
-
-        // ✅ Search
-        if (query?.searchTerm)
-          params.append('searchTerm', query.searchTerm.toString());
+        if (query?.maxDiscount)
+          params.append('maxDiscount', query.maxDiscount.toString());
 
         return {
           url: `/services?page=${page}&limit=${limit}&${params.toString()}`,

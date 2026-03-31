@@ -104,10 +104,11 @@ const AllServices = () => {
                   alt="No results"
                   width={100}
                   height={100}
-                  className="mx-auto"
+                  className="mx-auto w-40"
                 />
-                <p className="col-span-full text-center text-gray-500 capitalize">
-                  No service found matching your filters.
+                <p className="col-span-full text-center text-gray-500 capitalize font-medium mt-5 text-base">
+                  No services found. Try changing your search keywords or filter
+                  options.
                 </p>
               </div>
             )}
