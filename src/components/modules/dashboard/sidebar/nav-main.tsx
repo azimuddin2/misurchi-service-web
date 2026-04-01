@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRight, type LucideIcon } from 'lucide-react';
+import { ChevronRight, Lock, type LucideIcon } from 'lucide-react';
 
 import {
   Collapsible,
@@ -20,7 +20,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { cn } from '@/lib/utils'; // Your class merging utility
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
@@ -36,12 +36,14 @@ export function NavMain({
     url: string;
     icon: LucideIcon;
     isActive?: boolean;
+    disabled?: boolean;
+    lockIcon?: boolean;
     items?: {
       title: string;
       url: string;
     }[];
   }[];
-  currentPath: string; // ✅ Add this line
+  currentPath: string;
 }) {
   const pathname = usePathname();
   const user = useAppSelector(selectCurrentUser);
@@ -70,12 +72,33 @@ export function NavMain({
           )}
         </div>
       </SidebarGroupLabel>
+
       <SidebarMenu>
         {items.map((item) => {
           const isParentActive =
             pathname === item.url ||
             item.items?.some((sub) => pathname === sub.url);
 
+          // 🔒 Disabled item (locked for basic plan)
+          if (item.disabled) {
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  className="py-5 rounded-sm w-full text-left opacity-50 cursor-not-allowed hover:bg-transparent text-[#165940] my-1"
+                  onClick={(e) => e.preventDefault()}
+                >
+                  <item.icon />
+                  <span className="flex-1">{item.title}</span>
+                  {item.lockIcon && (
+                    <Lock className="h-4 w-4 ml-auto text-muted-foreground" />
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          }
+
+          // ✅ Normal item
           return (
             <Collapsible key={item.title} asChild defaultOpen={isParentActive}>
               <SidebarMenuItem>

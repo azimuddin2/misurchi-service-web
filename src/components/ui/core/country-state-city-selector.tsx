@@ -71,12 +71,11 @@ export default function CountryStateCitySelector({
       setSelectedCountry(userAddress.country);
       setSelectedState(userAddress.state);
       setSelectedCity(userAddress.city);
-
       setValue('country', userAddress.country);
       setValue('state', userAddress.state);
       setValue('city', userAddress.city);
     }
-  }, [userAddress?.country]);
+  }, [userAddress?.country, userAddress?.state, userAddress?.city]);
 
   return (
     <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-3">
@@ -136,13 +135,13 @@ export default function CountryStateCitySelector({
                   setValue('city', '');
                 }}
                 value={selectedState}
-                disabled={!selectedCountry || statesOfCountry.length === 0}
+                disabled={!selectedCountry || statesOfCountry?.length === 0}
               >
                 <SelectTrigger className="bg-[#f5f5f5] py-6 border-none w-full rounded-sm">
                   <SelectValue placeholder="Select State" />
                 </SelectTrigger>
                 <SelectContent>
-                  {statesOfCountry.length > 0 ? (
+                  {statesOfCountry?.length > 0 ? (
                     statesOfCountry.map((state: any) => (
                       <SelectItem key={state.name} value={state.name}>
                         {state.name}

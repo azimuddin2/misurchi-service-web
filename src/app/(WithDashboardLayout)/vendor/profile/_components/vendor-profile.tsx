@@ -41,6 +41,8 @@ import {
 import CoverImageUploader from '@/components/ui/core/CoverImageUploader';
 import CoverImagePreview from '@/components/ui/core/CoverImageUploader/CoverImagePreview';
 import LocationMap from '@/components/shared/location-map';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { vendorProfileSchema } from './profileValidation';
 
 const VendorProfile = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -56,6 +58,7 @@ const VendorProfile = () => {
   const [updateVendorProfile] = useUpdateVendorProfileMutation();
 
   const form = useForm({
+    resolver: zodResolver(vendorProfileSchema),
     defaultValues: {
       businessName: '',
       email: '',
@@ -266,7 +269,7 @@ const VendorProfile = () => {
                     {...field}
                     value={field.value || ''}
                     className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                    readOnly
+                    disabled
                   />
                 </FormControl>
                 <FormMessage />
@@ -298,11 +301,15 @@ const VendorProfile = () => {
           />
 
           {/* Country, State, City Selector */}
-          <div className="grid w-full  items-center mb-5">
+          <div className="grid w-full items-center mb-5">
             <CountryStateCitySelector
               control={control}
               setValue={setValue}
               register={register}
+              userAddress={{
+                country: vendorUser?.country || '',
+                state: vendorUser?.state || '',
+              }}
             />
           </div>
 
@@ -503,7 +510,6 @@ const VendorProfile = () => {
                 <FormControl>
                   <textarea
                     {...field}
-                    required
                     rows={8}
                     className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"
                     placeholder="Enter description here..."
@@ -523,8 +529,8 @@ const VendorProfile = () => {
               coordinates={
                 vendorUser?.location?.coordinates?.length === 2
                   ? [
-                      vendorUser.location.coordinates[1], // lat
-                      vendorUser.location.coordinates[0], // lng
+                      vendorUser.location.coordinates[1],
+                      vendorUser.location.coordinates[0],
                     ]
                   : undefined
               }
