@@ -57,7 +57,7 @@ const MyOrders = () => {
             {products.map((product, index) => (
               <div
                 key={index}
-                className="flex flex-col sm:flex-row gap-3 shadow-sm p-2 rounded-sm"
+                className="flex flex-col sm:flex-row gap-3 p-2 rounded-sm"
               >
                 <Image
                   src={product.image || '/placeholder.png'}

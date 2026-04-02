@@ -1,6 +1,5 @@
 'use client';
 
-import { AppButton } from '@/components/shared/app-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TProduct } from '@/types/product.type';
 import { ArrowRight, MapPin } from 'lucide-react';
@@ -119,7 +118,7 @@ const ProductCard = ({ product }: ProductProps) => {
               reviews)
             </p>
           </div>
-          <p className="flex items-center mt-3">
+          <p className="flex items-center mt-3 mb-5">
             <MapPin className="text-[#6B7280] mr-1" />
             <span className="text-[#6B7280]">
               {product?.vendor?.country}, {product.vendor.state}
@@ -127,21 +126,12 @@ const ProductCard = ({ product }: ProductProps) => {
           </p>
         </div>
       </div>
-
-      <AppButton
-        className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
-        content={
-          <Link
-            href={`/products/${product._id}`}
-            className="flex justify-center items-center space-x-1 font-semibold"
-          >
-            <span className="uppercase text-sm font-semibold mr-2">
-              SHOP NOW
-            </span>
-            <ArrowRight size={24} />
-          </Link>
-        }
-      />
+      <Link href={`/products/${product._id}`}>
+        <button className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80 p-[14px] cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500  flex justify-center items-center font-semibold">
+          <span className="uppercase text-sm font-semibold mr-2">SHOP NOW</span>
+          <ArrowRight size={18} />
+        </button>
+      </Link>
     </div>
   );
 };

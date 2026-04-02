@@ -108,7 +108,7 @@ export default function Header() {
             </div>
             <DropdownMenuSeparator />
             <Link href={`/${user?.role}/profile`}>
-              <DropdownMenuItem className="rounded-md gap-2">
+              <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
                 <User size={18} /> View Profile
               </DropdownMenuItem>
             </Link>
@@ -116,12 +116,12 @@ export default function Header() {
             {user?.role === 'vendor' && (
               <>
                 <Link href="/vendor/dashboard">
-                  <DropdownMenuItem className="rounded-md gap-2">
+                  <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
                     <LayoutDashboard size={18} /> Dashboard
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/vendor/manage-offering">
-                  <DropdownMenuItem className="rounded-md gap-2">
+                  <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
                     <Store size={18} /> Manage Offering
                   </DropdownMenuItem>
                 </Link>
@@ -131,12 +131,12 @@ export default function Header() {
             {user?.role === 'user' && (
               <>
                 <Link href="/my-orders">
-                  <DropdownMenuItem className="rounded-md gap-2">
+                  <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
                     <SendToBack size={18} /> My Orders
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/my-bookings">
-                  <DropdownMenuItem className="rounded-md gap-2">
+                  <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
                     <NotepadText size={18} /> My Bookings
                   </DropdownMenuItem>
                 </Link>
@@ -146,7 +146,7 @@ export default function Header() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleLogout}
-              className="rounded-sm text-white bg-red-500 hover:bg-red-600 mt-2 gap-2"
+              className="rounded-sm text-white bg-red-500 hover:bg-red-600 mt-2 gap-2 cursor-pointer"
             >
               <LogOut size={18} /> Logout
             </DropdownMenuItem>

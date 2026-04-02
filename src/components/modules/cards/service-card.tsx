@@ -1,6 +1,5 @@
 'use client';
 
-import { AppButton } from '@/components/shared/app-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TService } from '@/types/service.type';
 import { ArrowRight, MapPin } from 'lucide-react';
@@ -126,21 +125,12 @@ const ServiceCard = ({ service }: ServiceProps) => {
           </p>
         </div>
       </div>
-
-      <AppButton
-        className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
-        content={
-          <Link
-            href={`/services/${service._id}`}
-            className="flex justify-center items-center space-x-1 font-semibold"
-          >
-            <span className="uppercase text-sm font-semibold mr-2">
-              Schedule
-            </span>
-            <ArrowRight size={24} />
-          </Link>
-        }
-      />
+      <Link href={`/services/${service._id}`}>
+        <button className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80 p-[14px] cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500  flex justify-center items-center font-semibold">
+          <span className="uppercase text-sm font-semibold mr-2">Schedule</span>
+          <ArrowRight size={20} />
+        </button>
+      </Link>
     </div>
   );
 };

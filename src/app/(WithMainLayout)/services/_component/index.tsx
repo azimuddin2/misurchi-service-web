@@ -1,14 +1,14 @@
 'use client';
 
+import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useGetServiceByIdQuery } from '@/redux/features/service/serviceApi';
-import { TService } from '@/types/service.type';
-import { ArrowRight, MapPin, Send } from 'lucide-react';
+import { TService, TStatus } from '@/types/service.type';
+import { ArrowRight, MapPin, Send, PackageX } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
-import AddReview from './add-review';
 import ViewReviews from './view-reviews';
 import { Progress } from '@/components/ui/progress';
 import Link from 'next/link';
@@ -23,9 +23,50 @@ type Props = {
   serviceId: string;
 };
 
+const UnavailableIcon = () => <PackageX className="w-3.5 h-3.5" />;
+
+const statusConfig: Record<
+  TStatus,
+  {
+    label: string;
+    badge: string;
+    dot: string;
+    icon: (() => React.ReactElement) | null;
+    blockSchedule: boolean;
+    bannerClass: string;
+    bannerText: string;
+  }
+> = {
+  available: {
+    label: 'Available',
+    badge: 'bg-green-50 text-green-700 border-green-200',
+    dot: 'bg-green-500',
+    icon: null,
+    blockSchedule: false,
+    bannerClass: '',
+    bannerText: '',
+  },
+  unavailable: {
+    label: 'Unavailable',
+    badge: 'bg-red-50 text-red-700 border-red-200',
+    dot: 'bg-red-500',
+    icon: UnavailableIcon,
+    blockSchedule: true,
+    bannerClass: 'bg-red-50 border-red-200 text-red-700',
+    bannerText: 'This Service Is Currently Unavailable.',
+  },
+};
+
+// ✅ discount valid check
+const isValidDiscount = (discount?: string): boolean => {
+  if (!discount) return false;
+  const trimmed = discount.trim();
+  return trimmed !== '' && trimmed !== 'none' && trimmed !== '0%';
+};
+
 const ServiceDetails = ({ serviceId }: Props) => {
   const router = useRouter();
-  const { data, refetch, isLoading } = useGetServiceByIdQuery(serviceId);
+  const { data, isLoading } = useGetServiceByIdQuery(serviceId);
   const service: TService | undefined = data?.data;
   const vendorId = service?.vendor._id as string;
   const userId = service?.user._id as string;
@@ -33,23 +74,23 @@ const ServiceDetails = ({ serviceId }: Props) => {
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // When data is loaded, set the first image as default
   useEffect(() => {
     if (service?.images?.length) {
       setSelectedImage(service.images[0].url);
     }
   }, [service]);
 
+  // ✅ status — lowercase match
+  const status: TStatus = service?.status ?? 'available';
+  const cfg = statusConfig[status];
+
   const firstPricing = service?.savedServices?.[0];
   const price = Number(firstPricing?.price || 0);
   const discountStr = firstPricing?.discount || '0%';
-
-  // Convert discount to number
   const discountPercent = Number(discountStr.replace('%', ''));
   const discountedPrice = price - (price * discountPercent) / 100;
 
   const totalReviews = service?.reviews?.length ?? 0;
-
   const progress = [5, 4, 3, 2, 1].map((star) => {
     const count =
       service?.reviews?.filter((r: TReview) => r.rating === star).length ?? 0;
@@ -61,14 +102,12 @@ const ServiceDetails = ({ serviceId }: Props) => {
     router.push(`/user/message?userId=${userId}&serviceId=${serviceId}`);
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  if (isLoading) return <Spinner />;
 
   return (
     <div className="my-20">
       <div className="grid grid-cols-1 lg:grid-cols-2">
-        {/* Product Image Section */}
+        {/* LEFT: Images + Vendor */}
         <div>
           <div className="rounded-lg flex items-center justify-center h-[400px] relative overflow-hidden">
             {selectedImage && (
@@ -81,6 +120,7 @@ const ServiceDetails = ({ serviceId }: Props) => {
               />
             )}
           </div>
+
           {/* Thumbnails */}
           <div className="gap-3 mt-12 flex justify-start flex-wrap">
             {service?.images?.map((image, index) => (
@@ -117,15 +157,13 @@ const ServiceDetails = ({ serviceId }: Props) => {
               <div>
                 <p className="text-lg">{service?.vendor?.businessName}</p>
                 <p className="flex items-center gap-1">
-                  {' '}
-                  <MapPin />{' '}
+                  <MapPin />
                   <span>
                     {service?.vendor?.country} {service?.vendor.state}
                   </span>
                 </p>
               </div>
             </div>
-
             <FollowButton
               vendorId={vendorId}
               className="w-full lg:w-1/2 text-black border-gray-800 bg-gradient-to-t to-white from-white hover:bg-green-500/80"
@@ -133,23 +171,18 @@ const ServiceDetails = ({ serviceId }: Props) => {
           </div>
         </div>
 
-        {/* Product Info */}
+        {/* RIGHT: Service Info */}
         <div className="mt-5 lg:mt-0">
-          {/* Product first part */}
+          {/* Special Offer + Rating + Name */}
           <div className="mb-6">
-            <h2>
-              {service?.savedServices?.[0]?.discount &&
-                service.savedServices[0].discount !== 'none' &&
-                service.savedServices[0].discount.trim() !== '' && (
-                  <span className="bg-[#FCE9EACC] text-[#5F1011] p-3 rounded font-semibold uppercase">
-                    Special Offer
-                  </span>
-                )}
-            </h2>
-
+            {isValidDiscount(firstPricing?.discount) && (
+              <span className="bg-[#FCE9EACC] text-[#5F1011] p-3 rounded font-semibold uppercase">
+                Special Offer
+              </span>
+            )}
             <div className="flex items-center gap-2 mt-5">
               <StarRatings
-                rating={service?.avgRating}
+                rating={service?.avgRating ?? 0}
                 starRatedColor="#E8B006"
                 name="rating"
                 starSpacing="1px"
@@ -160,66 +193,79 @@ const ServiceDetails = ({ serviceId }: Props) => {
                 reviews)
               </p>
             </div>
-
             <h1 className="text-2xl text-[#212529] my-3">{service?.name}</h1>
 
-            <div>
-              {/* Original Price */}
-              <div className="flex items-center">
-                <p
-                  className={`text-xl font-medium ${
-                    discountPercent > 0
-                      ? 'text-gray-500 line-through'
-                      : 'text-gray-800'
-                  }`}
-                >
-                  ${price.toFixed(2)}
-                </p>
-
-                {service?.savedServices?.[0]?.discount &&
-                  service.savedServices[0].discount !== 'none' &&
-                  service.savedServices[0].discount.trim() !== '' && (
-                    <p className="px-3 py-1 text-sm font-semibold text-[#E12728] uppercase italic">
-                      {service.savedServices[0].discount} Off
-                    </p>
-                  )}
-              </div>
-
-              {/* Discounted Price */}
-              {discountPercent > 0 && (
-                <p className="text-xl font-semibold text-gray-800">
-                  ${discountedPrice.toFixed(2)}
+            {/* Price */}
+            <div className="flex items-center">
+              <p
+                className={`text-xl font-medium ${
+                  discountPercent > 0
+                    ? 'text-gray-500 line-through'
+                    : 'text-gray-800'
+                }`}
+              >
+                ${price.toFixed(2)}
+              </p>
+              {isValidDiscount(firstPricing?.discount) && (
+                <p className="px-3 py-1 text-sm font-semibold text-[#E12728] uppercase italic">
+                  {firstPricing?.discount} Off
                 </p>
               )}
             </div>
+            {discountPercent > 0 && (
+              <p className="text-xl font-semibold text-gray-800">
+                ${discountedPrice.toFixed(2)}
+              </p>
+            )}
           </div>
 
-          {/* Product second part  */}
+          {/* ✅ Status pill */}
+          <div className="flex items-center gap-2 mb-4">
+            <span
+              className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${cfg.badge}`}
+            >
+              <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
+              {cfg.icon && <cfg.icon />}
+              {cfg.label}
+            </span>
+          </div>
+
+          {/* ✅ Unavailable banner */}
+          {cfg.blockSchedule && (
+            <div
+              className={`flex items-center gap-2.5 rounded-lg px-4 py-3 text-sm font-medium border mb-4 ${cfg.bannerClass}`}
+            >
+              {cfg.icon && <cfg.icon />}
+              {cfg.bannerText}
+            </div>
+          )}
+
+          {/* Meta info */}
           <div>
             <div className="my-2 font-medium flex justify-between items-center p-5 border-t">
-              <span>Service Id</span>
-              <span className="font-medium">{service?.serviceId}</span>
+              <span>Service Code</span>
+              <span className="font-mono text-sm bg-gray-50 border border-gray-200 px-2 py-0.5 rounded">
+                {service?.serviceId}
+              </span>
             </div>
-
             <div className="my-2 font-medium flex justify-between items-center bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5">
-              <span>Service Type</span>
+              <span>Service Category</span>
               <span className="font-medium">{service?.type}</span>
             </div>
-
             <div className="my-2 font-medium">
               {service?.savedServices?.map((item, index) => {
                 const bgClass =
                   index % 2 === 0
                     ? 'my-2 font-medium p-5'
                     : 'my-2 font-medium bg-gradient-to-t to-[#cadfe7] from-[#d9ebe8] border-t border-b border-[#00325099] p-5';
-
                 return (
-                  <div key={item.id} className={`${bgClass}`}>
-                    {/* Right side: details inline */}
+                  <div key={item.id} className={bgClass}>
                     <div className="lg:flex justify-around items-center gap-6">
                       <p>Duration: {item.duration}</p>
                       <p>Price: ${item.price}</p>
-                      <p>Discount: {item.discount} </p>
+                      {isValidDiscount(item.discount) && (
+                        <p>Discount: {item.discount}</p>
+                      )}
                       <p>Final Price: ${item.finalPrice}</p>
                     </div>
                   </div>
@@ -228,20 +274,28 @@ const ServiceDetails = ({ serviceId }: Props) => {
             </div>
           </div>
 
+          {/* ✅ CTA Buttons */}
           <div>
-            <Link href={`/schedule/${service?._id}`}>
-              <Button className="w-full border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 text-white p-6 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500">
+            <Link href={cfg.blockSchedule ? '#' : `/schedule/${service?._id}`}>
+              <Button
+                disabled={cfg.blockSchedule}
+                className={`w-full p-6 text-sm mt-2 shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500 ${
+                  cfg.blockSchedule
+                    ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                    : 'border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 text-white hover:opacity-90 cursor-pointer'
+                }`}
+              >
                 <span className="uppercase text-sm font-semibold">
-                  Schedule
+                  {cfg.blockSchedule ? 'Unavailable' : 'Schedule'}
                 </span>
-                <ArrowRight />
+                {!cfg.blockSchedule && <ArrowRight />}
               </Button>
             </Link>
 
             <Button
               disabled={!user?.userId}
               onClick={handleMessageVendor}
-              className="w-full text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+              className="w-full text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6 cursor-pointer text-sm mt-4 shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500"
             >
               <span className="uppercase text-sm font-semibold">Message</span>
               <Send className="w-5 h-5" />
@@ -257,40 +311,37 @@ const ServiceDetails = ({ serviceId }: Props) => {
         </h5>
         <div
           className="mt-4 text-base text-gray-500 prose prose-sm max-w-none
-      [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
-      [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
-      [&_li]:my-0.5
-      [&_b]:font-semibold [&_strong]:font-semibold
-      [&_a]:text-blue-500 [&_a]:underline
-      [&_p]:my-1"
+            [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+            [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+            [&_li]:my-0.5
+            [&_b]:font-semibold [&_strong]:font-semibold
+            [&_a]:text-blue-500 [&_a]:underline
+            [&_p]:my-1"
           dangerouslySetInnerHTML={{ __html: service?.description || '' }}
         />
       </div>
 
+      {/* Reviews */}
       <div className="lg:flex my-10 gap-4">
-        {/* Average rating */}
-        <div className="lg:w-4/12 bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
+        <div className="w-full bg-[#f2f9fb] p-6 rounded-lg mb-4 lg:mb-0">
           <h2 className="text-2xl mb-2">Average Rating</h2>
-
           <div className="flex items-center gap-2 mt-5">
             {service ? (
               <StarRatings
-                rating={Number(service.avgRating) || 0} // default to 0 if undefined
+                rating={Number(service.avgRating) || 0}
                 starRatedColor="#E8B006"
-                name={`rating-${service._id}`} // unique name
+                name={`rating-${service._id}`}
                 starSpacing="1px"
                 starDimension="24px"
               />
             ) : (
-              <div className="h-6 w-24 bg-gray-200 animate-pulse rounded"></div> // loading skeleton
+              <div className="h-6 w-24 bg-gray-200 animate-pulse rounded" />
             )}
-
             <p className="text-[#6B7280] text-base">
               ({service?.avgRating?.toFixed(1) || 0} /{' '}
               {service?.reviews?.length || 0} reviews)
             </p>
           </div>
-
           <div className="mt-5 space-y-2">
             {progress.map(({ star, percentage }) => (
               <div key={star} className="flex items-center gap-3">
@@ -307,15 +358,6 @@ const ServiceDetails = ({ serviceId }: Props) => {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Add Review */}
-        <div className="lg:w-3/4">
-          <AddReview
-            vendorId={vendorId}
-            serviceId={serviceId}
-            refetch={refetch}
-          />
         </div>
       </div>
 

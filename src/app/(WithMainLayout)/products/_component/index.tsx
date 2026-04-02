@@ -15,7 +15,6 @@ import {
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
-import AddReview from './add-review';
 import ViewReviews from './view-reviews';
 import Spinner from '@/components/shared/Spinner';
 import { Progress } from '@/components/ui/progress';
@@ -90,7 +89,7 @@ const LOW_STOCK_THRESHOLD = 5;
 // ── Component ──────────────────────────────────────────────────
 const ProductDetails = ({ productId }: Props) => {
   const router = useRouter();
-  const { data, isLoading, refetch } = useGetProductByIdQuery(productId);
+  const { data, isLoading } = useGetProductByIdQuery(productId);
   const product: TProduct | undefined = data?.data;
   const vendorId = product?.vendor._id as string;
   const userId = product?.user._id as string;

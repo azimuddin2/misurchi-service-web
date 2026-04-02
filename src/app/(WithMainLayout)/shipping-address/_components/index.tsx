@@ -238,9 +238,9 @@ const ShippingAddress = () => {
                   <FormControl>
                     <textarea
                       {...field}
-                      rows={8}
+                      rows={2}
                       className="bg-[#f5f5f5] py-4 px-4 border-none rounded-sm w-full"
-                      placeholder="e.g. 123 Main St, Apt 4B, New York, NY 10001"
+                      placeholder="e.g. 123 Main Street, Apartment 4B"
                     />
                   </FormControl>
                   <FormMessage />

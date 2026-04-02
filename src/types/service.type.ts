@@ -46,7 +46,7 @@ export type TService = {
   savedServices: TServicePricing[];
   description: string; // optional
   images: TImage[];
-  status: string;
+  status: TStatus;
   highlightStatus: string;
 
   availability: {
