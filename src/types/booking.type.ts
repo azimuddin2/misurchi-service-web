@@ -10,7 +10,12 @@ export type TBookingStatus =
   | 'cancelled'
   | 'completed';
 
-export type TPaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
+export type TPaymentStatus =
+  | 'pending'
+  | 'half-paid'
+  | 'paid'
+  | 'refunded'
+  | 'failed';
 export type TBookingRequestType = 'none' | 'cancel' | 'reschedule';
 
 export interface IBookingRequest {
@@ -42,7 +47,10 @@ export type TBooking = {
   paymentStatus: TPaymentStatus;
 
   isPaid: boolean;
-  trnId: string;
+  paidAmount?: number; // কত টাকা দেওয়া হয়েছে
+  remainingAmount?: number; // কত বাকি আছে
+  trnId?: string; // শেষ transaction ID
+  trnIds?: string[]; // সব transaction ID
 
   // Request field for cancel/reschedule
   request?: IBookingRequest;

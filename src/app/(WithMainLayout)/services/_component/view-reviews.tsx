@@ -26,7 +26,7 @@ const ViewReviews = ({ serviceId }: Props) => {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">Customer Feedback</h1>
+      <h1 className="text-2xl font-medium mb-6">Customer Feedback</h1>
       <div>
         {reviews?.length > 0 ? (
           <>

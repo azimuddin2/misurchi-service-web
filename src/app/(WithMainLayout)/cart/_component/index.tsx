@@ -178,7 +178,7 @@ const Cart = () => {
     dispatch(
       setCheckoutData({
         products,
-        vendor: selectedItems[0].user?._id,
+        vendor: selectedItems[0].vendor?._id,
         totalPrice: products.reduce((sum, p) => sum + p.price * p.quantity, 0),
       }),
     );

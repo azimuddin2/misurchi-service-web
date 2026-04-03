@@ -65,6 +65,8 @@ const OrdersRequest = () => {
   const { data, isLoading } = useGetOrdersByEmailQuery(email);
   const orders = data?.data ?? [];
 
+  console.log('Fetched Orders:', orders);
+
   const handleConfirmCancel = () => {
     if (!selectedCancelOrder) return;
     // TODO: cancelOrder(selectedCancelOrder._id)
@@ -227,11 +229,11 @@ const OrdersRequest = () => {
     },
     {
       accessorKey: 'vendor',
-      header: 'Vendor',
+      header: 'Vendor Provider',
       cell: ({ row }) => (
         <div>
           <p className="text-base font-semibold">
-            {row.original.vendor?.businessName}
+            {row.original.vendor?.businessName || 'Unknown Vendor'}
           </p>
           <p className="text-sm text-gray-500">{row.original.vendor?.email}</p>
           <p className="text-xs text-gray-500">{row.original.vendor?.phone}</p>
@@ -266,7 +268,7 @@ const OrdersRequest = () => {
           <div className="flex flex-col gap-1">
             <PaymentBadge isPaid={isPaid} />
             {trnId && (
-              <span className="text-xs text-gray-400 font-mono break-all">
+              <span className="text-xs text-gray-500 font-mono break-all">
                 TXN ID: {trnId}
               </span>
             )}

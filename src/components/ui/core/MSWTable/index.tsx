@@ -82,9 +82,11 @@ export function MSWTable<TData, TValue>({
                   alt="No results"
                   width={100}
                   height={100}
-                  className="mx-auto"
+                  className="mx-auto w-32 mt-10"
                 />
-                No results.
+                <span className="font-semibold mt-2 text-gray-600">
+                  No Results.
+                </span>
               </TableCell>
             </TableRow>
           )}

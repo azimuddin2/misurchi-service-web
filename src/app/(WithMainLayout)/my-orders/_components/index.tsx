@@ -118,6 +118,9 @@ const MyOrders = () => {
           <p className="text-xs sm:text-sm text-gray-500 break-words">
             {row.original.vendor?.email}
           </p>
+          <p className="text-xs sm:text-sm text-gray-500 break-words">
+            {row.original.vendor?.phone || 'Phone not available'}
+          </p>
         </div>
       ),
     },
