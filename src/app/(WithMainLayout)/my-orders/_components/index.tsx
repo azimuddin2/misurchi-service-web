@@ -199,7 +199,7 @@ const MyOrders = () => {
               size="sm"
               className="text-gray-50 rounded border-gray-800 bg-gradient-to-t to-green-800 from-green-600/70 hover:bg-green-500/80 font-semibold cursor-pointer whitespace-nowrap"
             >
-              Pay
+              Pay Now
             </Button>
           ) : (
             <div>
