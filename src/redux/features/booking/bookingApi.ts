@@ -141,7 +141,7 @@ const bookingApi = baseApi.injectEndpoints({
       invalidatesTags: ['Booking'],
     }),
 
-    // ✅ Update order delivery status
+    // ✅ Update bookings status
     updateBookingStatus: builder.mutation<
       TResponse<TBooking>,
       { id: string; status: { status: string } }

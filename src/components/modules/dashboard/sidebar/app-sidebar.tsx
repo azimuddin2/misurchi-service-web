@@ -13,6 +13,7 @@ import {
   BadgeDollarSign,
   MessageCircleMore,
   Home,
+  MessageSquareText,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -86,6 +87,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Messages',
         url: `/vendor/messages`,
         icon: MessageCircleMore,
+        disabled: false,
+        lockIcon: false,
+      },
+      {
+        title: 'Feedback History',
+        url: `/vendor/feedback-history`,
+        icon: MessageSquareText,
         disabled: false,
         lockIcon: false,
       },

@@ -18,7 +18,6 @@ import {
   MapPin,
   CreditCard,
   Package,
-  ChevronRight,
   Sparkles,
 } from 'lucide-react';
 
@@ -90,7 +89,7 @@ function PaymentAction({
           Fully Paid
         </span>
         {trnId && (
-          <p className="text-[8px] text-gray-400 font-mono truncate max-w-[160px]">
+          <p className="text-sm text-gray-400 font-mono truncate">
             TXN: {trnId}
           </p>
         )}

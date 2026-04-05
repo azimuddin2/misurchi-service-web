@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import CancelledModal from './cancelled-modal';
 import ReturnModal from './return-modal';
+import OrderReviewModal from './order-review-modal';
 
 const statusMap: Record<string, { className: string; label: string }> = {
   pending: {
@@ -59,24 +60,25 @@ const OrdersRequest = () => {
   const [selectedReturnOrder, setSelectedReturnOrder] = useState<TOrder | null>(
     null,
   );
+  const [selectedReviewOrder, setSelectedReviewOrder] = useState<TOrder | null>(
+    null,
+  );
+
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [isReturnModalOpen, setReturnModalOpen] = useState(false);
+  const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
   const { data, isLoading } = useGetOrdersByEmailQuery(email);
   const orders = data?.data ?? [];
 
-  console.log('Fetched Orders:', orders);
-
   const handleConfirmCancel = () => {
     if (!selectedCancelOrder) return;
-    // TODO: cancelOrder(selectedCancelOrder._id)
     setCancelModalOpen(false);
     setSelectedCancelOrder(null);
   };
 
   const handleConfirmReturn = () => {
     if (!selectedReturnOrder) return;
-    // TODO: returnOrder(selectedReturnOrder._id)
     setReturnModalOpen(false);
     setSelectedReturnOrder(null);
   };
@@ -86,7 +88,6 @@ const OrdersRequest = () => {
     const requestType = request?.type ?? 'none';
     const vendorApproved = request?.vendorApproved;
 
-    // Request already made — show status only
     if (requestType !== 'none') {
       return (
         <div className="flex flex-col gap-1">
@@ -107,7 +108,6 @@ const OrdersRequest = () => {
       );
     }
 
-    // Unpaid + pending — can cancel
     if (!isPaid && status === 'pending') {
       return (
         <Button
@@ -124,7 +124,6 @@ const OrdersRequest = () => {
       );
     }
 
-    // Paid + pending or shipped — can cancel
     if (isPaid && (status === 'pending' || status === 'shipped')) {
       return (
         <Button
@@ -141,24 +140,36 @@ const OrdersRequest = () => {
       );
     }
 
-    // Paid + delivered — can return
+    // ✅ Paid & Delivered: Show both Return and Review buttons
     if (isPaid && status === 'delivered') {
       return (
-        <Button
-          size="sm"
-          variant="outline"
-          className="border border-green-500 rounded text-green-500 hover:text-green-600"
-          onClick={() => {
-            setSelectedReturnOrder(order);
-            setReturnModalOpen(true);
-          }}
-        >
-          Return
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="border border-green-500 rounded text-green-500 hover:text-green-600 cursor-pointer"
+            onClick={() => {
+              setSelectedReturnOrder(order);
+              setReturnModalOpen(true);
+            }}
+          >
+            Return
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border border-blue-400 rounded text-blue-500 hover:text-blue-600 cursor-pointer"
+            onClick={() => {
+              setSelectedReviewOrder(order);
+              setReviewModalOpen(true);
+            }}
+          >
+            Review
+          </Button>
+        </div>
       );
     }
 
-    // Unpaid + delivered — no action
     if (!isPaid && status === 'delivered') {
       return <span className="text-gray-400 text-sm">No action available</span>;
     }
@@ -172,7 +183,6 @@ const OrdersRequest = () => {
       header: 'Products',
       cell: ({ row }) => {
         const products = row.original.products || [];
-
         return (
           <div className="flex flex-col gap-2 min-w-[260px] max-w-[320px]">
             {products.map((product, index) => (
@@ -187,20 +197,16 @@ const OrdersRequest = () => {
                   height={80}
                   className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded border"
                 />
-
                 <div className="flex-1">
                   <p className="text-sm sm:text-base font-medium break-words">
                     {product.name}
                   </p>
-
-                  {/* Size & Color */}
                   <div className="flex gap-2 flex-wrap my-1">
                     {product.size && (
                       <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded font-medium">
                         Size: {product.size}
                       </span>
                     )}
-
                     {product.color && (
                       <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded flex items-center gap-1 font-medium">
                         Color:
@@ -212,11 +218,9 @@ const OrdersRequest = () => {
                       </span>
                     )}
                   </div>
-
                   <p className="text-xs sm:text-sm text-gray-500">
                     Quantity: {product.quantity}
                   </p>
-
                   <p className="text-xs sm:text-sm text-gray-500">
                     Price: ${product.price}
                   </p>
@@ -319,6 +323,11 @@ const OrdersRequest = () => {
         isOpen={isReturnModalOpen}
         onOpenChange={setReturnModalOpen}
         onConfirm={handleConfirmReturn}
+      />
+      <OrderReviewModal
+        selectedOrder={selectedReviewOrder}
+        isOpen={isReviewModalOpen}
+        onOpenChange={setReviewModalOpen}
       />
     </div>
   );

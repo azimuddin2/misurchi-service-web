@@ -47,10 +47,10 @@ export type TBooking = {
   paymentStatus: TPaymentStatus;
 
   isPaid: boolean;
-  paidAmount?: number; // কত টাকা দেওয়া হয়েছে
-  remainingAmount?: number; // কত বাকি আছে
-  trnId?: string; // শেষ transaction ID
-  trnIds?: string[]; // সব transaction ID
+  paidAmount?: number;
+  remainingAmount?: number;
+  trnId?: string;
+  trnIds?: string[];
 
   // Request field for cancel/reschedule
   request?: IBookingRequest;
