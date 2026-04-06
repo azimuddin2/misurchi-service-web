@@ -26,7 +26,6 @@ export default function FilterSidebar() {
     'All',
     'Special Offer',
     'New Arrivals',
-    'Most Popular',
     'Black Friday Deal',
     'Top Rated',
   ];
