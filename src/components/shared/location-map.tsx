@@ -2,18 +2,20 @@
 
 import {
   GoogleMap,
-  Marker,
   useJsApiLoader,
   Autocomplete,
+  Marker,
 } from '@react-google-maps/api';
 import { useCallback, useRef, useState } from 'react';
 import { MapPin, Search, X } from 'lucide-react';
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
+const LIBRARIES: ('places')[] = ['places'];
+
+const MAP_CONTAINER_STYLE = {
+  height: '400px',
+  width: '100%',
+  borderRadius: '5px',
+};
 
 interface LocationMapProps {
   coordinates?: number[];
@@ -36,21 +38,18 @@ const LocationMap = ({
   };
 
   const [markerPosition, setMarkerPosition] = useState(defaultCenter);
-  const [mapCenter, setMapCenter] = useState(defaultCenter); // 👈 new
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [selectedAddress, setSelectedAddress] = useState('');
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const mapRef = useRef<google.maps.Map | null>(null); // 👈 new
-
-  console.log('LocationMap rendered with coordinates:', coordinates);
+  const mapRef = useRef<google.maps.Map | null>(null);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
-    libraries: ['places'],
+    libraries: LIBRARIES,
   });
 
-  // 👈 map instance save korbe
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
   }, []);
@@ -64,46 +63,45 @@ const LocationMap = ({
       if (readonly) return;
       const lat = e.latLng?.lat();
       const lng = e.latLng?.lng();
-      if (lat !== undefined && lng !== undefined) {
-        setMarkerPosition({ lat, lng });
-        setMapCenter({ lat, lng }); // 👈 center update
+      if (lat === undefined || lng === undefined) return;
 
-        const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode(
-          { location: { lat, lng } },
-          (results: any, status: any) => {
-            if (status === 'OK' && results[0]) {
-              const address = results[0].formatted_address;
-              setSelectedAddress(address);
-              if (inputRef.current) inputRef.current.value = address;
-              onLocationChange?.({ lat, lng, address });
-            }
-          },
-        );
-      }
+      setMarkerPosition({ lat, lng });
+      setMapCenter({ lat, lng });
+
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode(
+        { location: { lat, lng } },
+        (results: any, status: any) => {
+          if (status === 'OK' && results[0]) {
+            const address = results[0].formatted_address;
+            setSelectedAddress(address);
+            if (inputRef.current) inputRef.current.value = address;
+            onLocationChange?.({ lat, lng, address });
+          }
+        },
+      );
     },
     [readonly, onLocationChange],
   );
 
   const handlePlaceChanged = () => {
     const place = autocompleteRef.current?.getPlace();
-    if (place?.geometry?.location) {
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      const address = place.formatted_address || '';
+    if (!place?.geometry?.location) return;
 
-      setMarkerPosition({ lat, lng });
-      setMapCenter({ lat, lng }); // 👈 center update
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    const address = place.formatted_address || '';
 
-      // 👈 smooth pan + zoom in — Google Maps er moto
-      if (mapRef.current) {
-        mapRef.current.panTo({ lat, lng });
-        mapRef.current.setZoom(16);
-      }
+    setMarkerPosition({ lat, lng });
+    setMapCenter({ lat, lng });
 
-      setSelectedAddress(address);
-      onLocationChange?.({ lat, lng, address });
+    if (mapRef.current) {
+      mapRef.current.panTo({ lat, lng });
+      mapRef.current.setZoom(16);
     }
+
+    setSelectedAddress(address);
+    onLocationChange?.({ lat, lng, address });
   };
 
   const handleClear = () => {
@@ -136,11 +134,12 @@ const LocationMap = ({
               type="text"
               placeholder="Search location or click on map..."
               className="w-full pl-9 pr-9 py-3 bg-[#f5f5f5] border-none rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              onKeyDown={(e) => e.stopPropagation()} // 👈 form submit block korbe
+              onKeyDown={(e) => e.stopPropagation()}
             />
           </Autocomplete>
           {selectedAddress && (
             <button
+              type="button"
               onClick={handleClear}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
@@ -159,14 +158,12 @@ const LocationMap = ({
 
       <GoogleMap
         mapContainerStyle={{
-          height: '400px',
-          width: '100%',
-          borderRadius: '5px',
+          ...MAP_CONTAINER_STYLE,
           cursor: readonly ? 'default' : 'crosshair',
         }}
-        center={mapCenter} // 👈 dynamic center
+        center={mapCenter}
         zoom={14}
-        onLoad={onLoad} // 👈 map instance save
+        onLoad={onLoad}
         onUnmount={onUnmount}
         onClick={handleMapClick}
         options={{
@@ -175,11 +172,13 @@ const LocationMap = ({
           fullscreenControl: false,
         }}
       >
-        <Marker
-          position={markerPosition}
-          animation={window.google?.maps?.Animation?.DROP}
-          clickable={false}
-        />
+        {typeof window !== 'undefined' && window.google && (
+          <Marker
+            position={markerPosition}
+            animation={window.google.maps.Animation.DROP}
+            clickable={false}
+          />
+        )}
       </GoogleMap>
 
       {!readonly && (

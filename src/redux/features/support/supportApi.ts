@@ -19,14 +19,31 @@ const supportApi = baseApi.injectEndpoints({
 
     getSupportByEmail: builder.query<
       TResponse<TSupport[]>,
-      { email: string; query?: Record<string, unknown> }
+      {
+        email: string;
+        page?: number | string;
+        limit?: number | string;
+        query?: Record<string, string | string[] | undefined>;
+      }
     >({
-      query: ({ email, query }) => ({
-        url: `/supports/${email}`,
-        method: 'GET',
-        params: query,
-        credentials: 'include',
-      }),
+      query: ({ email, page = 1, limit = 6, query }) => {
+        const params = new URLSearchParams();
+
+        if (query?.searchTerm) {
+          params.append('searchTerm', query.searchTerm.toString());
+        }
+
+        if (query?.createdAt) {
+          const date = new Date(query.createdAt.toString().slice(0, 10));
+          params.append('createdAt', date.toISOString());
+        }
+
+        return {
+          url: `/supports/${email}?page=${page}&limit=${limit}&${params.toString()}`,
+          method: 'GET',
+          credentials: 'include',
+        };
+      },
       providesTags: ['Support'],
     }),
 

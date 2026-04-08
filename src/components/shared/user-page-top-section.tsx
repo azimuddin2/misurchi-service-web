@@ -1,14 +1,13 @@
 'use client';
+
 import Image from 'next/image';
 import React from 'react';
 import topSectionBg from '@/assets/images/offer-bg.png';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-// import AnimatedArrow from "@/components/animatedArrows/AnimatedArrow";
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
-import { toast } from 'sonner';
 import { ArrowRight, LogOut } from 'lucide-react';
 import { logout } from '@/redux/features/auth/authSlice';
 import Cookies from 'js-cookie';
@@ -32,6 +31,11 @@ const navLinks = [
   },
   {
     _id: 4,
+    title: 'Feedback History',
+    href: '/user/feedback-history',
+  },
+  {
+    _id: 5,
     title: 'Settings',
     href: '/user/settings',
   },
@@ -74,12 +78,12 @@ const UserPagesTopSection = () => {
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl text-center text-white lg:text-5xl md:text-3xl text-xl font-semibold lg:px-16 md:px-10 px-2 lg:py-4 py-5 rounded-lg backdrop-blur-[4px] md:backdrop-blur-[7px]"
         style={{ background: 'rgba(0,0,0,0.12)' }} // dark semi-transparent background
       >
-        <div className="flex flex-wrap justify-center items-center gap-2">
+        <div className="flex flex-wrap justify-center items-center gap-1 lg:gap-2">
           {navLinks.map((navLink) => (
             <Link href={navLink.href} key={navLink._id}>
               <Button
                 className={cn(
-                  'font-medium uppercase rounded border-r-3 border-b-3 md:min-w-40 md:py-5 cursor-pointer group text-black sm:m-2 m-1 text-[10px] md:text-sm px-5 md:px-3 py-0 md:h-9 h-7 flex items-center gap-1',
+                  'font-medium uppercase rounded border-r-3 border-b-3 md:min-w-40 md:py-5 cursor-pointer group text-black sm:m-2 m-1 text-[10px] md:text-sm px-8 md:px-3 py-0 md:h-9 h-7 flex items-center gap-1',
                   currentPath === navLink?.href?.split('/')[2]
                     ? 'bg-gradient-to-t from-green-500/70 to-green-700 text-white border-gray-800 shadow-sm shadow-gray-500'
                     : 'bg-white hover:bg-white/30 hover:text-white border-gray-800',

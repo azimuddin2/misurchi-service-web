@@ -1,4 +1,4 @@
-import FeedbackHistory from './_components';
+import FeedbackHistory from '../../../../components/modules/feedback-history';
 
 const FeedbackHistoryPage = () => {
   return (

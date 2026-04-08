@@ -46,7 +46,7 @@ const MSWPagination = ({ totalPage }: { totalPage: number }) => {
         disabled={currentPage === 1}
         variant="outline"
         size="sm"
-        className="w-8 h-8 rounded-full flex justify-center items-center"
+        className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer"
       >
         <ArrowLeft />
       </Button>
@@ -59,7 +59,7 @@ const MSWPagination = ({ totalPage }: { totalPage: number }) => {
             key={pageNum}
             onClick={() => updatePage(pageNum)}
             size="sm"
-            className={`w-8 h-8 rounded-full flex justify-center items-center transition-colors ${
+            className={`w-8 h-8 rounded-full flex justify-center items-center cursor-pointer transition-colors ${
               isActive
                 ? 'bg-[#003250] text-white hover:bg-[#003250]'
                 : 'bg-white text-gray-700 border hover:bg-gray-100'
@@ -74,7 +74,7 @@ const MSWPagination = ({ totalPage }: { totalPage: number }) => {
         disabled={currentPage === totalPage}
         variant="outline"
         size="sm"
-        className="w-8 h-8 rounded-full flex justify-center items-center"
+        className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer"
       >
         <ArrowRight />
       </Button>

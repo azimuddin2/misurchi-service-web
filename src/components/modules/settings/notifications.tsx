@@ -11,12 +11,16 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useAppSelector } from '@/redux/hooks';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 
 type NotificationFormValues = {
   enableNotification: boolean;
 };
 
 const Notifications = () => {
+  const user = useAppSelector(selectCurrentUser);
+
   const form = useForm<NotificationFormValues>({
     defaultValues: {
       enableNotification: true, // ✅ default enabled
@@ -85,7 +89,7 @@ const Notifications = () => {
           Feedback Log History
         </h2>
         <Link
-          href="/feedback-history"
+          href={`/${user?.role}/feedback-history`}
           className="mt-2 sm:mt-0 text-[#0078BF] border-b border-[#0078BF] hover:text-blue-600 transition-colors"
         >
           Go to Feedback
