@@ -1,44 +1,38 @@
 'use client';
 
-import Image from 'next/image';
 import React from 'react';
-import topSectionBg from '@/assets/images/offer-bg.png';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
-import { ArrowRight, LogOut } from 'lucide-react';
 import { logout } from '@/redux/features/auth/authSlice';
 import Cookies from 'js-cookie';
 import { protectedRoutes } from '@/constants';
+import {
+  User,
+  ClipboardList,
+  MessageCircle,
+  Star,
+  Settings,
+  LogOut,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const navLinks = [
-  {
-    _id: 1,
-    title: 'Profile Details',
-    href: '/user/profile',
-  },
+  { _id: 1, title: 'Profile Details', href: '/user/profile', icon: User },
   {
     _id: 2,
     title: 'My Request Field',
     href: '/user/request',
+    icon: ClipboardList,
   },
-  {
-    _id: 3,
-    title: 'Message',
-    href: '/user/message',
-  },
+  { _id: 3, title: 'Message', href: '/user/message', icon: MessageCircle },
   {
     _id: 4,
     title: 'Feedback History',
     href: '/user/feedback-history',
+    icon: Star,
   },
-  {
-    _id: 5,
-    title: 'Settings',
-    href: '/user/settings',
-  },
+  { _id: 5, title: 'Settings', href: '/user/settings', icon: Settings },
 ];
 
 const UserPagesTopSection = () => {
@@ -46,66 +40,71 @@ const UserPagesTopSection = () => {
   const currentPath = pathName?.split('/')[2];
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const pathname = usePathname();
 
   const handleLogout = () => {
-    // 1. Clear redux user state
     dispatch(logout());
-
-    // 2. Remove cookie from client
     Cookies.remove('accessToken');
-
-    // 3. Redirect if user is on protected routes
-    if (protectedRoutes.some((route) => pathname.match(route))) {
+    if (protectedRoutes.some((route) => pathName.match(route))) {
       router.push('/');
     }
   };
 
   return (
-    <div className="relative max-h-[240px]">
-      {/* Background Image */}
-      <Image
-        src={topSectionBg}
-        alt="bg_image"
-        className="w-full max-h-[240px] min-h-[150px] object-cover"
-      />
-
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#205D67]/80 to-[#205D67]/90"></div>
-
-      {/* Text & Buttons */}
+    <div className="relative w-full h-[220px] overflow-hidden">
+      {/* bg */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0d3d46] via-[#1a6b7a] to-[#205D67]" />
+      {/* dot pattern */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl text-center text-white lg:text-5xl md:text-3xl text-xl font-semibold lg:px-16 md:px-10 px-2 lg:py-4 py-5 rounded-lg backdrop-blur-[4px] md:backdrop-blur-[7px]"
-        style={{ background: 'rgba(0,0,0,0.12)' }} // dark semi-transparent background
-      >
-        <div className="flex flex-wrap justify-center items-center gap-1 lg:gap-2">
-          {navLinks.map((navLink) => (
-            <Link href={navLink.href} key={navLink._id}>
-              <Button
-                className={cn(
-                  'font-medium uppercase rounded border-r-3 border-b-3 md:min-w-40 md:py-5 cursor-pointer group text-black sm:m-2 m-1 text-[10px] md:text-sm px-8 md:px-3 py-0 md:h-9 h-7 flex items-center gap-1',
-                  currentPath === navLink?.href?.split('/')[2]
-                    ? 'bg-gradient-to-t from-green-500/70 to-green-700 text-white border-gray-800 shadow-sm shadow-gray-500'
-                    : 'bg-white hover:bg-white/30 hover:text-white border-gray-800',
-                )}
-              >
-                {navLink.title}
-                <ArrowRight className="md:size-4 size-2" />
-              </Button>
-            </Link>
-          ))}
+        className="absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
+          backgroundSize: '28px 28px',
+        }}
+      />
+      {/* bottom fade */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/25" />
 
-          <Button
+      {/* content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 px-6">
+        {/* label */}
+        <p className="text-[10px] tracking-[3px] uppercase text-white/50 font-medium flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_6px_#4ade80]" />
+          My Account
+        </p>
+
+        {/* nav pills */}
+        <nav className="flex flex-wrap justify-center gap-2">
+          {navLinks.map(({ _id, title, href, icon: Icon }) => {
+            const isActive = currentPath === href.split('/')[2];
+            return (
+              <Link key={_id} href={href}>
+                <span
+                  className={cn(
+                    'flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer transition-all duration-200 border backdrop-blur-sm',
+                    isActive
+                      ? 'bg-white border-green-500 text-[#0d3d46]  font-semibold'
+                      : 'bg-white/10 text-white/85 border-white/20 hover:bg-white/22 hover:border-white/40 hover:text-white hover:-translate-y-px',
+                  )}
+                >
+                  <Icon
+                    size={12}
+                    className={isActive ? 'opacity-100' : 'opacity-70'}
+                  />
+                  {title}
+                </span>
+              </Link>
+            );
+          })}
+
+          {/* logout */}
+          <button
             onClick={handleLogout}
-            className={cn(
-              'rounded border-r-3 border-b-3 uppercase md:min-w-40 md:py-5 cursor-pointer group bg-white text-red-500 sm:m-2 m-1 text-[10px] md:text-sm px-2 md:px-3 py-0 md:h-9 h-7 flex items-center gap-1 hover:bg-white/30 hover:text-white',
-              'border-gray-800',
-            )}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium border border-red-400/50 bg-red-500/15 text-red-300 backdrop-blur-sm transition-all duration-200 hover:bg-red-500/30 hover:border-red-400/80 hover:text-white hover:-translate-y-px"
           >
-            <LogOut className="md:size-4 size-3" />
-            Log out
-          </Button>
-        </div>
+            <LogOut size={12} />
+            Log Out
+          </button>
+        </nav>
       </div>
     </div>
   );

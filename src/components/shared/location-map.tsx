@@ -9,7 +9,7 @@ import {
 import { useCallback, useRef, useState } from 'react';
 import { MapPin, Search, X } from 'lucide-react';
 
-const LIBRARIES: ('places')[] = ['places'];
+const LIBRARIES: 'places'[] = ['places'];
 
 const MAP_CONTAINER_STYLE = {
   height: '400px',
