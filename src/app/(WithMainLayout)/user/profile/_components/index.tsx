@@ -51,10 +51,9 @@ const UserProfile = () => {
       lastName: '',
       email: '',
       phone: '',
-      location: {
-        streetAddress: '',
-        coordinates: { lat: 0, lng: 0 },
-      },
+      latitude: '',
+      longitude: '',
+      streetAddress: '',
     },
   });
 
@@ -66,6 +65,13 @@ const UserProfile = () => {
         lastName: userData.lastName || '',
         email: userData.email || '',
         phone: userData.phone || '',
+        latitude: userData.location?.coordinates?.[1]
+          ? String(userData.location.coordinates[1])
+          : '',
+        longitude: userData.location?.coordinates?.[0]
+          ? String(userData.location.coordinates[0])
+          : '',
+        streetAddress: userData.location?.streetAddress || '',
       });
       setCoverImagePreview(userData.coverImage ? [userData.coverImage] : []);
       setImagePreview(userData.image ? [userData.image] : []);
@@ -75,6 +81,8 @@ const UserProfile = () => {
   const {
     formState: { isSubmitting },
   } = form;
+
+  const { setValue } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
@@ -280,43 +288,27 @@ const UserProfile = () => {
             />
           </div>
 
-          {/* Location */}
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem className="lg:mb-0 mb-5">
-                <FormLabel className="!text-gray-700 !text-base font-medium">
-                  Location
-                </FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Input
-                      type="text"
-                      placeholder="Enter your location"
-                      {...field}
-                      value={field.value?.streetAddress || ''}
-                      onChange={(e) =>
-                        form.setValue('location', {
-                          ...field.value,
-                          streetAddress: e.target.value,
-                        })
-                      }
-                      className="bg-[#f5f5f5] py-6 pr-10 border-none rounded-sm"
-                    />
-                    <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           {/* Google Map Preview */}
-          <LocationMap
-            streetAddress={form.watch('location.streetAddress') || ''}
-            coordinates={form.watch('location.coordinates') || null}
-          />
+          <div className="mt-8 space-y-2">
+            <label className="text-gray-700 text-base font-medium">
+              Location
+            </label>
+            <LocationMap
+              coordinates={
+                userData?.location?.coordinates?.length === 2
+                  ? [
+                      userData.location.coordinates[1],
+                      userData.location.coordinates[0],
+                    ]
+                  : undefined
+              }
+              onLocationChange={({ lat, lng, address }) => {
+                setValue('latitude', String(lat));
+                setValue('longitude', String(lng));
+                setValue('streetAddress', address);
+              }}
+            />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
             {/* Submit Button */}

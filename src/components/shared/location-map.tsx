@@ -8,6 +8,7 @@ import {
 } from '@react-google-maps/api';
 import { useCallback, useRef, useState } from 'react';
 import { MapPin, Search, X } from 'lucide-react';
+import { Input } from '../ui/input';
 
 const LIBRARIES: 'places'[] = ['places'];
 
@@ -129,11 +130,11 @@ const LocationMap = ({
             onLoad={(ac) => (autocompleteRef.current = ac)}
             onPlaceChanged={handlePlaceChanged}
           >
-            <input
+            <Input
               ref={inputRef}
               type="text"
               placeholder="Search location or click on map..."
-              className="w-full pl-9 pr-9 py-3 bg-[#f5f5f5] border-none rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full pl-9 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-[#f5f5f5] py-6 border-none rounded-sm mb-3"
               onKeyDown={(e) => e.stopPropagation()}
             />
           </Autocomplete>

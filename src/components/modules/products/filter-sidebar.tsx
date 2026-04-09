@@ -6,6 +6,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { X, Filter, CircleX } from 'lucide-react';
 import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
+import { useGetAllRecommendedTypeQuery } from '@/redux/features/recommendedType/recommendedTypeApi';
+
+// Special keys that need custom backend handling (not passed as 'recommended' filter)
+const SPECIAL_RECOMMENDED = ['All', 'Special Offer', 'Top Rated'];
 
 export default function FilterSidebar() {
   const [price, setPrice] = useState<[number, number]>([0, 5000]);
@@ -20,13 +24,21 @@ export default function FilterSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // Fetch dynamic recommended types from API (e.g. "New Arrivals", "Black Friday Deal" etc.)
+  const { data: recommendedData } = useGetAllRecommendedTypeQuery({});
+  const dynamicRecommended: { _id: string; name: string }[] =
+    recommendedData?.data || [];
+
+  // Final list: "All" first, then "Special Offer", then dynamic ones, then "Top Rated" last
   const recommendedOptions = [
     'All',
     'Special Offer',
-    'New Arrivals',
-    'Black Friday Deal',
+    ...dynamicRecommended.map((r) => r.name),
     'Top Rated',
   ];
+
+  const { data } = useGetAllProductTypeQuery({});
+  const productTypes = data?.data || [];
 
   const discounts = [
     '10% - 20% Off',
@@ -36,31 +48,88 @@ export default function FilterSidebar() {
     '50% Above',
   ];
 
-  const { data } = useGetAllProductTypeQuery({});
-  const productTypes = data?.data || [];
-
   // ----------------------
   // Update URL Query Params
   // ----------------------
-  const updateQueryParam = (key: string, values: string[] | string | null) => {
+  const updateQueryParam = (
+    updates: Record<string, string[] | string | null>,
+  ) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (!values || (Array.isArray(values) && values.length === 0)) {
-      params.delete(key);
-    } else {
-      if (Array.isArray(values)) {
-        params.set(key, values.join(',')); // multi-select stored as comma-separated
+    Object.entries(updates).forEach(([key, values]) => {
+      if (!values || (Array.isArray(values) && values.length === 0)) {
+        params.delete(key);
+      } else if (Array.isArray(values)) {
+        params.set(key, values.join(','));
       } else {
         params.set(key, values);
       }
-    }
+    });
 
-    params.set('page', '1'); // reset page
+    params.set('page', '1');
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   // ----------------------
-  // Toggle multi-select
+  // Toggle Recommended (with special logic)
+  // ----------------------
+  const toggleRecommended = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (value === 'All') {
+      // Clear all recommended-related filters
+      params.delete('recommended');
+      params.delete('isOnSale');
+      params.delete('sortBy');
+      params.set('page', '1');
+      setSelectedRecommended([]);
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      return;
+    }
+
+    let newSelected: string[];
+
+    if (selectedRecommended.includes(value)) {
+      newSelected = selectedRecommended.filter((v) => v !== value);
+    } else {
+      newSelected = [...selectedRecommended.filter((v) => v !== 'All'), value];
+    }
+
+    setSelectedRecommended(newSelected);
+
+    // Separate special vs dynamic recommended values
+    const specialSelected = newSelected.filter((v) =>
+      SPECIAL_RECOMMENDED.includes(v),
+    );
+    const dynamicSelected = newSelected.filter(
+      (v) => !SPECIAL_RECOMMENDED.includes(v),
+    );
+
+    const updates: Record<string, string[] | string | null> = {};
+
+    // "Special Offer" → send isOnSale=true to backend
+    if (specialSelected.includes('Special Offer')) {
+      updates['isOnSale'] = 'true';
+    } else {
+      updates['isOnSale'] = null;
+    }
+
+    // "Top Rated" → send sortBy=rating to backend
+    if (specialSelected.includes('Top Rated')) {
+      updates['sortBy'] = 'rating';
+    } else {
+      updates['sortBy'] = null;
+    }
+
+    // Dynamic recommended options go through normal 'recommended' param
+    updates['recommended'] =
+      dynamicSelected.length > 0 ? dynamicSelected : null;
+
+    updateQueryParam(updates);
+  };
+
+  // ----------------------
+  // Toggle multi-select (product types & discounts)
   // ----------------------
   const toggleSelection = (
     value: string,
@@ -81,7 +150,9 @@ export default function FilterSidebar() {
     }
 
     setSelected(newSelected);
-    updateQueryParam(queryKey, newSelected.length > 0 ? newSelected : null);
+    updateQueryParam({
+      [queryKey]: newSelected.length > 0 ? newSelected : null,
+    });
   };
 
   // ----------------------
@@ -89,11 +160,7 @@ export default function FilterSidebar() {
   // ----------------------
   const handleApplyPrice = () => {
     if (minPrice && maxPrice && Number(minPrice) <= Number(maxPrice)) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('minPrice', minPrice);
-      params.set('maxPrice', maxPrice);
-      params.set('page', '1');
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      updateQueryParam({ minPrice, maxPrice });
     }
   };
 
@@ -103,16 +170,20 @@ export default function FilterSidebar() {
   useEffect(() => {
     const sp = Object.fromEntries(Array.from(searchParams.entries()));
 
-    // Price
     if (sp.minPrice && sp.maxPrice) {
       setMinPrice(sp.minPrice);
       setMaxPrice(sp.maxPrice);
       setPrice([Number(sp.minPrice), Number(sp.maxPrice)]);
     }
 
-    // Multi-select fields
+    // Rebuild selectedRecommended from URL
+    const urlRecommended = sp.recommended?.split(',') || [];
+    const specialFromUrl: string[] = [];
+    if (sp.isOnSale === 'true') specialFromUrl.push('Special Offer');
+    if (sp.sortBy === 'rating') specialFromUrl.push('Top Rated');
+
+    setSelectedRecommended([...specialFromUrl, ...urlRecommended]);
     setSelectedProducts(sp.productType?.split(',') || []);
-    setSelectedRecommended(sp.recommended?.split(',') || []);
     setSelectedDiscounts(sp.discount?.split(',') || []);
   }, [searchParams]);
 
@@ -146,7 +217,7 @@ export default function FilterSidebar() {
               <Button
                 onClick={() => router.push(pathname, { scroll: false })}
                 size="sm"
-                className="bg-red-400 hover:bg-red-500 text-white rounded flex items-center gap-1"
+                className="bg-red-400 hover:bg-red-500 text-white rounded flex items-center gap-1 cursor-pointer"
               >
                 Clear <CircleX size={20} />
               </Button>
@@ -166,20 +237,17 @@ export default function FilterSidebar() {
               <div key={item} className="flex items-center gap-2 mb-1">
                 <Checkbox
                   className="cursor-pointer"
-                  checked={selectedRecommended.includes(item)}
-                  onCheckedChange={() =>
-                    toggleSelection(
-                      item,
-                      selectedRecommended,
-                      setSelectedRecommended,
-                      'recommended',
-                    )
+                  checked={
+                    item === 'All'
+                      ? selectedRecommended.length === 0
+                      : selectedRecommended.includes(item)
                   }
+                  onCheckedChange={() => toggleRecommended(item)}
                   id={`rec-${item}`}
                 />
                 <label
                   htmlFor={`rec-${item}`}
-                  className="text-sm text-gray-700"
+                  className="text-sm text-gray-700 cursor-pointer"
                 >
                   {item}
                 </label>
@@ -205,7 +273,10 @@ export default function FilterSidebar() {
                   }
                   id={type.name}
                 />
-                <label htmlFor={type.name} className="text-sm text-gray-700">
+                <label
+                  htmlFor={type.name}
+                  className="text-sm text-gray-700 cursor-pointer"
+                >
                   {type.name}
                 </label>
               </div>
@@ -263,7 +334,7 @@ export default function FilterSidebar() {
                 />
                 <label
                   htmlFor={`disc-${discount}`}
-                  className="text-sm text-gray-700"
+                  className="text-sm text-gray-700 cursor-pointer"
                 >
                   {discount}
                 </label>

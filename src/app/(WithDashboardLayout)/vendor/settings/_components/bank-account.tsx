@@ -75,7 +75,7 @@ const BankAccount = () => {
         <h2 className="text-lg font-medium">Set Up Your Stripe Bank Account</h2>
         <p className="text-sm text-gray-500">
           Connect your bank account via Stripe to receive payments securely. You
-          will be redirected to Stripe's onboarding page.
+          will be redirected to Stripe&apos;s onboarding page.
         </p>
 
         {/* 1️⃣ Stripe Connected & Onboarding Complete */}

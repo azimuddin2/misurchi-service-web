@@ -80,14 +80,14 @@ const UserPagesTopSection = () => {
               <Link key={_id} href={href}>
                 <span
                   className={cn(
-                    'flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer transition-all duration-200 border backdrop-blur-sm',
+                    'flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm cursor-pointer transition-all duration-200 border backdrop-blur-sm uppercase font-medium',
                     isActive
-                      ? 'bg-white border-green-500 text-[#0d3d46]  font-semibold'
+                      ? 'bg-white border-green-500 text-[#0d3d46]'
                       : 'bg-white/10 text-white/85 border-white/20 hover:bg-white/22 hover:border-white/40 hover:text-white hover:-translate-y-px',
                   )}
                 >
                   <Icon
-                    size={12}
+                    size={14}
                     className={isActive ? 'opacity-100' : 'opacity-70'}
                   />
                   {title}
@@ -99,7 +99,7 @@ const UserPagesTopSection = () => {
           {/* logout */}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium border border-red-400/50 bg-red-500/15 text-red-300 backdrop-blur-sm transition-all duration-200 hover:bg-red-500/30 hover:border-red-400/80 hover:text-white hover:-translate-y-px"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium border border-red-400/50 bg-red-500/15 text-red-300 backdrop-blur-sm transition-all duration-200 hover:bg-red-500/30 hover:border-red-400/80 hover:text-white hover:-translate-y-px uppercase"
           >
             <LogOut size={12} />
             Log Out
