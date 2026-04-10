@@ -148,7 +148,7 @@ export default function Header() {
               onClick={handleLogout}
               className="rounded-sm text-white bg-red-500 hover:bg-red-600 mt-2 gap-2 cursor-pointer"
             >
-              <LogOut size={18} /> Logout
+              <LogOut size={18} /> Log Out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -183,9 +183,9 @@ export default function Header() {
           ) : (
             <Button
               onClick={handleLogout}
-              className="bg-[#0d3c59e9] px-3 py-1 text-sm text-white flex items-center gap-1"
+              className="bg-[#0d3c59e9] px-3 py-1 text-sm text-white flex items-center gap-1 cursor-pointer"
             >
-              <LogOut size={16} /> Logout
+              <LogOut size={16} /> Log Out
             </Button>
           )}
         </div>

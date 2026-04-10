@@ -89,7 +89,7 @@ const AllProducts = () => {
               />
               <button
                 onClick={handleSearch}
-                className="bg-sky-950 text-white p-4 rounded-full absolute right-0"
+                className="bg-sky-950 text-white p-4 rounded-full absolute right-0 cursor-pointer"
               >
                 <Search className="h-5 w-5" />
               </button>

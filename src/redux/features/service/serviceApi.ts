@@ -33,25 +33,45 @@ const serviceApi = baseApi.injectEndpoints({
         query?: Record<string, string | string[] | undefined>;
       }
     >({
-      query: ({ page = 1, limit = 10, query }) => {
+      query: ({ page = 1, limit = 9, query }) => {
         const params = new URLSearchParams();
 
         if (query?.searchTerm)
           params.append('searchTerm', query.searchTerm.toString());
 
-        if (query?.type) params.append('type', query.type.toString());
+        if (query?.type) {
+          if (Array.isArray(query.type)) {
+            params.append('type', query.type.join(','));
+          } else {
+            params.append('type', query.type.toString());
+          }
+        }
 
         if (query?.minPrice)
           params.append('minPrice', query.minPrice.toString());
-
         if (query?.maxPrice)
           params.append('maxPrice', query.maxPrice.toString());
 
         if (query?.minDiscount)
           params.append('minDiscount', query.minDiscount.toString());
-
         if (query?.maxDiscount)
           params.append('maxDiscount', query.maxDiscount.toString());
+
+        if (query?.recommended) {
+          if (Array.isArray(query.recommended)) {
+            params.append('recommended', query.recommended.join(','));
+          } else {
+            params.append('recommended', query.recommended.toString());
+          }
+        }
+
+        if (query?.isOnSale)
+          params.append('isOnSale', query.isOnSale.toString());
+
+        if (query?.sortBy) params.append('sortBy', query.sortBy.toString());
+
+        if (query?.sortOrder)
+          params.append('sortOrder', query.sortOrder.toString());
 
         return {
           url: `/services?page=${page}&limit=${limit}&${params.toString()}`,
