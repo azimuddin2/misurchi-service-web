@@ -34,6 +34,8 @@ import { selectCartItems } from '@/redux/features/cart/cartSlice';
 import { usePathname, useRouter } from 'next/navigation';
 import { protectedRoutes } from '@/constants';
 import Cookies from 'js-cookie';
+import { useGetAllNotificationsQuery } from '@/redux/features/notification/notificationApi';
+import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const TOP_NAV_LINKS = [
   { label: 'Services', href: '/services' },
@@ -57,6 +59,25 @@ export default function Header() {
   const cartItems = useAppSelector(selectCartItems);
   const cartCount = cartItems.length;
 
+  const userId = user?.userId as string;
+
+  // Get vendor profile if the user is a vendor
+  const { data: vendorData } = useGetVendorProfileQuery(user?.email || '');
+  const vendorId = vendorData?.data?._id as string;
+
+  const receiver = user?.role === 'vendor' ? vendorId : userId;
+
+  // Fetch notifications
+  const { data, refetch } = useGetAllNotificationsQuery(
+    { receiver },
+    {
+      skip: !receiver,
+      pollingInterval: 500,
+      refetchOnMountOrArgChange: true,
+    },
+  );
+  const unreadCount = data?.data?.filter((n) => !n.read).length ?? 0;
+
   const handleLogout = () => {
     dispatch(logout());
     Cookies.remove('accessToken');
@@ -68,8 +89,14 @@ export default function Header() {
   const ICONS_LINKS = (
     <div className="flex items-center gap-4">
       {user?.email && (
-        <Link href="/notifications" className="cursor-pointer">
+        <Link href="/notifications" className="relative cursor-pointer">
           <Bell size={22} />
+
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
         </Link>
       )}
 

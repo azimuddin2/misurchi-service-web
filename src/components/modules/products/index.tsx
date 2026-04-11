@@ -18,7 +18,7 @@ const AllProducts = () => {
 
   const [search, setSearch] = useState(searchParams.get('searchTerm') || '');
   const page = searchParams.get('page') || '1';
-  const limit = searchParams.get('limit') || '6';
+  const limit = searchParams.get('limit') || '3';
 
   // Safe decode function
   const safeDecode = (str: string) => {

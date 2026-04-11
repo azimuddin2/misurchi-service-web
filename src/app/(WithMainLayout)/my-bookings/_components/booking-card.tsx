@@ -1,12 +1,11 @@
 'use client';
 
 import { TBooking } from '@/types/booking.type';
-import { CalendarDays, Clock, Timer, Sparkles } from 'lucide-react';
+import { CalendarDays, Clock, Timer, Sparkles, Eye } from 'lucide-react';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import PaymentAction from './payment-action';
 import InfoItem from './info-item';
-import { Button } from '@/components/ui/button';
 
 const statusConfig: Record<
   string,
@@ -53,6 +52,8 @@ const BookingCard = ({
 
   const { price, paymentType, paymentStatus, paidAmount, remainingAmount } =
     booking;
+
+  const hasPaymentHistory = (booking.trnIds?.length ?? 0) > 0;
 
   return (
     <div className="group relative bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
@@ -155,13 +156,16 @@ const BookingCard = ({
               )}
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onSelect(booking)}
-            >
-              Payment History
-            </Button>
+            {/* Payment History Button (ONLY CLEAN CONDITION) */}
+            {hasPaymentHistory && (
+              <button
+                onClick={() => onSelect(booking)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-700 hover:bg-green-100 transition-colors cursor-pointer"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                Payment History
+              </button>
+            )}
 
             {/* Action */}
             <PaymentAction booking={booking} onCheckout={onCheckout} />

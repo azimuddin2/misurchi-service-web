@@ -20,7 +20,7 @@ const AllServices = () => {
   );
 
   const page = searchParams.get('page') || '1';
-  const limit = searchParams.get('limit') || '6';
+  const limit = searchParams.get('limit') || '3';
 
   // ✅ Get filters from URL
   const queryParams = {
@@ -30,6 +30,9 @@ const AllServices = () => {
     maxPrice: searchParams.get('maxPrice') || '',
     minDiscount: searchParams.get('minDiscount') || '',
     maxDiscount: searchParams.get('maxDiscount') || '',
+    recommended: searchParams.get('recommended') || '',
+    isOnSale: searchParams.get('isOnSale') || '',
+    sortBy: searchParams.get('sortBy') || '',
   };
 
   const { data, isLoading } = useGetAllServicesQuery({

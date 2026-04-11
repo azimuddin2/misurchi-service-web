@@ -73,6 +73,8 @@ export default function FilterSidebar() {
   // ----------------------
   // Toggle Recommended (with special logic)
   // ----------------------
+  // toggleRecommended function এ এই bug fix করুন:
+
   const toggleRecommended = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -81,19 +83,28 @@ export default function FilterSidebar() {
       params.delete('isOnSale');
       params.delete('sortBy');
       params.set('page', '1');
-
       setSelectedRecommended([]);
-
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
       return;
     }
 
-    let newSelected: string[];
+    const filtered = selectedRecommended.filter((v) => v !== 'All');
 
-    if (selectedRecommended.includes(value)) {
-      newSelected = selectedRecommended.filter((v) => v !== value);
+    let newSelected: string[];
+    if (filtered.includes(value)) {
+      newSelected = filtered.filter((v) => v !== value);
     } else {
-      newSelected = [...selectedRecommended.filter((v) => v !== 'All'), value];
+      newSelected = [...filtered, value];
+    }
+
+    if (newSelected.length === 0) {
+      params.delete('recommended');
+      params.delete('isOnSale');
+      params.delete('sortBy');
+      params.set('page', '1');
+      setSelectedRecommended([]);
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      return;
     }
 
     setSelectedRecommended(newSelected);
@@ -101,12 +112,10 @@ export default function FilterSidebar() {
     const specialSelected = newSelected.filter((v) =>
       SPECIAL_RECOMMENDED.includes(v),
     );
-
     const dynamicSelected = newSelected.filter(
       (v) => !SPECIAL_RECOMMENDED.includes(v),
     );
 
-    // 🟢 clear old params first
     params.delete('recommended');
     params.delete('isOnSale');
     params.delete('sortBy');
@@ -114,17 +123,14 @@ export default function FilterSidebar() {
     if (dynamicSelected.length > 0) {
       params.set('recommended', dynamicSelected.join(','));
     }
-
     if (specialSelected.includes('Special Offer')) {
       params.set('isOnSale', 'true');
     }
-
     if (specialSelected.includes('Top Rated')) {
       params.set('sortBy', 'rating');
     }
 
     params.set('page', '1');
-
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
