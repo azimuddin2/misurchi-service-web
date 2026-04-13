@@ -1,23 +1,23 @@
 'use client';
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { TTodayBooking } from '@/types/dashboard.type';
 import { Clock, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import Image from 'next/image';
+import { TPendingBooking } from '@/types/dashboard.type';
 
-type TTodayBookingProps = {
-  todayBookings: TTodayBooking[];
+type TPendingBookingProps = {
+  pendingBookings: TPendingBooking[];
 };
 
-const TodayAppointments = ({ todayBookings }: TTodayBookingProps) => {
+const PendingBookings = ({ pendingBookings }: TPendingBookingProps) => {
   return (
     <Card className="w-full mt-5">
       {/* Header */}
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-medium">
-          Today’s Appointments
+        <CardTitle className="text-lg font-semibold">
+          Pending Bookings
         </CardTitle>
         <Link
           href="/vendor/activity-center"
@@ -29,8 +29,8 @@ const TodayAppointments = ({ todayBookings }: TTodayBookingProps) => {
 
       {/* Content */}
       <CardContent className="space-y-3">
-        {todayBookings.length > 0 ? (
-          todayBookings.map((booking) => (
+        {pendingBookings.length > 0 ? (
+          pendingBookings.map((booking) => (
             <div
               key={booking._id}
               className="flex items-start justify-between bg-[#f9fefc] p-4 border-l-4 border-[#def7eb] rounded-lg hover:bg-[#f1fdf6] transition"
@@ -50,6 +50,9 @@ const TodayAppointments = ({ todayBookings }: TTodayBookingProps) => {
                   </span>
                 </div>
               </div>
+              {/* <div className="bg-[#def7eb] text-sm py-2 px-4 rounded-sm text-[#1E90FF] capitalize">
+                {booking.status}
+              </div> */}
             </div>
           ))
         ) : (
@@ -69,4 +72,4 @@ const TodayAppointments = ({ todayBookings }: TTodayBookingProps) => {
   );
 };
 
-export default TodayAppointments;
+export default PendingBookings;

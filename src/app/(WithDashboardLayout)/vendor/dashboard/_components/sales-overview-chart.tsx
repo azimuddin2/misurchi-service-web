@@ -57,8 +57,8 @@ const SalesOverviewChart = () => {
     <div className="w-full space-y-6 my-5">
       <div className="rounded-lg border border-gray-200 bg-cc-card-bg p-6 shadow-sm">
         <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-gray-900">
-            Yearly Sales Overview
+          <h3 className="text-lg font-semibold text-gray-900">
+            Annual Overview
           </h3>
           <Select
             value={selectedYear.toString()}

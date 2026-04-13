@@ -62,6 +62,19 @@ const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ['User'],
     }),
+
+    updateNotificationSettings: builder.mutation<
+      TResponse<IUser>,
+      { notifications: boolean }
+    >({
+      query: (body) => ({
+        url: `/users/update-notifications`,
+        method: 'PATCH',
+        body,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -70,4 +83,5 @@ export const {
   useUpdateUserProfileMutation,
   useGetAllUsersQuery,
   useGetUserByIdQuery,
+  useUpdateNotificationSettingsMutation,
 } = userApi;

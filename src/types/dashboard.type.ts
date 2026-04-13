@@ -1,8 +1,13 @@
+export type TMetricWithChange = {
+  count: number;
+  changePercent: number;
+};
+
 export type TVendorDashboardStats = {
-  pendingOrders: number;
-  pendingBookings: number;
-  totalSchedule: number;
-  totalSales: number;
+  totalTransactions: TMetricWithChange;
+  totalBookings: TMetricWithChange;
+  pendingOrders: TMetricWithChange;
+  pendingBookings: TMetricWithChange;
 };
 
 // --- Single Pending Order ---
@@ -16,7 +21,7 @@ export type TPendingOrder = {
 };
 
 // --- Single Today's Booking ---
-export type TTodayBooking = {
+export type TPendingBooking = {
   _id: string;
   name: string;
   serviceName: string;
@@ -43,6 +48,6 @@ export type TRecentActivity = {
 // --- Main Dashboard Data ---
 export type TVendorDashboardData = {
   pendingOrders: TPendingOrder[];
-  todayBookings: TTodayBooking[];
+  pendingBookings: TPendingBooking[];
   recentActivity: TRecentActivity[];
 };

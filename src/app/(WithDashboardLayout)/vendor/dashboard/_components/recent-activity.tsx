@@ -12,10 +12,12 @@ type TRecentActivityProps = {
 
 const RecentActivity = ({ recentActivity }: TRecentActivityProps) => {
   return (
-    <div className="lg:flex-3/4">
+    <div className="lg:flex-3/6">
       <Card className="w-full h-[380px] ">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg font-medium">Recent Activity</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            Recent Activity
+          </CardTitle>
           <Link
             href="/vendor/activity-center"
             className="text-[#1E90FF] text-sm hover:underline"

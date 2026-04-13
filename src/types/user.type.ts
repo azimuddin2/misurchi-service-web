@@ -19,6 +19,7 @@ export interface IUser {
   country?: string;
   status: TStatus;
   isDeleted: boolean;
+  notifications: boolean;
   isVerified: boolean;
   verification: {
     otp: string | number;

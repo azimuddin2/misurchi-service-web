@@ -14,7 +14,7 @@ const PendingOrders = ({ pendingOrders }: TPendingOrdersProps) => {
   return (
     <Card className="w-full mt-5">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-medium">Pending Orders</CardTitle>
+        <CardTitle className="text-lg font-semibold">Pending Orders</CardTitle>
         <Link
           href={'/vendor/activity-center'}
           className="text-[#1E90FF] text-sm hover:underline"

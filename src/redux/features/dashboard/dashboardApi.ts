@@ -9,7 +9,7 @@ const dashboardApi = baseApi.injectEndpoints({
       string
     >({
       query: (id) => ({
-        url: `/dashboard/vendor-stats/${id}`,
+        url: `/vendors/vendor-stats/${id}`,
         method: 'GET',
         credentials: 'include',
       }),
@@ -21,7 +21,7 @@ const dashboardApi = baseApi.injectEndpoints({
       { id: string; year?: number }
     >({
       query: ({ id, year }) => ({
-        url: `/dashboard/vendor-sales-overview/${id}?year=${year}`,
+        url: `/vendors/vendor-sales-overview/${id}?year=${year}`,
         method: 'GET',
         credentials: 'include',
       }),
@@ -33,7 +33,7 @@ const dashboardApi = baseApi.injectEndpoints({
       { id: string; month?: number }
     >({
       query: ({ id, month }) => ({
-        url: `/dashboard/appointments-overview/${id}?month=${month}`,
+        url: `/vendors/appointments-overview/${id}?month=${month}`,
         method: 'GET',
         credentials: 'include',
       }),
@@ -42,7 +42,7 @@ const dashboardApi = baseApi.injectEndpoints({
 
     getVendorDashboardData: builder.query<TResponse<any>, { id: string }>({
       query: ({ id }) => ({
-        url: `/dashboard/vendor-data/${id}`,
+        url: `/vendors/vendor-data/${id}`,
         method: 'GET',
         credentials: 'include',
       }),
