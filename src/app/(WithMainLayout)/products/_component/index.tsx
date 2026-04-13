@@ -556,13 +556,6 @@ const ProductDetails = ({ productId }: Props) => {
             ))}
           </div>
         </div>
-        {/* <div className="lg:w-3/4">
-          <AddReview
-            vendorId={vendorId}
-            productId={productId}
-            refetch={refetch}
-          />
-        </div> */}
       </div>
 
       <ViewReviews productId={productId} />

@@ -270,7 +270,7 @@ const CancellationRequest = () => {
                   )
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200"
+    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
               >
                 Cancellation Request
                 <FolderSymlink />
@@ -283,7 +283,7 @@ const CancellationRequest = () => {
                   router.push(`/${user?.role}/activity-center/order-return`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200"
+    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
               >
                 Return Request
                 <FolderSymlink />

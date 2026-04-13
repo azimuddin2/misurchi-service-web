@@ -40,16 +40,47 @@ const statusMap: Record<string, { className: string; label: string }> = {
   },
 };
 
-const PaymentBadge = ({ isPaid }: { isPaid: boolean }) =>
-  isPaid ? (
-    <Badge className="bg-green-100 text-green-700 border-green-300 border rounded-full px-2 py-1 text-xs">
-      Paid
-    </Badge>
-  ) : (
-    <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300 border rounded-full px-2 py-1 text-xs">
-      Pending
-    </Badge>
+type PaymentBadgeProps = {
+  isPaid: boolean;
+  paidAmount?: number;
+  totalAmount: number;
+};
+
+export const PaymentBadge = ({
+  isPaid,
+  paidAmount,
+  totalAmount,
+}: PaymentBadgeProps) => {
+  const percentage =
+    paidAmount !== undefined
+      ? Math.min(100, Math.max(0, Math.round((paidAmount / totalAmount) * 100)))
+      : 0;
+
+  // ✅ Fully Paid
+  if (isPaid) {
+    return (
+      <span className="text-xs px-2 py-1 rounded-full w-fit bg-green-100 text-green-700 border border-green-300">
+        Paid (100%)
+      </span>
+    );
+  }
+
+  // ✅ Partial Payment
+  if (paidAmount !== undefined && paidAmount > 0) {
+    return (
+      <span className="text-xs px-2 py-1 rounded-full w-fit bg-yellow-100 text-yellow-700 border border-yellow-300">
+        {percentage}% Paid
+      </span>
+    );
+  }
+
+  // ❌ Unpaid
+  return (
+    <span className="text-xs px-2 py-1 rounded-full bg-red-100 w-fit text-red-600 border border-red-300">
+      Unpaid
+    </span>
   );
+};
 
 const BookingsRequest = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -211,31 +242,66 @@ const BookingsRequest = () => {
 
     {
       accessorKey: 'date',
-      header: 'Date',
-      cell: ({ row }) => format(new Date(row.original.date), 'dd MMM yyyy'),
-    },
-
-    {
-      accessorKey: 'time',
-      header: 'Time',
-      cell: ({ row }) => row.original.time,
-    },
-
-    {
-      accessorKey: 'duration',
-      header: 'Duration',
-      cell: ({ row }) => `${row.original.duration}s`,
+      header: 'Date & Time',
+      cell: ({ row }) => (
+        <div>
+          <p>{format(new Date(row.original.date), 'dd MMM, yyyy')}</p>
+          <p className="text-sm text-gray-500">{row.original.time}</p>
+          <p className="text-sm text-gray-400">
+            Duration - {row.original.duration}s
+          </p>
+        </div>
+      ),
     },
 
     {
       accessorKey: 'payment',
       header: 'Payment',
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-1">
-          <span className="capitalize">Pay {row.original.paymentType}</span>
-          <PaymentBadge isPaid={row.original.isPaid} />
-        </div>
-      ),
+      cell: ({ row }) => {
+        const {
+          paymentType,
+          isPaid,
+          paidAmount,
+          remainingAmount = 0, // ✅ default value fixes TS error
+          price,
+          trnId,
+        } = row.original;
+
+        return (
+          <div className="flex flex-col gap-1 text-sm min-w-[140px]">
+            {/* Payment Type */}
+            <span className="capitalize">{paymentType} payment</span>
+
+            {/* Badge */}
+            <PaymentBadge
+              isPaid={isPaid}
+              paidAmount={paidAmount}
+              totalAmount={price}
+            />
+
+            {/* Paid Amount */}
+            {paidAmount !== undefined && (
+              <span className="text-xs text-gray-500">Paid: ${paidAmount}</span>
+            )}
+
+            {/* Remaining Amount */}
+            {remainingAmount > 0 ? (
+              <span className="text-xs text-red-500">
+                Due: ${remainingAmount}
+              </span>
+            ) : (
+              <span className="text-xs text-green-600">No due</span>
+            )}
+
+            {/* Transaction ID */}
+            {trnId && (
+              <span className="text-xs text-gray-400 break-all">
+                TXN: {trnId}
+              </span>
+            )}
+          </div>
+        );
+      },
     },
 
     {
@@ -250,7 +316,7 @@ const BookingsRequest = () => {
 
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: 'Booking Status',
       cell: ({ row }) => {
         const status = row.original.status;
 

@@ -316,41 +316,6 @@ const ManageServices = () => {
         format(new Date(row.original.createdAt), 'dd MMM, yyyy'),
     },
     {
-      accessorKey: 'highlightStatus',
-      header: 'Highlight Status',
-      cell: ({ row }) => {
-        const status = row.original.highlightStatus;
-        const statusTextColorMap: Record<string, string> = {
-          Highlight: 'text-[#1D4ED8] border-[#1D4ED8]',
-          Highlighted: 'text-[#165940] border-[#165940]',
-        };
-        const statusColor = statusTextColorMap[status] || 'text-gray-700';
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={`flex items-center gap-2 capitalize px-3 py-1 border rounded-sm bg-white ${statusColor}`}
-            >
-              {status}
-              <ChevronDown className="w-4 h-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-44">
-              {highlightstatusOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.key}
-                  onClick={() =>
-                    handleHighlightStatusUpdate(row.original._id, option.key)
-                  }
-                  className="capitalize px-3 py-2 hover:bg-gray-100"
-                >
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    },
-    {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }) => (

@@ -127,7 +127,7 @@ const productApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/products?vendor=${vendorId}&page=${page}&limit=${limit}&${params.toString()}`,
+          url: `/products/vendor?vendorId=${vendorId}&page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };

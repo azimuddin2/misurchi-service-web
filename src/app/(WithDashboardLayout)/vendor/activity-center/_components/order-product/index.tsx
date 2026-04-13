@@ -46,6 +46,30 @@ const statusOptions = [
   { label: 'Delivered', key: 'delivered' },
 ];
 
+const PAYMENT_BADGE_CONFIG = {
+  paid: {
+    label: 'Paid',
+    className: 'bg-green-100 text-green-700 border-green-300',
+  },
+  unpaid: {
+    label: 'Unpaid',
+    className: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+  },
+} as const;
+
+const PaymentBadge = ({ isPaid }: { isPaid: boolean }) => {
+  const config = isPaid
+    ? PAYMENT_BADGE_CONFIG.paid
+    : PAYMENT_BADGE_CONFIG.unpaid;
+  return (
+    <span
+      className={`inline-flex items-center w-fit rounded-full border px-2 py-1 text-xs font-medium ${config.className}`}
+    >
+      {config.label}
+    </span>
+  );
+};
+
 const ManageOrderProducts = () => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
@@ -166,21 +190,19 @@ const ManageOrderProducts = () => {
       accessorKey: 'products',
       header: 'Product',
       cell: ({ row }) => {
-        const products = row.original.products || [];
-
+        const products = row.original.products ?? [];
         return (
-          <div className="lg:flex flex-col gap-2 w-fit">
+          <div className="flex flex-col gap-2 w-fit">
             {products.map((p) => (
               <div key={p.product} className="flex items-center gap-3">
                 <Image
                   src={p.image || '/placeholder.png'}
                   alt={p.name}
-                  width={64}
-                  height={64}
-                  className="lg:w-24 lg:h-24 object-cover rounded border"
+                  width={100}
+                  height={100}
+                  className="lg:w-20 lg:h-20 object-cover rounded border shrink-0"
                 />
-                <div>
-                  <p>{}</p>
+                <div className="min-w-[140px]">
                   <p className="text-base font-medium">{p.name}</p>
                   <p className="text-sm text-gray-500">
                     Quantity: {p.quantity}
@@ -224,7 +246,23 @@ const ManageOrderProducts = () => {
         </span>
       ),
     },
-
+    {
+      accessorKey: 'isPaid',
+      header: 'Payment Status',
+      cell: ({ row }) => {
+        const { isPaid, trnId } = row.original;
+        return (
+          <div className="flex flex-col gap-1">
+            <PaymentBadge isPaid={isPaid} />
+            {trnId && (
+              <span className="text-xs text-gray-500 font-mono break-all">
+                TXN ID: {trnId}
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
     {
       accessorKey: 'status',
       header: 'Delivery Status',
@@ -252,14 +290,14 @@ const ManageOrderProducts = () => {
               {statusOptions.map((option) => (
                 <DropdownMenuItem
                   key={option.key}
-                  disabled={option.key === status} // ✅ disable if current status
+                  disabled={option.key === status}
                   onClick={() =>
-                    option.key !== status && // ✅ only allow change if different
+                    option.key !== status &&
                     handleStatusUpdate(row.original._id, option.key)
                   }
                   className={`capitalize px-3 py-2 ${
                     option.key === status
-                      ? 'opacity-50 cursor-not-allowed' // ✅ style for disabled
+                      ? 'opacity-50 cursor-not-allowed'
                       : 'hover:bg-gray-100'
                   }`}
                 >
@@ -448,7 +486,7 @@ const ManageOrderProducts = () => {
                   )
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200"
+    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
               >
                 Cancellation Request
                 <FolderSymlink />
@@ -461,7 +499,7 @@ const ManageOrderProducts = () => {
                   router.push(`/${user?.role}/activity-center/order-return`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200"
+    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
               >
                 Return Request
                 <FolderSymlink />

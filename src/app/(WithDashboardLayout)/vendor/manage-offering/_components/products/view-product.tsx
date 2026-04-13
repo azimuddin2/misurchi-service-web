@@ -151,6 +151,21 @@ const ViewProduct = ({ productId }: Props) => {
                 </p>
               )}
             </div>
+
+            <div>
+              {product?.recommendedType?.length && (
+                <div className="mt-3 right-2 z-10 items-end">
+                  {product?.recommendedType.map((type, index) => (
+                    <span
+                      key={index}
+                      className="bg-[#E9F4FFCC] text-[#0D3C6B] text-xs font-semibold px-2 py-1 rounded mr-2 uppercase ring-1 ring-[#d2dfeccc]"
+                    >
+                      {type}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Product second part  */}

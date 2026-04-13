@@ -20,7 +20,7 @@ const AllServices = () => {
   );
 
   const page = searchParams.get('page') || '1';
-  const limit = searchParams.get('limit') || '3';
+  const limit = searchParams.get('limit') || '9';
 
   // ✅ Get filters from URL
   const queryParams = {

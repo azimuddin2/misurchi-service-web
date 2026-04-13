@@ -22,7 +22,7 @@ import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import {
   useGetAllBookingsByUserQuery,
   useUpdateBookingRequestApprovalMutation,
-  useUpdateBookingStatusMutation, // ✅ নতুন import
+  useUpdateBookingStatusMutation,
 } from '@/redux/features/booking/bookingApi';
 import { Input } from '@/components/ui/input';
 import MSWPagination from '@/components/ui/core/MSWPagination';
@@ -48,6 +48,48 @@ const statusOptions = [
   { label: 'Completed', key: 'completed' },
   { label: 'Cancelled', key: 'cancelled' },
 ];
+
+type PaymentBadgeProps = {
+  isPaid: boolean;
+  paidAmount?: number;
+  totalAmount: number;
+};
+
+export const PaymentBadge = ({
+  isPaid,
+  paidAmount,
+  totalAmount,
+}: PaymentBadgeProps) => {
+  const percentage =
+    paidAmount !== undefined
+      ? Math.min(100, Math.max(0, Math.round((paidAmount / totalAmount) * 100)))
+      : 0;
+
+  // ✅ Fully Paid
+  if (isPaid) {
+    return (
+      <span className="text-xs px-2 py-1 rounded-full w-fit bg-green-100 text-green-700 border border-green-300">
+        Paid (100%)
+      </span>
+    );
+  }
+
+  // ✅ Partial Payment
+  if (paidAmount !== undefined && paidAmount > 0) {
+    return (
+      <span className="text-xs px-2 py-1 rounded-full w-fit bg-yellow-100 text-yellow-700 border border-yellow-300">
+        {percentage}% Paid
+      </span>
+    );
+  }
+
+  // ❌ Unpaid
+  return (
+    <span className="text-xs px-2 py-1 rounded-full bg-red-100 w-fit text-red-600 border border-red-300">
+      Unpaid
+    </span>
+  );
+};
 
 const ManageBookingServices = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -120,9 +162,9 @@ const ManageBookingServices = () => {
 
   const [updateBookingRequestApproval] =
     useUpdateBookingRequestApprovalMutation();
-  const [updateBookingStatus] = useUpdateBookingStatusMutation(); // ✅ নতুন
+  const [updateBookingStatus] = useUpdateBookingStatusMutation();
 
-  // ✅ নতুন status update handler
+  // ✅ New status update handler
   const handleStatusUpdate = async (bookingId: string, status: string) => {
     const toastId = toast.loading('Updating status...');
     try {
@@ -155,7 +197,7 @@ const ManageBookingServices = () => {
     }
   };
 
-  // ✅ Status color map — booking status অনুযায়ী
+  // ✅ Status color map — booking status
   const statusTextColorMap: Record<string, string> = {
     pending: 'text-yellow-600 border-yellow-600',
     confirmed: 'text-blue-600 border-blue-600',
@@ -172,16 +214,19 @@ const ManageBookingServices = () => {
         const service = row.original.service;
         const imageUrl = service?.images?.[0]?.url || '/placeholder.png';
         return (
-          <div className="flex items-start space-x-3">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-3">
             <Image
               src={imageUrl}
               alt={service?.name || 'Service'}
               width={100}
               height={100}
-              className="w-24 h-28 rounded-sm object-cover border"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-sm object-cover border"
             />
-            <div>
-              <p className="truncate">{row.original.serviceName}</p>
+
+            <div className="min-w-0">
+              <p className="truncate text-sm sm:text-base">
+                {row.original.serviceName}
+              </p>
               <p className="truncate text-xs text-gray-400">
                 ID: {row.original.serviceId}
               </p>
@@ -208,22 +253,60 @@ const ManageBookingServices = () => {
         <div>
           <p>{format(new Date(row.original.date), 'dd MMM, yyyy')}</p>
           <p className="truncate text-sm text-gray-500">{row.original.time}</p>
+          <p className="truncate text-gray-500 text-sm">
+            Duration - {row.original.duration}s
+          </p>
         </div>
       ),
     },
     {
-      accessorKey: 'duration',
-      header: 'Duration',
-      cell: ({ row }) => (
-        <span className="truncate">{row.original.duration}s</span>
-      ),
-    },
-    {
-      accessorKey: 'paymentType',
-      header: 'Payment Type',
-      cell: ({ row }) => (
-        <span className="capitalize">Pay {row.original.paymentType}</span>
-      ),
+      accessorKey: 'payment',
+      header: 'Payment',
+      cell: ({ row }) => {
+        const {
+          paymentType,
+          isPaid,
+          paidAmount,
+          remainingAmount = 0, // ✅ default value fixes TS error
+          price,
+          trnId,
+        } = row.original;
+
+        return (
+          <div className="flex flex-col gap-1 text-sm min-w-[140px]">
+            {/* Payment Type */}
+            <span className="capitalize">{paymentType} payment</span>
+
+            {/* Badge */}
+            <PaymentBadge
+              isPaid={isPaid}
+              paidAmount={paidAmount}
+              totalAmount={price}
+            />
+
+            {/* Paid Amount */}
+            {paidAmount !== undefined && (
+              <span className="text-xs text-gray-500">Paid: ${paidAmount}</span>
+            )}
+
+            {/* Remaining Amount */}
+            {remainingAmount > 0 ? (
+              <span className="text-xs text-red-500">
+                Due: ${remainingAmount}
+              </span>
+            ) : (
+              <span className="text-xs text-green-600">No due</span>
+            )}
+
+            {/* Transaction ID */}
+            {trnId && (
+              <span className="text-xs text-gray-400 break-all">
+                TXN: {trnId}
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: 'price',
@@ -235,7 +318,7 @@ const ManageBookingServices = () => {
       ),
     },
 
-    // ✅ নতুন Booking Status column
+    // ✅ Booking Status column
     {
       accessorKey: 'status',
       header: 'Booking Status',
@@ -438,7 +521,7 @@ const ManageBookingServices = () => {
                 onClick={() =>
                   router.push(`/${user?.role}/activity-center/booking-cancel`)
                 }
-                className="relative w-full cursor-pointer text-[#165940] border[#165940] text-base font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200"
+                className="relative w-full cursor-pointer text-[#165940] border[#165940] text-base font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
               >
                 Cancel Request
                 <FolderSymlink />
@@ -450,7 +533,7 @@ const ManageBookingServices = () => {
                     `/${user?.role}/activity-center/booking-reschedule`,
                   )
                 }
-                className="relative w-full cursor-pointer text-[#165940] text-base font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200"
+                className="relative w-full cursor-pointer text-[#165940] text-base font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
               >
                 Reschedule Request
                 <FolderSymlink />

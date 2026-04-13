@@ -265,7 +265,7 @@ const CancelRequest = () => {
                   router.push(`/${user?.role}/activity-center/booking-cancel`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200"
+    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
               >
                 Cancel Request
                 <FolderSymlink />
@@ -280,7 +280,7 @@ const CancelRequest = () => {
                   )
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200"
+    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
               >
                 Reschedule Request
                 <FolderSymlink />

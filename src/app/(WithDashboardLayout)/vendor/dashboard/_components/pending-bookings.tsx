@@ -64,7 +64,7 @@ const PendingBookings = ({ pendingBookings }: TPendingBookingProps) => {
               height={100}
               className="mx-auto"
             />
-            <p>No appointments scheduled for today.</p>
+            <p>No pending bookings available.</p>
           </div>
         )}
       </CardContent>

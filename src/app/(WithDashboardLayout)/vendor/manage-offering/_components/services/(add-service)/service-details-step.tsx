@@ -266,7 +266,9 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center">
                   <Upload className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-                  <span className="text-xs text-gray-500">Add Image</span>
+                  <span className="text-xs text-gray-500 uppercase">
+                    Upload Image
+                  </span>
                 </div>
               </div>
             </div>
