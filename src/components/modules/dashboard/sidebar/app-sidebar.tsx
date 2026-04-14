@@ -14,6 +14,8 @@ import {
   MessageCircleMore,
   Home,
   MessageSquareText,
+  ShieldCheck,
+  FileCheck,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -76,13 +78,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         disabled: false,
         lockIcon: false,
       },
-      {
-        title: 'Refer and Earn',
-        url: `/vendor/refer-and-earn`,
-        icon: BadgeDollarSign,
-        disabled: false,
-        lockIcon: false,
-      },
+      // {
+      //   title: 'Refer and Earn',
+      //   url: `/vendor/refer-and-earn`,
+      //   icon: BadgeDollarSign,
+      //   disabled: false,
+      //   lockIcon: false,
+      // },
       {
         title: 'Messages',
         url: `/vendor/messages`,
@@ -124,6 +126,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Settings,
         disabled: false,
         lockIcon: false,
+        items: [
+          {
+            title: 'Return Policy',
+            url: '/vendor/settings/return-policy',
+            icon: ShieldCheck,
+          },
+          {
+            title: 'Cancellation Policy',
+            url: '/vendor/settings/cancellation-policy',
+            icon: FileCheck,
+          },
+        ],
       },
       {
         title: 'Back Home',

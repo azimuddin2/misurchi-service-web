@@ -8,7 +8,6 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { CheckCircle } from 'lucide-react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import {
   Form,
@@ -25,6 +24,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { TBooking } from '@/types/booking.type';
 import { useUpdateBookingRequestMutation } from '@/redux/features/booking/bookingApi';
+import { useGetCancellationPolicyQuery } from '@/redux/features/cancellationPolicy/cancellationPolicyApi';
+import Spinner from '@/components/shared/Spinner';
 
 interface CancelModalProps {
   selectedBooking: TBooking | null;
@@ -52,6 +53,10 @@ const CancelModal = ({
       reason: '',
     },
   });
+
+  const { data: cancellationData, isLoading } = useGetCancellationPolicyQuery(
+    selectedBooking?.vendor?._id as string,
+  );
 
   const [updateBookingRequest] = useUpdateBookingRequestMutation();
 
@@ -95,6 +100,10 @@ const CancelModal = ({
     }
   };
 
+  if (isLoading) {
+    return <Spinner />;
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg rounded-lg">
@@ -103,22 +112,18 @@ const CancelModal = ({
             Cancellation Policy
           </DialogTitle>
           <DialogDescription asChild>
-            <div>
-              <span className="text-base font-medium">Cancellation:</span>
-              <div className="mt-2 space-y-1">
-                <span className="flex text-sm">
-                  <CheckCircle size={24} className="text-green-500 mr-2" />
-                  The user will be eligible for a 50% refund of the total
-                  service price if they cancel more than 24 hours before the
-                  scheduled service.
-                </span>
-                <span className="flex text-sm mt-3">
-                  <CheckCircle size={24} className="text-green-500 mr-2" />
-                  If the user cancels within 24 hours of the scheduled service,
-                  no refund will be issued. You can be reschedule your service.
-                </span>
-              </div>
-            </div>
+            <div
+              className="mt-2 text-base text-gray-500 prose prose-sm max-w-none
+            [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+            [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+            [&_li]:my-0.5
+            [&_b]:font-semibold [&_strong]:font-semibold
+            [&_a]:text-blue-500 [&_a]:underline
+            [&_p]:my-1"
+              dangerouslySetInnerHTML={{
+                __html: cancellationData?.data?.content || '',
+              }}
+            />
           </DialogDescription>
         </DialogHeader>
 

@@ -27,6 +27,7 @@ import MSWImageUploader from '@/components/ui/core/MSWImageUploader';
 import ImagePreviewer from '@/components/ui/core/MSWImageUploader/ImagePreviewer';
 import { toast } from 'sonner';
 import { useRequestOrderMutation } from '@/redux/features/order/orderApi';
+import { useGetReturnPolicyQuery } from '@/redux/features/returnPolicy/returnPolicyApi';
 
 interface CancelModalProps {
   selectedOrder: TOrder | null;
@@ -57,6 +58,10 @@ const ReturnModal = ({
       reason: '',
     },
   });
+
+  const { data: returnData } = useGetReturnPolicyQuery(
+    selectedOrder?.vendor?._id as string,
+  );
 
   const [requestOrder] = useRequestOrderMutation();
 
@@ -108,31 +113,23 @@ const ReturnModal = ({
             Return Policy
           </DialogTitle>
           <DialogDescription asChild>
-            <div>
-              <span className="text-base font-medium">Returns:</span>
-              <div className="mt-2 space-y-1">
-                <span className="flex items-center text-sm">
-                  <CheckCircle size={16} className="text-green-500 mr-2" />
-                  Returns accepted within 7 days of delivery.
-                </span>
-                <span className="flex items-center text-sm">
-                  <CheckCircle size={16} className="text-green-500 mr-2" />A 20%
-                  restocking fee will apply.
-                </span>
-                <span className="flex items-center text-sm">
-                  <CheckCircle size={16} className="text-green-500 mr-2" />
-                  Items must be in original condition and unused.
-                </span>
-              </div>
-            </div>
+            <div
+              className="mt-2 text-base text-gray-500 prose prose-sm max-w-none
+            [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+            [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+            [&_li]:my-0.5
+            [&_b]:font-semibold [&_strong]:font-semibold
+            [&_a]:text-blue-500 [&_a]:underline
+            [&_p]:my-1"
+              dangerouslySetInnerHTML={{
+                __html: returnData?.data?.content || '',
+              }}
+            />
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-4 space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="">
             {/* Images part */}
             <div className="mb-6">
               <div className="flex justify-between items-center">

@@ -262,7 +262,7 @@ const BookingsRequest = () => {
           paymentType,
           isPaid,
           paidAmount,
-          remainingAmount = 0, // ✅ default value fixes TS error
+          remainingAmount = 0,
           price,
           trnId,
         } = row.original;

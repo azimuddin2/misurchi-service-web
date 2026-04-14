@@ -8,13 +8,13 @@ import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { useGetAllPaymentQuery } from '@/redux/features/payment/paymentApi';
 import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { TPayment } from '@/types/payment.type';
+import Spinner from '@/components/shared/Spinner';
 
 const TransactionHistory = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -90,6 +90,10 @@ const TransactionHistory = () => {
       setSelectedDate(undefined);
     }
   }, [searchParams]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   const columns: ColumnDef<TPayment>[] = [
     // Select checkbox

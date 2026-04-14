@@ -25,6 +25,7 @@ import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useRequestOrderMutation } from '@/redux/features/order/orderApi';
 import { toast } from 'sonner';
+import { useGetCancellationPolicyQuery } from '@/redux/features/cancellationPolicy/cancellationPolicyApi';
 
 interface CancelModalProps {
   selectedOrder: TOrder | null;
@@ -52,6 +53,10 @@ const CancelledModal = ({
       reason: '',
     },
   });
+
+  const { data: cancellationData } = useGetCancellationPolicyQuery(
+    selectedOrder?.vendor?._id as string,
+  );
 
   const [requestOrder] = useRequestOrderMutation();
 
@@ -102,19 +107,18 @@ const CancelledModal = ({
             Cancellation Policy
           </DialogTitle>
           <DialogDescription asChild>
-            <div>
-              <span className="text-base font-medium">Cancellation:</span>
-              <div className="mt-2 space-y-1">
-                <span className="flex items-center text-sm">
-                  <CheckCircle size={16} className="text-green-500 mr-2" />
-                  Full refund if cancelled before shipping.
-                </span>
-                <span className="flex items-center text-sm">
-                  <CheckCircle size={16} className="text-green-500 mr-2" />
-                  After product shipping, orders cannot be cancelled.
-                </span>
-              </div>
-            </div>
+            <div
+              className="mt-2 text-base text-gray-500 prose prose-sm max-w-none
+            [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+            [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+            [&_li]:my-0.5
+            [&_b]:font-semibold [&_strong]:font-semibold
+            [&_a]:text-blue-500 [&_a]:underline
+            [&_p]:my-1"
+              dangerouslySetInnerHTML={{
+                __html: cancellationData?.data?.content || '',
+              }}
+            />
           </DialogDescription>
         </DialogHeader>
 

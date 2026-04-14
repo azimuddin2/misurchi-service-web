@@ -41,6 +41,7 @@ export function NavMain({
     items?: {
       title: string;
       url: string;
+      icon?: LucideIcon;
     }[];
   }[];
   currentPath: string;
@@ -100,7 +101,7 @@ export function NavMain({
 
           // ✅ Normal item
           return (
-            <Collapsible key={item.title} asChild defaultOpen={isParentActive}>
+            <Collapsible key={item.title} asChild defaultOpen={true}>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
@@ -141,11 +142,14 @@ export function NavMain({
                                 asChild
                                 className={cn(
                                   isSubActive
-                                    ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white font-medium'
+                                    ? 'bg-[#ebf7ee] text-[#000000] font-medium'
                                     : 'hover:bg-muted text-muted-foreground',
                                 )}
                               >
-                                <Link href={subItem.url}>
+                                <Link href={subItem.url} className="mt-1">
+                                  {subItem.icon && (
+                                    <subItem.icon className="mr-2" />
+                                  )}
                                   <span>{subItem.title}</span>
                                 </Link>
                               </SidebarMenuSubButton>
