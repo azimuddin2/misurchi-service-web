@@ -119,22 +119,24 @@ const VendorProfile = () => {
   const { register, setValue, control } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log('Form Data:', data);
+    const { latitude, longitude, streetAddress, ...rest } = data;
+
+    const payload = {
+      ...rest,
+      location: {
+        type: 'Point',
+        coordinates: [parseFloat(longitude), parseFloat(latitude)], // [lng, lat]
+        streetAddress: streetAddress,
+      },
+    };
+
+    console.log('Payload to be sent:', payload);
 
     const formData = new FormData();
+    formData.append('data', JSON.stringify(payload));
 
-    // Backend expects JSON string for other fields
-    formData.append('data', JSON.stringify(data));
-
-    // Append profile image(s)
-    imageFiles.forEach((file) => {
-      formData.append('profile', file);
-    });
-
-    // Append cover image(s)
-    coverImageFiles.forEach((file) => {
-      formData.append('coverImage', file);
-    });
+    imageFiles.forEach((file) => formData.append('profile', file));
+    coverImageFiles.forEach((file) => formData.append('coverImage', file));
 
     const toastId = toast.loading('Updating profile...');
 

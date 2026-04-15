@@ -64,11 +64,11 @@ export function NavMain({
           </h2>
           {userInfo?.subscribed ? (
             <Badge className="capitalize rounded-full text-blue-500 border border-blue-300 bg-blue-100 hover:bg-blue-100">
-              {userInfo?.subscribed}
+              {userInfo?.subscribed} Plan
             </Badge>
           ) : (
             <Badge className="capitalize rounded-full text-blue-500 border border-blue-300 bg-blue-100 hover:bg-blue-100">
-              Basic
+              Basic Plan
             </Badge>
           )}
         </div>

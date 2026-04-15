@@ -1,28 +1,34 @@
 'use client';
 
-import ServiceCard from '@/components/modules/cards/service-card';
-import Spinner from '@/components/shared/Spinner';
-import { useGetAllServicesQuery } from '@/redux/features/service/serviceApi';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
-import { TService } from '@/types/service.type';
-import MSWPagination from '@/components/ui/core/MSWPagination';
-import { useCallback, useEffect, useState } from 'react';
+import { Search, MapPinIcon } from 'lucide-react';
+
+import ServiceCard from '@/components/modules/cards/service-card';
 import FilterSidebar from './filter-sidebar';
+import Spinner from '@/components/shared/Spinner';
+import MSWPagination from '@/components/ui/core/MSWPagination';
+import { useGetAllServicesQuery } from '@/redux/features/service/serviceApi';
+import { TService } from '@/types/service.type';
 import Image from 'next/image';
 
 const AllServices = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState<string>(
-    searchParams.get('searchTerm') || '',
-  );
+  const [search, setSearch] = useState(searchParams.get('searchTerm') || '');
 
   const page = searchParams.get('page') || '1';
   const limit = searchParams.get('limit') || '9';
 
-  // ✅ Get filters from URL
+  // ✅ lat/lng
+  const lat = searchParams.get('lat');
+  const lng = searchParams.get('lng');
+
+  // ✅ check nearby active
+  const isNearbyActive = useMemo(() => Boolean(lat && lng), [lat, lng]);
+
+  // ✅ query params
   const queryParams = {
     searchTerm: searchParams.get('searchTerm') || '',
     type: searchParams.get('type') || '',
@@ -33,6 +39,9 @@ const AllServices = () => {
     recommended: searchParams.get('recommended') || '',
     isOnSale: searchParams.get('isOnSale') || '',
     sortBy: searchParams.get('sortBy') || '',
+
+    // ✅ nearby
+    ...(lat && lng ? { lat: String(lat), lng: String(lng) } : {}),
   };
 
   const { data, isLoading } = useGetAllServicesQuery({
@@ -44,21 +53,54 @@ const AllServices = () => {
   const services = data?.data || [];
   const meta = data?.meta || { totalPage: 1 };
 
-  // ✅ Update URL when filters change
-  const updateSearchParams = useCallback(
-    (newParams: Record<string, string | null | undefined>) => {
-      const currentParams = new URLSearchParams(searchParams.toString());
-      Object.entries(newParams).forEach(([key, value]) => {
-        if (!value) currentParams.delete(key);
-        else currentParams.set(key, value);
-      });
-      router.push(`?${currentParams.toString()}`);
-    },
-    [router, searchParams],
-  );
+  // ✅ SEARCH
+  const handleSearch = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
 
-  const handleSearch = () => {
-    updateSearchParams({ searchTerm: search, page: '1' });
+    if (search) params.set('searchTerm', search);
+    else params.delete('searchTerm');
+
+    params.set('page', '1');
+
+    router.push(`?${params.toString()}`);
+  }, [router, search, searchParams]);
+
+  // ✅ GET LOCATION
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation not supported');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        params.set('lat', String(position.coords.latitude));
+        params.set('lng', String(position.coords.longitude));
+
+        if (search) params.set('searchTerm', search);
+        else params.delete('searchTerm');
+
+        params.set('page', '1');
+
+        router.push(`?${params.toString()}`);
+      },
+      (error) => {
+        alert(error.message);
+      },
+    );
+  };
+
+  // ✅ CLEAR NEARBY
+  const clearNearby = () => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.delete('lat');
+    params.delete('lng');
+    params.set('page', '1');
+
+    router.push(`?${params.toString()}`);
   };
 
   useEffect(() => {
@@ -70,34 +112,68 @@ const AllServices = () => {
   return (
     <div className="mb-10">
       <div className="block lg:flex gap-10 mt-5">
+        {/* FILTER */}
         <div className="w-80">
           <FilterSidebar />
         </div>
 
+        {/* MAIN */}
         <div className="w-full lg:mb-0">
-          {/* ✅ Search box */}
-          <div className="max-w-3xl relative">
-            <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search service here..."
-                className="w-full px-6 py-3 outline-none"
-              />
+          {/* SEARCH + NEARBY */}
+          <div className="flex items-center gap-4">
+            {/* SEARCH */}
+            <div className="flex items-center w-3/4">
+              <div className="relative w-full">
+                <div className="flex items-center bg-white border rounded-full shadow-md overflow-hidden">
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search service here..."
+                    className="w-full px-6 py-4 outline-none text-sm"
+                  />
+
+                  <button
+                    onClick={handleSearch}
+                    className="bg-sky-950 hover:bg-sky-900 text-white p-4 rounded-full m-1 transition cursor-pointer"
+                  >
+                    <Search className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* NEARBY BUTTON */}
+            <div className="flex items-center gap-4 w-1/4">
               <button
-                onClick={handleSearch}
-                className="bg-sky-950 text-white p-4 rounded-full absolute right-0"
+                onClick={!isNearbyActive ? getLocation : clearNearby}
+                className={`flex items-center justify-center gap-2 px-3 py-2 rounded-full border w-full transition text-sm cursor-pointer
+                  ${
+                    !isNearbyActive
+                      ? 'text-sky-700 border-sky-700 hover:bg-sky-50'
+                      : 'text-red-600 border-red-400 hover:bg-red-50'
+                  }
+                `}
               >
-                <Search className="h-5 w-5" />
+                <MapPinIcon size={18} />
+
+                <span className="font-medium">
+                  {!isNearbyActive
+                    ? 'Find Services Near My Location'
+                    : 'Clear Nearby'}
+                </span>
               </button>
+
+              {isNearbyActive && (
+                <span className="text-xs text-green-600">● ON</span>
+              )}
             </div>
           </div>
 
-          {/* ✅ Services grid */}
+          {/* GRID */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
-            {services?.length > 0 ? (
-              services?.map((service: TService) => (
+            {services.length > 0 ? (
+              services.map((service: TService) => (
                 <ServiceCard key={service._id} service={service} />
               ))
             ) : (
@@ -109,7 +185,7 @@ const AllServices = () => {
                   height={100}
                   className="mx-auto w-40"
                 />
-                <p className="col-span-full text-center text-gray-500 capitalize font-medium mt-5 text-base">
+                <p className="capitalize">
                   No services found. Try changing your search keywords or filter
                   options.
                 </p>
@@ -119,7 +195,8 @@ const AllServices = () => {
         </div>
       </div>
 
-      <MSWPagination totalPage={meta?.totalPage} />
+      {/* PAGINATION */}
+      <MSWPagination totalPage={meta.totalPage} />
     </div>
   );
 };

@@ -73,6 +73,15 @@ const serviceApi = baseApi.injectEndpoints({
         if (query?.sortOrder)
           params.append('sortOrder', query.sortOrder.toString());
 
+        // 🚨 NEW: NEARBY SUPPORT
+        if (query?.lat) {
+          params.append('lat', query.lat.toString());
+        }
+
+        if (query?.lng) {
+          params.append('lng', query.lng.toString());
+        }
+
         return {
           url: `/services?page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',

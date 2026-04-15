@@ -78,21 +78,24 @@ const AllProducts = () => {
         {/* Product list */}
         <div className="w-full lg:mb-0">
           {/* Search bar */}
-          <div className="max-w-3xl relative">
-            <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search product here..."
-                className="w-full px-6 py-3 outline-none"
-              />
-              <button
-                onClick={handleSearch}
-                className="bg-sky-950 text-white p-4 rounded-full absolute right-0 cursor-pointer"
-              >
-                <Search className="h-5 w-5" />
-              </button>
+          <div className="flex items-center w-full lg:w-4/5 mx-auto">
+            <div className="relative w-full">
+              <div className="flex items-center bg-white border rounded-full shadow-md overflow-hidden">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search product here..."
+                  className="w-full px-6 py-4 outline-none text-sm"
+                />
+
+                <button
+                  onClick={handleSearch}
+                  className="bg-sky-950 hover:bg-sky-900 text-white p-4 rounded-full m-1 transition"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
 

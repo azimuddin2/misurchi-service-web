@@ -1,7 +1,7 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
-import { ArrowRight, MapPin } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -85,23 +85,26 @@ const UserProfile = () => {
   const { setValue } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data);
+    const { latitude, longitude, streetAddress, ...rest } = data;
+
+    const payload = {
+      ...rest,
+      location: {
+        type: 'Point',
+        coordinates: [parseFloat(longitude), parseFloat(latitude)], // [lng, lat]
+        streetAddress: streetAddress,
+      },
+    };
+
+    console.log('Payload to be sent:', payload);
+
     const formData = new FormData();
+    formData.append('data', JSON.stringify(payload));
 
-    // Backend expects JSON string for other fields
-    formData.append('data', JSON.stringify(data));
+    imageFiles.forEach((file) => formData.append('profile', file));
+    coverImageFiles.forEach((file) => formData.append('coverImage', file));
 
-    // Append profile image(s)
-    imageFiles.forEach((file) => {
-      formData.append('profile', file);
-    });
-
-    // Append cover image(s)
-    coverImageFiles.forEach((file) => {
-      formData.append('coverImage', file);
-    });
-
-    const toastId = toast.loading('Updating Profile...');
+    const toastId = toast.loading('Updating profile...');
     try {
       const res = await updateUserProfile({
         email: email,
