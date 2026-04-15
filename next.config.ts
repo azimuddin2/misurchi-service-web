@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['react-circular-progressbar'],
+  // transpilePackages: ['react-circular-progressbar'],
   images: {
     remotePatterns: [
       {

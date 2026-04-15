@@ -3,9 +3,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
-/* globals.css */
-@import 'react-circular-progressbar/dist/styles.css';
-
 body {
   font-family: 'Inter', sans-serif;
 }
@@ -137,3 +134,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
+/* globals.css */
+@import 'react-circular-progressbar/dist/styles.css';
