@@ -44,7 +44,7 @@ const AllServices = () => {
     ...(lat && lng ? { lat: String(lat), lng: String(lng) } : {}),
   };
 
-  const { data, isLoading } = useGetAllServicesQuery({
+  const { data, isLoading, isFetching } = useGetAllServicesQuery({
     page,
     limit,
     query: queryParams,
@@ -148,10 +148,9 @@ const AllServices = () => {
               <button
                 onClick={!isNearbyActive ? getLocation : clearNearby}
                 className={`flex items-center justify-center gap-2 px-3 py-2 rounded-full border w-full transition text-sm cursor-pointer
-                  ${
-                    !isNearbyActive
-                      ? 'text-sky-700 border-sky-700 hover:bg-sky-50'
-                      : 'text-red-600 border-red-400 hover:bg-red-50'
+                  ${!isNearbyActive
+                    ? 'text-sky-700 border-sky-700 hover:bg-sky-50'
+                    : 'text-red-600 border-red-400 hover:bg-red-50'
                   }
                 `}
               >
@@ -170,28 +169,45 @@ const AllServices = () => {
             </div>
           </div>
 
-          {/* GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
-            {services.length > 0 ? (
-              services.map((service: TService) => (
-                <ServiceCard key={service._id} service={service} />
-              ))
-            ) : (
-              <div className="col-span-full h-screen text-center text-gray-500 my-20">
-                <Image
-                  src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-                  alt="No results"
-                  width={100}
-                  height={100}
-                  className="mx-auto w-40"
-                />
-                <p className="capitalize">
-                  No services found. Try changing your search keywords or filter
-                  options.
-                </p>
+          {/* Product List */}
+          <div className="relative">
+            {/* Loading overlay */}
+            {isFetching && (
+              <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 z-0 flex items-center justify-center rounded-xl backdrop-blur-sm">
+                <Spinner />
               </div>
             )}
+
+            <div
+              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8 transition-opacity duration-300 ${isFetching ? "opacity-40 pointer-events-none" : "opacity-100"
+                }`}
+            >
+              {services.length > 0 ? (
+                services.map((service: TService) => (
+                  <ServiceCard key={service._id} service={service} />
+                ))
+              ) : (
+                !isFetching && (
+                  <div className="col-span-full flex flex-col items-center justify-center py-24 text-gray-400">
+                    <Image
+                      src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                      alt="No results"
+                      width={160}
+                      height={160}
+                      className="mb-6 opacity-80"
+                    />
+                    <p className="text-base font-medium text-gray-500">
+                      No services found
+                    </p>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Try changing your search keywords or filter options.
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
           </div>
+
         </div>
       </div>
 
