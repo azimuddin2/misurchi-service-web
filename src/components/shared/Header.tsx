@@ -186,7 +186,7 @@ export default function Header() {
   return (
     <header className="w-full shadow border-b z-auto">
       {/* Top Contact Bar */}
-      <div className="bg-[#093954] text-white text-sm py-2">
+      <div className="bg-[#093954] text-white text-sm py-2 lg:px-4">
         <div className="container mx-auto px-5 lg:px-0 flex justify-between items-center">
           <div className="lg:flex gap-6">
             <p className="flex items-center gap-1">
@@ -219,7 +219,7 @@ export default function Header() {
       </div>
 
       {/* Main Nav */}
-      <div className="flex justify-between items-center container mx-auto px-5 lg:px-0 py-3 bg-white">
+      <div className="flex justify-between items-center container mx-auto px-5 lg:px-4 py-3 bg-white">
         {/* Desktop Top Nav */}
         <nav className="hidden md:flex gap-6">
           {TOP_NAV_LINKS.map(({ label, href }) => (

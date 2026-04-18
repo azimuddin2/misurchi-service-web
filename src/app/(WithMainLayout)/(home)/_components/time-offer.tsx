@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 const TimeOffer = () => {
   const calculateTimeLeft = () => {
-    const difference = +new Date('2025-12-31T00:00:00') - +new Date();
+    const difference = +new Date('2026-05-31T00:00:00') - +new Date();
     let timeLeft = {
       days: '00',
       hours: '00',

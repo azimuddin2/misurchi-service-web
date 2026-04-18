@@ -6,7 +6,7 @@ import Services from './services';
 
 const ProductServiceSection = () => {
   return (
-    <div className="container lg:mx-auto px-4 lg:px-0">
+    <div className="container lg:mx-auto px-4">
       <h1 className="text-[#000000] text-2xl lg:text-4xl font-semibold text-center">
         Our Top Rated Services & Products
       </h1>

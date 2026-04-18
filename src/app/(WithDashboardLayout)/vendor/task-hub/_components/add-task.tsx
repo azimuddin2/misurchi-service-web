@@ -118,7 +118,7 @@ const AddTask = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg flex-grow max-w-5xl p-4 lg:p-8 shadow">
+    <div className="bg-white rounded-lg grow max-w-5xl p-4 lg:p-8 shadow">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {/* Title */}
@@ -127,7 +127,7 @@ const AddTask = () => {
             name="title"
             render={({ field }) => (
               <FormItem className="lg:mb-0 mb-5">
-                <FormLabel className="!text-gray-700 !text-base font-medium">
+                <FormLabel className="text-gray-700! text-base! font-medium">
                   Title
                 </FormLabel>
                 <FormControl>
@@ -150,7 +150,7 @@ const AddTask = () => {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="!text-gray-700 !text-base font-medium lg:mt-5">
+                <FormLabel className="text-gray-700! text-base! font-medium lg:mt-5">
                   Description
                 </FormLabel>
                 <FormControl>
@@ -169,7 +169,7 @@ const AddTask = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
             {/* Date */}
             <div>
-              <FormLabel className="!text-gray-700 !text-base font-medium mb-2">
+              <FormLabel className="text-gray-700! text-base! font-medium mb-2">
                 Estimated completion date
               </FormLabel>
               <Popover>
@@ -201,7 +201,7 @@ const AddTask = () => {
 
             {/* Time */}
             <div>
-              <FormLabel className="!text-gray-700 !text-base font-medium mb-2">
+              <FormLabel className="text-gray-700! text-base! font-medium mb-2">
                 Estimated completion Time
               </FormLabel>
               <Popover>
@@ -272,7 +272,7 @@ const AddTask = () => {
           <AppButton
             className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 mt-5"
             content={
-              <div className="flex justify-center items-center space-x-2 font-semibold">
+              <div className="flex justify-center items-center space-x-2 font-semibold uppercase">
                 <p>{isSubmitting ? 'Saving...' : 'Save'}</p>
                 <ArrowRight />
               </div>

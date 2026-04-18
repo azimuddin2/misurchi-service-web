@@ -23,6 +23,11 @@ const vendorApi = baseApi.injectEndpoints({
           params.append('createdAt', date.toISOString());
         }
 
+        // ✅ Top rated filter apply
+        if (query?.topRated) {
+          params.append('topRated', 'true');
+        }
+
         return {
           url: `/vendors?page=${page}&limit=${limit}&${params.toString()}`,
           method: 'GET',

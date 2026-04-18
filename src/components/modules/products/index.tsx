@@ -110,36 +110,33 @@ const AllProducts = () => {
 
             {/* Product grid */}
             <div
-              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8 transition-opacity duration-300 ${isFetching ? "opacity-40 pointer-events-none" : "opacity-100"
-                }`}
+              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8 transition-opacity duration-300 ${
+                isFetching ? 'opacity-40 pointer-events-none' : 'opacity-100'
+              }`}
             >
-              {products.length > 0 ? (
-                products.map((product: TProduct) => (
-                  <ProductCard key={product._id} product={product} />
-                ))
-              ) : (
-                !isFetching && (
-                  <div className="col-span-full flex flex-col items-center justify-center py-24 text-gray-400">
-                    <Image
-                      src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-                      alt="No results"
-                      width={160}
-                      height={160}
-                      className="mb-6 opacity-80"
-                    />
-                    <p className="text-base font-medium text-gray-500">
-                      No product found
-                    </p>
-                    <p className="text-sm text-gray-400 mt-1">
-                      Try changing your search keywords or filter options.
-                    </p>
-                  </div>
-                )
-              )}
+              {products.length > 0
+                ? products.map((product: TProduct) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))
+                : !isFetching && (
+                    <div className="col-span-full flex flex-col items-center justify-center py-24 text-gray-400">
+                      <Image
+                        src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                        alt="No results"
+                        width={160}
+                        height={160}
+                        className="mb-6 opacity-80"
+                      />
+                      <p className="text-base font-medium text-gray-500">
+                        No product found
+                      </p>
+                      <p className="text-sm text-gray-400 mt-1">
+                        Try changing your search keywords or filter options.
+                      </p>
+                    </div>
+                  )}
             </div>
           </div>
-
-
         </div>
       </div>
 

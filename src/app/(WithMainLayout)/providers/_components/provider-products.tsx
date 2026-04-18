@@ -27,7 +27,7 @@ const ProviderProducts = ({ vendorId }: Props) => {
   const limit = searchParams.get('limit') || 9;
   const searchTerm = searchParams.get('searchTerm') || '';
 
-  const { data, isLoading } = useGetAllProductsByUserQuery({
+  const { data, isLoading, isFetching } = useGetAllProductsByUserQuery({
     vendorId,
     page,
     limit,
@@ -67,14 +67,10 @@ const ProviderProducts = ({ vendorId }: Props) => {
   }
 
   return (
-    <div className="mb-10 container mx-auto">
+    <div className="mb-10 container px-3 lg:mx-auto">
       <div className="block lg:flex gap-10 mt-5">
-        <div className="w-80">
-          <FilterSidebar />
-        </div>
-
         <div className="w-full lg:mb-0">
-          <div className=" relative">
+          <div className="lg:w-1/2 mx-auto relative">
             <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
               <input
                 type="text"
@@ -92,23 +88,43 @@ const ProviderProducts = ({ vendorId }: Props) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
-            {products.length > 0 ? (
-              products.map((product: TProduct) => (
-                <ProductCard key={product._id} product={product} />
-              ))
-            ) : (
-              <div className="flex flex-col justify-center items-center py-16 text-center">
-                <Image
-                  src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-                  alt="No results"
-                  width={120}
-                  height={120}
-                  className="mb-3 opacity-80"
-                />
-                <p className="text-gray-500 text-sm">No results found</p>
+          {/* Product list */}
+          <div className="relative">
+            {/* Loading overlay - filter change */}
+            {isFetching && (
+              <div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 z-0 flex items-center justify-center rounded-xl backdrop-blur-sm">
+                <Spinner />
               </div>
             )}
+
+            {/* Product grid */}
+            <div
+              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-8 transition-opacity duration-300 ${
+                isFetching ? 'opacity-40 pointer-events-none' : 'opacity-100'
+              }`}
+            >
+              {products.length > 0
+                ? products.map((product: TProduct) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))
+                : !isFetching && (
+                    <div className="col-span-full flex flex-col items-center justify-center py-24 text-gray-400">
+                      <Image
+                        src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                        alt="No results"
+                        width={160}
+                        height={160}
+                        className="mb-6 opacity-80"
+                      />
+                      <p className="text-base font-medium text-gray-500">
+                        No product found
+                      </p>
+                      <p className="text-sm text-gray-400 mt-1">
+                        Try changing your search keywords or filter options.
+                      </p>
+                    </div>
+                  )}
+            </div>
           </div>
         </div>
       </div>

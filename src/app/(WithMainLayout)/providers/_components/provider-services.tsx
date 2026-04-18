@@ -1,5 +1,4 @@
 import ServiceCard from '@/components/modules/cards/service-card';
-import FilterSidebar from '@/components/modules/services/filter-sidebar';
 import Spinner from '@/components/shared/Spinner';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllServicesByUserQuery } from '@/redux/features/service/serviceApi';
@@ -65,13 +64,10 @@ const ProviderServices = ({ vendorId }: Props) => {
   }
 
   return (
-    <div className="mb-10 container mx-auto">
+    <div className="mb-10 container px-3 mx-auto">
       <div className="block lg:flex gap-10 mt-5">
-        <div className="w-80">
-          <FilterSidebar />
-        </div>
         <div className="w-full lg:mb-0">
-          <div className="relative">
+          <div className="lg:w-1/2 mx-auto relative">
             <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
               <input
                 type="text"
@@ -89,7 +85,7 @@ const ProviderServices = ({ vendorId }: Props) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
             {services?.length > 0 ? (
               services?.map((service: TService) => (
                 <ServiceCard key={service._id} service={service} />
