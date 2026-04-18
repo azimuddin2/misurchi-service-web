@@ -50,7 +50,7 @@ const ProductCard = ({ product }: ProductProps) => {
           )}
 
         {/* Recommended Type Badges */}
-        {product.recommendedType.length > 0 && (
+        {product?.recommendedType?.length > 0 && (
           <div className="absolute bottom-12 right-2 z-10 items-end">
             {product.recommendedType.map((type, index) => (
               <span
@@ -121,7 +121,7 @@ const ProductCard = ({ product }: ProductProps) => {
           <p className="flex items-center mt-3 mb-5">
             <MapPin className="text-[#6B7280] mr-1" />
             <span className="text-[#6B7280]">
-              {product?.vendor?.country}, {product.vendor.state}
+              {product?.vendor?.country}, {product?.vendor?.state}
             </span>
           </p>
         </div>

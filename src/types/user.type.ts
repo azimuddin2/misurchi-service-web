@@ -72,5 +72,7 @@ export type TVendorUser = {
     coordinates: number[]; // [lng, lat]
     streetAddress?: string;
   };
+  reviewCount: number;
+  avgRating: number;
   __v: number;
 };

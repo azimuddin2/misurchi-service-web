@@ -38,7 +38,7 @@ const arrivalServices: TArrivalServices[] = [
 
 export const NewArrival = () => {
   return (
-    <section className="flex justify-center items-center mb-20 px-4 lg:px-0">
+    <section className="flex justify-center items-center mb-20 px-4">
       <Container>
         {/* New Arrivals sections head content displayed here */}
         <SectionHeadWithBorder

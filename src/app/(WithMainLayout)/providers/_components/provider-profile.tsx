@@ -50,7 +50,7 @@ const ProviderProfile = ({ providerId }: Props) => {
   return (
     <div>
       {/* User Info */}
-      <div className="min-h-screen py-8">
+      <div className="min-h-screen py-8 px-3 lg:px-0">
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <Card className="mb-6 overflow-hidden pt-0">
@@ -229,7 +229,7 @@ const ProviderProfile = ({ providerId }: Props) => {
         <Tabs defaultValue="products">
           <TabsList
             style={{ background: 'none' }}
-            className="flex rounded-md w-full py-5 lg:max-w-6xl gap-1 mx-auto lg:gap-3 shadow-none"
+            className="flex rounded-md w-full px-3 lg:px-0 py-5 lg:max-w-6xl gap-1 mx-auto lg:gap-3 shadow-none"
           >
             {/* Products Tab */}
             <TabsTrigger

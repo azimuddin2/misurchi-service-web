@@ -49,7 +49,7 @@ const ServiceCard = ({ service }: ServiceProps) => {
           )}
 
         {/* Recommended Type Badges */}
-        {service?.recommendedType.length > 0 && (
+        {service?.recommendedType?.length > 0 && (
           <div className="absolute bottom-12 right-2 z-10 items-end">
             {service.recommendedType.map((type, index) => (
               <span
