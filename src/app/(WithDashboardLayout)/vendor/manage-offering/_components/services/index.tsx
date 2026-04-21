@@ -40,7 +40,6 @@ import { TService } from '@/types/service.type';
 import {
   useDeleteServiceMutation,
   useGetAllServicesByUserQuery,
-  useServiceHighlightStatusMutation,
   useUpdateServiceStatusMutation,
 } from '@/redux/features/service/serviceApi';
 import Spinner from '@/components/shared/Spinner';
@@ -103,7 +102,6 @@ const ManageServices = () => {
   const meta = data?.meta || { totalPage: 1 };
 
   const [updateServiceStatus] = useUpdateServiceStatusMutation();
-  const [serviceHighlightStatus] = useServiceHighlightStatusMutation();
   const [deleteService] = useDeleteServiceMutation();
 
   // searchTeam & createdAt date filtering

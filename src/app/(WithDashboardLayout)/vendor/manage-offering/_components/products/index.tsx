@@ -40,7 +40,6 @@ import { Input } from '@/components/ui/input';
 import {
   useDeleteProductMutation,
   useGetAllProductsByUserQuery,
-  useProductHighlightStatusMutation,
   useUpdateProductStatusMutation,
 } from '@/redux/features/product/productApi';
 import Spinner from '@/components/shared/Spinner';
@@ -104,7 +103,6 @@ const ManageProducts = () => {
   const meta = data?.meta || { totalPage: 1 };
 
   const [updateProductStatus] = useUpdateProductStatusMutation();
-  const [productHighlightStatus] = useProductHighlightStatusMutation();
   const [deleteProduct] = useDeleteProductMutation();
 
   // search & createdAt date filtering part

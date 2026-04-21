@@ -126,7 +126,7 @@ const AddMember = () => {
 
           <div>
             {/* First and Last Name */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-1">
               <FormField
                 control={form.control}
                 name="firstName"
@@ -194,7 +194,7 @@ const AddMember = () => {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* Role */}
               <FormField
                 control={form.control}
@@ -254,7 +254,7 @@ const AddMember = () => {
                 control={form.control}
                 name="timeZone"
                 render={({ field }) => (
-                  <FormItem className="lg:mb-0 mb-5">
+                  <FormItem className="lg:mb-0 mb-5 mt-3">
                     <FormLabel className="!text-gray-700 !text-base font-medium">
                       Time Zone
                     </FormLabel>
@@ -285,7 +285,7 @@ const AddMember = () => {
                 control={form.control}
                 name="workHours"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='mt-3'>
                     <FormLabel className="!text-gray-700 !text-base font-medium">
                       Work Hours
                     </FormLabel>
