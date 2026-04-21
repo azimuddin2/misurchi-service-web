@@ -19,6 +19,7 @@ import {
   AlertCircle,
   ChevronDown,
   Edit,
+  ExternalLink,
   Eye,
   PlusCircle,
   Search,
@@ -50,11 +51,6 @@ import { useGetUserProfileQuery } from '@/redux/features/user/userApi';
 const statusOptions = [
   { label: 'available', key: 'available' },
   { label: 'unavailable', key: 'unavailable' },
-];
-
-const highlightstatusOptions = [
-  { label: 'Highlight', key: 'Highlight' },
-  { label: 'Highlighted', key: 'Highlighted' },
 ];
 
 const ManageServices = () => {
@@ -171,29 +167,6 @@ const ManageServices = () => {
       refetch();
     } catch (error: any) {
       toast.error(error?.data?.message || 'Status update failed');
-    } finally {
-      toast.dismiss(toastId);
-    }
-  };
-
-  const handleHighlightStatusUpdate = async (
-    serviceId: string,
-    highlightStatus: string,
-  ) => {
-    const toastId = toast.loading('Updating highlight status...');
-
-    const updateHighlightStatus = { highlightStatus };
-
-    try {
-      const res = await serviceHighlightStatus({
-        id: serviceId,
-        highlightStatus: updateHighlightStatus,
-      }).unwrap();
-
-      toast.success(res.message || 'Highlight status updated');
-      refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Highlight status update failed');
     } finally {
       toast.dismiss(toastId);
     }
@@ -376,12 +349,21 @@ const ManageServices = () => {
   return (
     <div>
       {(!stripeAccountId || !stripeOnboardingComplete) && (
-        <div className="mt-2 flex items-center gap-2 text-yellow-800 bg-yellow-50 p-3 rounded border border-yellow-200 text-sm">
-          <AlertCircle size={18} />
-          <span>
-            Complete your Stripe onboarding account to add service. Go to your
-            settings and click Continue Bank Account.
-          </span>
+        <div className="mt-2 flex items-start gap-3 text-yellow-800 bg-yellow-50 p-3 rounded border border-yellow-200 text-sm">
+          <AlertCircle size={18} className="mt-0.5 shrink-0 text-yellow-600" />
+          <div className="flex flex-col gap-1">
+            <span className="font-medium">Stripe onboarding incomplete</span>
+            <span className="text-yellow-700">
+              Complete your bank account setup before adding services.
+            </span>
+            <Link
+              href="/vendor/settings"
+              className="mt-1 inline-flex items-center gap-1 font-medium text-yellow-900 underline underline-offset-2 hover:text-yellow-700 transition-colors"
+            >
+              Go to Settings → Continue Bank Account
+              <ExternalLink size={13} />
+            </Link>
+          </div>
         </div>
       )}
 
@@ -438,7 +420,7 @@ const ManageServices = () => {
 
       {/* Table & Pagination */}
       <MSWTable columns={columns} data={services || []} />
-      <MSWPagination totalPage={meta?.totalPage} />
+      {services?.length > 5 && <MSWPagination totalPage={meta?.totalPage} />}
 
       {/* Delete Modal */}
       <DeleteConfirmationModal

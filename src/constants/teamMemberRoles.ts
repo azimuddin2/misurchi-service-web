@@ -1,7 +1,7 @@
 const teamMemberRoles = [
-  { label: 'Supervisor', value: 'Supervisor' },
-  { label: 'Manager', value: 'Manager' },
-  { label: 'Team Member', value: 'Team Member' },
+  { label: 'Supervisor', value: 'supervisor' },
+  { label: 'Manager', value: 'manager' },
+  { label: 'Team Member', value: 'team_member' },
 ];
 
 export const roleOptions = teamMemberRoles.map((item) => ({

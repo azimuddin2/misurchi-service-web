@@ -20,6 +20,7 @@ import {
   AlertCircle,
   ChevronDown,
   Edit,
+  ExternalLink,
   Eye,
   PlusCircle,
   Search,
@@ -34,7 +35,6 @@ import { format, parseISO } from 'date-fns';
 import { AppButton } from '@/components/shared/app-button';
 import { Checkbox } from '@/components/ui/checkbox';
 import DeleteConfirmationModal from '@/components/ui/core/MSWModal/DeleteConfirmationModal';
-import { RxUpdate } from 'react-icons/rx';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import {
@@ -53,11 +53,6 @@ const statusOptions = [
   { label: 'Out of Stock', key: 'Out of Stock' },
   { label: 'TBC', key: 'TBC' },
   { label: 'Discontinued', key: 'Discontinued' },
-];
-
-const highlightstatusOptions = [
-  { label: 'Highlight', key: 'Highlight' },
-  { label: 'Highlighted', key: 'Highlighted' },
 ];
 
 const ManageProducts = () => {
@@ -173,29 +168,6 @@ const ManageProducts = () => {
       refetch();
     } catch (error: any) {
       toast.error(error?.data?.message || 'Status update failed');
-    } finally {
-      toast.dismiss(toastId);
-    }
-  };
-
-  const handleHighlightStatusUpdate = async (
-    productId: string,
-    highlightStatus: string,
-  ) => {
-    const toastId = toast.loading('Updating highlight status...');
-
-    const updateHighlightStatus = { highlightStatus };
-
-    try {
-      const res = await productHighlightStatus({
-        id: productId,
-        highlightStatus: updateHighlightStatus,
-      }).unwrap();
-
-      toast.success(res.message || 'Highlight status updated');
-      refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Highlight status update failed');
     } finally {
       toast.dismiss(toastId);
     }
@@ -377,12 +349,21 @@ const ManageProducts = () => {
   return (
     <div>
       {(!stripeAccountId || !stripeOnboardingComplete) && (
-        <div className="mt-2 flex items-center gap-2 text-yellow-800 bg-yellow-50 p-3 rounded border border-yellow-200 text-sm">
-          <AlertCircle size={18} />
-          <span>
-            Complete your Stripe onboarding account to add products. Go to your
-            settings and click Continue Bank Account.
-          </span>
+        <div className="mt-2 flex items-start gap-3 text-yellow-800 bg-yellow-50 p-3 rounded border border-yellow-200 text-sm">
+          <AlertCircle size={18} className="mt-0.5 shrink-0 text-yellow-600" />
+          <div className="flex flex-col gap-1">
+            <span className="font-medium">Stripe onboarding incomplete</span>
+            <span className="text-yellow-700">
+              Complete your bank account setup before adding products.
+            </span>
+            <Link
+              href="/vendor/settings"
+              className="mt-1 inline-flex items-center gap-1 font-medium text-yellow-900 underline underline-offset-2 hover:text-yellow-700 transition-colors"
+            >
+              Go to Settings → Continue Bank Account
+              <ExternalLink size={13} />
+            </Link>
+          </div>
         </div>
       )}
 
@@ -439,7 +420,7 @@ const ManageProducts = () => {
 
       {/* Table & Pagination */}
       <MSWTable columns={columns} data={products || []} />
-      <MSWPagination totalPage={meta?.totalPage} />
+      {products?.length > 5 && <MSWPagination totalPage={meta?.totalPage} />}
 
       {/* Delete Modal */}
       <DeleteConfirmationModal

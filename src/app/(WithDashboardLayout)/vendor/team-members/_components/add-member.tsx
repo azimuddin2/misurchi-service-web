@@ -72,7 +72,7 @@ const AddMember = () => {
     const modifiedData = {
       vendor: vendorId,
       ...data,
-      assignTask: tasks,
+      // assignTask: tasks,
     };
 
     const formData = new FormData();
@@ -125,28 +125,51 @@ const AddMember = () => {
           {/* data input fields */}
 
           <div>
-            {/* Name */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Name
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Name"
-                      {...field}
-                      value={field.value || ''}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* First and Last Name */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-5">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem className="lg:mb-0 mb-5">
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      First Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="First Name"
+                        {...field}
+                        value={field.value || ''}
+                        className="bg-[#f5f5f5] py-6 border-none rounded-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Last Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Last Name"
+                        {...field}
+                        value={field.value || ''}
+                        className="bg-[#f5f5f5] py-6 border-none rounded-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Email */}
             <FormField
@@ -289,72 +312,13 @@ const AddMember = () => {
               />
             </div>
 
-            <div className="my-5">
-              {/* Assign Task */}
-              <FormField
-                control={form.control}
-                name="assignTask"
-                render={({ field }) => (
-                  <FormItem className="lg:mb-0 mb-5">
-                    <FormLabel className="!text-gray-700 !text-base font-medium">
-                      Assign Task
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Enter Task"
-                        {...field}
-                        value={field.value || ''}
-                        className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="p-2 flex justify-center mt-5 cursor-pointer text-sm shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 w-1/4 text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80">
-                <button
-                  type="button"
-                  onClick={handleAdd}
-                  className=" inline-flex justify-center items-center space-x-1 font-semibold bg-none"
-                >
-                  <PlusCircle size={20} />
-                  <span className="uppercase text-sm font-semibold">
-                    Add Task
-                  </span>
-                </button>
-              </div>
-
-              <div className="space-y-2 grid grid-cols-2 lg:grid-cols-3 gap-3 mt-5">
-                {tasks.map((task, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between border rounded-md px-4 py-2"
-                  >
-                    <div className="flex">
-                      <CircleCheck className="text-green-500" size={18} />
-                      <span className="mx-2">{task}</span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemove(index)}
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500 rounded-full cursor-pointer" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Phone Number */}
             <FormField
               control={form.control}
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
+                  <FormLabel className="!text-gray-700 !text-base font-medium mt-5">
                     Phone Number
                   </FormLabel>
                   <FormControl>

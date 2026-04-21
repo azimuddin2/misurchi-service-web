@@ -1,9 +1,8 @@
 import { z } from 'zod';
 
 export const addMemberSchema = z.object({
-  name: z.string({
-    required_error: 'Name is required',
-  }),
+  firstName: z.string({ required_error: 'First Name is required' }),
+  lastName: z.string({ required_error: 'Last Name is required' }),
 
   email: z
     .string({
@@ -27,9 +26,9 @@ export const addMemberSchema = z.object({
     required_error: 'Work hours are required',
   }),
 
-  assignTask: z.string({
-    required_error: 'At least one task is required',
-  }),
+  // assignTask: z.string({
+  //   required_error: 'At least one task is required',
+  // }),
 
   phone: z
     .string({

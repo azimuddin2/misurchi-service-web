@@ -21,7 +21,7 @@ const ProviderServices = ({ vendorId }: Props) => {
   );
 
   const page = searchParams.get('page') || 1;
-  const limit = searchParams.get('limit') || 9;
+  const limit = searchParams.get('limit') || 8;
   const searchTerm = searchParams.get('searchTerm') || '';
 
   const { data, isLoading } = useGetAllServicesByUserQuery({

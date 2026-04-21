@@ -1,7 +1,6 @@
 'use client';
 
 import ProductCard from '@/components/modules/cards/product-card';
-import FilterSidebar from '@/components/modules/products/filter-sidebar';
 import Spinner from '@/components/shared/Spinner';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllProductsByUserQuery } from '@/redux/features/product/productApi';
@@ -24,7 +23,7 @@ const ProviderProducts = ({ vendorId }: Props) => {
   );
 
   const page = searchParams.get('page') || 1;
-  const limit = searchParams.get('limit') || 9;
+  const limit = searchParams.get('limit') || 8;
   const searchTerm = searchParams.get('searchTerm') || '';
 
   const { data, isLoading, isFetching } = useGetAllProductsByUserQuery({
