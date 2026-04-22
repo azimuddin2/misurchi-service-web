@@ -168,8 +168,8 @@ const AddAssignModal = ({
                     </FormControl>
                     <SelectContent className="max-h-60 overflow-y-auto">
                       {members?.map((member) => (
-                        <SelectItem key={member._id} value={member.name}>
-                          {member.name}
+                        <SelectItem key={member._id} value={member.firstName}>
+                          {member.firstName}
                         </SelectItem>
                       ))}
                     </SelectContent>
