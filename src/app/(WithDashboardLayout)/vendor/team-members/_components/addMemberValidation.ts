@@ -26,10 +26,6 @@ export const addMemberSchema = z.object({
     required_error: 'Work hours are required',
   }),
 
-  // assignTask: z.string({
-  //   required_error: 'At least one task is required',
-  // }),
-
   phone: z
     .string({
       required_error: 'Phone number is required',

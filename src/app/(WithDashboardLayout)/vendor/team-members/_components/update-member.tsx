@@ -1,7 +1,7 @@
 'use client';
 
 import { AppButton } from '@/components/shared/app-button';
-import { ArrowRight, CircleCheck, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
   Form,
@@ -29,7 +29,6 @@ import ImagePreviewer from '@/components/ui/core/MSWImageUploader/ImagePreviewer
 import { toast } from 'sonner';
 import { timezonesOptions } from '@/constants/timezones';
 import { workHourOptions } from '@/constants/workHour';
-import { Button } from '@/components/ui/button';
 import { roleOptions } from '@/constants/teamMemberRoles';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import {
@@ -47,7 +46,6 @@ type Props = {
 const UpdateMember = ({ memberId }: Props) => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
-  const [tasks, setTasks] = useState<string[]>([]);
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
 
@@ -59,13 +57,13 @@ const UpdateMember = ({ memberId }: Props) => {
   const form = useForm({
     resolver: zodResolver(updateMemberSchema),
     defaultValues: {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       role: '',
       speciality: '',
       timeZone: '',
       workHours: '',
-      assignTask: '',
       phone: '',
     },
   });
@@ -74,17 +72,16 @@ const UpdateMember = ({ memberId }: Props) => {
   useEffect(() => {
     if (member) {
       form.reset({
-        name: member.name ?? '',
+        firstName: member.firstName ?? '',
+        lastName: member.lastName ?? '',
         email: member.email ?? '',
         role: member.role ?? '',
         speciality: member.speciality ?? '',
         timeZone: member.timeZone ?? '',
         workHours: member.workHours ?? '',
-        assignTask: '',
         phone: member.phone ?? '',
       });
 
-      setTasks(member.assignTask || []);
       setImagePreview(member.image ? [member.image] : []);
     }
   }, [member, form]);
@@ -93,22 +90,9 @@ const UpdateMember = ({ memberId }: Props) => {
     formState: { isSubmitting },
   } = form;
 
-  // handle Assign Task!
-  const handleAdd = () => {
-    const value = (form.getValues('assignTask') ?? '').trim();
-    if (value && !tasks.includes(value)) {
-      setTasks((prev) => [...prev, value]);
-      form.setValue('assignTask', '');
-    }
-  };
-  const handleRemove = (index: number) => {
-    setTasks((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const modifiedData = {
       ...data,
-      assignTask: tasks,
     };
 
     const formData = new FormData();
@@ -140,49 +124,73 @@ const UpdateMember = ({ memberId }: Props) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {/* Images part */}
-          <div className="mb-10">
-            <div className="flex gap-4">
-              {imageFiles.length < 1 && (
-                <MSWImageUploader
-                  setImageFiles={setImageFiles}
-                  setImagePreview={setImagePreview}
-                  label="Upload Image"
-                  className="w-full lg:w-fit"
-                />
-              )}
+          <div className="flex gap-4">
+            {imagePreview.length < 1 && (
+              <MSWImageUploader
+                setImageFiles={setImageFiles}
+                setImagePreview={setImagePreview}
+                label="Upload Image"
+                className="w-full lg:w-fit"
+              />
+            )}
 
+            {imagePreview.length > 0 && (
               <ImagePreviewer
                 className="flex flex-wrap gap-4"
                 setImageFiles={setImageFiles}
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}
               />
-            </div>
+            )}
           </div>
 
           {/* data input fields */}
           <div>
-            {/* Name */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="lg:mb-0 mb-5">
-                  <FormLabel className="!text-gray-700 !text-base font-medium">
-                    Name
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter Name"
-                      {...field}
-                      className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* First and Last Name */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-1">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem className="lg:mb-0 mb-5">
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      First Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="First Name"
+                        {...field}
+                        value={field.value || ''}
+                        className="bg-[#f5f5f5] py-6 border-none rounded-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="!text-gray-700 !text-base font-medium">
+                      Last Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Last Name"
+                        {...field}
+                        value={field.value || ''}
+                        className="bg-[#f5f5f5] py-6 border-none rounded-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Email */}
             <FormField
@@ -206,7 +214,7 @@ const UpdateMember = ({ memberId }: Props) => {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
               {/* Role */}
               <FormField
                 control={form.control}
@@ -262,7 +270,7 @@ const UpdateMember = ({ memberId }: Props) => {
                 control={form.control}
                 name="timeZone"
                 render={({ field }) => (
-                  <FormItem className="lg:mb-0 mb-5">
+                  <FormItem className="lg:mb-0 mb-5 lg:mt-3">
                     <FormLabel className="!text-gray-700 !text-base font-medium">
                       Time Zone
                     </FormLabel>
@@ -290,7 +298,7 @@ const UpdateMember = ({ memberId }: Props) => {
                 control={form.control}
                 name="workHours"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="lg:mt-3">
                     <FormLabel className="!text-gray-700 !text-base font-medium">
                       Work Hours
                     </FormLabel>
@@ -312,64 +320,6 @@ const UpdateMember = ({ memberId }: Props) => {
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="my-5">
-              {/* Assign Task */}
-              <FormField
-                control={form.control}
-                name="assignTask"
-                render={({ field }) => (
-                  <FormItem className="lg:mb-0 mb-5">
-                    <FormLabel className="!text-gray-700 !text-base font-medium">
-                      Assign Task
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Enter Task"
-                        {...field}
-                        className="bg-[#f5f5f5] py-6 border-none rounded-sm"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="p-2 flex justify-center mt-5 cursor-pointer text-sm shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 w-1/4 text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80">
-                <button
-                  type="button"
-                  onClick={handleAdd}
-                  className=" inline-flex justify-center items-center space-x-1 font-semibold bg-none"
-                >
-                  <PlusCircle size={20} />
-                  <span className="uppercase text-sm font-semibold">
-                    Add Task
-                  </span>
-                </button>
-              </div>
-
-              <div className="space-y-2 grid grid-cols-2 lg:grid-cols-3 gap-3 mt-5">
-                {tasks.map((task, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between border rounded-md px-4 py-2"
-                  >
-                    <div className="flex">
-                      <CircleCheck className="text-green-500" size={18} />
-                      <span className="mx-2">{task}</span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemove(index)}
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500 rounded-full cursor-pointer" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Phone Number */}
@@ -397,7 +347,7 @@ const UpdateMember = ({ memberId }: Props) => {
           </div>
 
           {/* Submit Button */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-3">
             <AppButton
               className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
               content={

@@ -1,9 +1,8 @@
 import { z } from 'zod';
 
 export const updateMemberSchema = z.object({
-  name: z.string({
-    required_error: 'Name is required',
-  }),
+  firstName: z.string({ required_error: 'First Name is required' }),
+  lastName: z.string({ required_error: 'Last Name is required' }),
 
   email: z
     .string({
@@ -25,10 +24,6 @@ export const updateMemberSchema = z.object({
 
   workHours: z.string({
     required_error: 'Work hours are required',
-  }),
-
-  assignTask: z.string({
-    required_error: 'At least one task is required',
   }),
 
   phone: z

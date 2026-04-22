@@ -1,7 +1,7 @@
 'use client';
 
 import { AppButton } from '@/components/shared/app-button';
-import { ArrowRight, CircleCheck, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import {
   Form,
@@ -29,7 +29,6 @@ import ImagePreviewer from '@/components/ui/core/MSWImageUploader/ImagePreviewer
 import { toast } from 'sonner';
 import { timezonesOptions } from '@/constants/timezones';
 import { workHourOptions } from '@/constants/workHour';
-import { Button } from '@/components/ui/button';
 import { roleOptions } from '@/constants/teamMemberRoles';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import { addMemberSchema } from './addMemberValidation';
@@ -39,7 +38,6 @@ import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 const AddMember = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
-  const [tasks, setTasks] = useState<string[]>([]);
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
 
@@ -51,18 +49,6 @@ const AddMember = () => {
     formState: { isSubmitting },
   } = form;
 
-  // handle Assign Task!
-  const handleAdd = () => {
-    const value = (form.getValues('assignTask') ?? '').trim();
-    if (value && !tasks.includes(value)) {
-      setTasks((prev) => [...prev, value]);
-      form.setValue('assignTask', '');
-    }
-  };
-  const handleRemove = (index: number) => {
-    setTasks((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
   const vendorId = vendorData?.data?._id as string;
 
@@ -72,14 +58,13 @@ const AddMember = () => {
     const modifiedData = {
       vendor: vendorId,
       ...data,
-      // assignTask: tasks,
     };
 
     const formData = new FormData();
-    formData.append('data', JSON.stringify(modifiedData)); //✅Backend expects JSON string
+    formData.append('data', JSON.stringify(modifiedData));
 
     imageFiles.forEach((file) => {
-      formData.append('image', file); //✅Append multiple images
+      formData.append('image', file);
     });
 
     const toastId = toast.loading('Adding Team Member...');
@@ -285,7 +270,7 @@ const AddMember = () => {
                 control={form.control}
                 name="workHours"
                 render={({ field }) => (
-                  <FormItem className='mt-3'>
+                  <FormItem className="mt-3">
                     <FormLabel className="!text-gray-700 !text-base font-medium">
                       Work Hours
                     </FormLabel>

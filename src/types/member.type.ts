@@ -1,6 +1,7 @@
 export type TMember = {
   vendor: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   image: string;
   role: string;

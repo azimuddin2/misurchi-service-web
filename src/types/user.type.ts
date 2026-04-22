@@ -1,4 +1,4 @@
-export type TRole = 'vendor' | 'user' | 'admin';
+export type TRole = 'vendor' | 'user' | 'admin' | 'team_member';
 
 export type TStatus = 'ongoing' | 'confirmed' | 'blocked';
 export type TSubscribed = 'advance' | 'basic';

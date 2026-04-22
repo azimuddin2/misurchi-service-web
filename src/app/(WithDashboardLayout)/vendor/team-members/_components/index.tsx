@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Edit, PlusCircle, Search, Trash2 } from 'lucide-react';
+import { Edit, Eye, PlusCircle, Search, Trash2 } from 'lucide-react';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
@@ -113,8 +113,10 @@ const ManageTeamMembers = () => {
 
   // API call here backend
   const handleDelete = (data: TMember) => {
+    const fullName = `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim();
+
     setSelectedId(data?._id);
-    setSelectedItem(data?.name);
+    setSelectedItem(fullName);
     setModalOpen(true);
   };
 
@@ -166,20 +168,26 @@ const ManageTeamMembers = () => {
       ),
     },
     {
-      accessorKey: 'name',
+      accessorKey: 'firstName',
       header: 'Name',
       cell: ({ row }) => {
-        const { image, name } = row.original;
+        const { image, firstName, lastName } = row.original;
+        const fullName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
+
         return (
-          <div className="flex items-start space-x-3">
+          <div className="flex items-center gap-3">
             <Image
-              src={image}
-              alt={name}
-              width={100}
-              height={100}
-              className="w-14 h-14 rounded-full object-cover border"
+              src={image ?? '/placeholder.png'}
+              alt={fullName || 'Team member'}
+              width={48}
+              height={48}
+              className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100"
             />
-            <span className="truncate">{name}</span>
+            <div className="flex flex-col min-w-0">
+              <span className="font-medium text-gray-900 truncate">
+                {fullName}
+              </span>
+            </div>
           </div>
         );
       },
@@ -215,6 +223,22 @@ const ManageTeamMembers = () => {
       header: 'Action',
       cell: ({ row }) => (
         <div className="flex items-center space-x-3">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Eye
+                  // onClick={() =>
+                  //   router.push(
+                  //     `/${user?.role}/manage-offering/view-product/${row.original._id}`,
+                  //   )
+                  // }
+                  size={20}
+                  className="text-blue-400 cursor-pointer"
+                />
+              </TooltipTrigger>
+              <TooltipContent>View</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
