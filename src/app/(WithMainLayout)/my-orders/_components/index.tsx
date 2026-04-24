@@ -36,12 +36,25 @@ const MyOrders = () => {
       const response = await createCheckoutSession(payload).unwrap();
 
       if (response.success && response.data) {
-        window.location.href = response.data; // redirect to Stripe Checkout
+        window.location.href = response.data;
       } else {
         toast.error(response.message || 'Failed to start payment.');
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Something went wrong.');
+      const errorMessage = error?.data?.message || '';
+
+      // Stripe capability error
+      if (
+        errorMessage.includes('transfers') ||
+        errorMessage.includes('capabilities') ||
+        errorMessage.includes('destination')
+      ) {
+        toast.warning(
+          'This vendor has not completed their payment setup yet. Please try again later or contact support.',
+        );
+      } else {
+        toast.error('Something went wrong. Please try again.');
+      }
     }
   };
 

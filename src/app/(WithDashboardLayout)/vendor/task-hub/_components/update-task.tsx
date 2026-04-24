@@ -298,7 +298,10 @@ const UpdateTask = ({ taskId }: Props) => {
                   </FormControl>
                   <SelectContent className="max-h-60 overflow-y-auto">
                     {members?.map((member) => (
-                      <SelectItem key={member.firstName} value={member.firstName}>
+                      <SelectItem
+                        key={member.firstName}
+                        value={member.firstName}
+                      >
                         {member.firstName}
                       </SelectItem>
                     ))}

@@ -84,6 +84,7 @@ const ManageServices = () => {
 
   const stripeAccountId = userData?.data?.stripeAccountId;
   const stripeOnboardingComplete = userData?.data?.stripeOnboardingComplete;
+  const isStripeReady = !!stripeAccountId && stripeOnboardingComplete;
 
   const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
   const vendorId = vendorData?.data?._id as string;
@@ -346,7 +347,8 @@ const ManageServices = () => {
 
   return (
     <div>
-      {(!stripeAccountId || !stripeOnboardingComplete) && (
+      {/* Warning */}
+      {!isStripeReady && (
         <div className="mt-2 flex items-start gap-3 text-yellow-800 bg-yellow-50 p-3 rounded border border-yellow-200 text-sm">
           <AlertCircle size={18} className="mt-0.5 shrink-0 text-yellow-600" />
           <div className="flex flex-col gap-1">
@@ -367,16 +369,27 @@ const ManageServices = () => {
 
       {/* Add Service Button */}
       <AppButton
-        disabled={!stripeAccountId || !stripeOnboardingComplete}
+        disabled={!isStripeReady}
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
-          <Link
-            href={`/${user?.role}/manage-offering/add-service`}
-            className="flex justify-center items-center space-x-1 font-semibold"
-          >
-            <PlusCircle size={24} />
-            <span className="uppercase text-sm font-semibold">Add Service</span>
-          </Link>
+          isStripeReady ? (
+            <Link
+              href={`/${user?.role}/manage-offering/add-service`}
+              className="flex justify-center items-center space-x-1 font-semibold"
+            >
+              <PlusCircle size={24} />
+              <span className="uppercase text-sm font-semibold">
+                Add Service
+              </span>
+            </Link>
+          ) : (
+            <div className="flex justify-center items-center space-x-1 font-semibold">
+              <PlusCircle size={24} />
+              <span className="uppercase text-sm font-semibold">
+                Add Service
+              </span>
+            </div>
+          )
         }
       />
 
@@ -418,7 +431,7 @@ const ManageServices = () => {
 
       {/* Table & Pagination */}
       <MSWTable columns={columns} data={services || []} />
-      {services?.length > 5 && <MSWPagination totalPage={meta?.totalPage} />}
+      {services?.length > 1 && <MSWPagination totalPage={meta?.totalPage} />}
 
       {/* Delete Modal */}
       <DeleteConfirmationModal
