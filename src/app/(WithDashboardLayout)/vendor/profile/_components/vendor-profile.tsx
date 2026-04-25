@@ -46,13 +46,15 @@ import { vendorProfileSchema } from './profileValidation';
 
 const VendorProfile = () => {
   const user = useAppSelector(selectCurrentUser);
-  const email = user?.email as string;
+  const email = user?.vendorEmail as string;
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
   const [coverImageFiles, setCoverImageFiles] = useState<File[] | []>([]);
   const [coverImagePreview, setCoverImagePreview] = useState<string[] | []>([]);
 
-  const { data, isLoading, refetch } = useGetVendorProfileQuery(email);
+  const { data, isLoading, refetch } = useGetVendorProfileQuery(
+    user?.vendorEmail as string,
+  );
   const vendorUser: TVendorUser | undefined = data?.data;
 
   const [updateVendorProfile] = useUpdateVendorProfileMutation();

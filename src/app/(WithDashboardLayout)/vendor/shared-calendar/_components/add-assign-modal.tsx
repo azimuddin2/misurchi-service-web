@@ -23,7 +23,6 @@ import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
 import { TBooking } from '@/types/booking.type';
 import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import {
@@ -57,8 +56,7 @@ const AddAssignModal = ({
 }: AddAssignModalProps) => {
   const user = useAppSelector(selectCurrentUser);
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data: membersData } = useGetAllMembersQuery({ vendorId });
   const members = membersData?.data || [];

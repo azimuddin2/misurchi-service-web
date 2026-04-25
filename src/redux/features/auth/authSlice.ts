@@ -1,12 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
+import { TRole } from '@/types';
+import { TTeamMemberRole } from '@/types/member.type';
 
 export type TUser = {
   userId: string;
   name?: string;
   email: string;
-  role: string;
+  role: TRole;
   image?: string;
+  vendorId?: string;
+  vendorEmail?: string;
+  teamRole?: TTeamMemberRole;
+  permissions?: string[];
   iat: number;
   exp: number;
 };

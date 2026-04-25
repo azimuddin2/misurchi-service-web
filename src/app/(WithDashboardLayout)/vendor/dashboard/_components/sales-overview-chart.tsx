@@ -19,13 +19,11 @@ import {
 } from '@/components/ui/select';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useGetVendorSalesOverviewChartQuery } from '@/redux/features/dashboard/dashboardApi';
 
 const SalesOverviewChart = () => {
   const user = useAppSelector(selectCurrentUser);
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email ?? '');
-  const vendorId = vendorData?.data?._id;
+  const vendorId = user?.vendorId as string;
 
   const currentYear = new Date().getFullYear();
   const yearOptions = [

@@ -28,8 +28,7 @@ const SharedCalendar = () => {
   // Format date as 'YYYY-MM-DD' for backend
   const formattedDate = selectedDate?.toLocaleDateString('en-CA') || '';
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   // Fetch bookings for selected date
   const { data, isLoading, isError, refetch } = useGetBookingAppointmentsQuery({

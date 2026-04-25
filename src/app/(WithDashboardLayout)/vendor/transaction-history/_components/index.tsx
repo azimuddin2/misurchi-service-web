@@ -12,7 +12,6 @@ import { format, parseISO } from 'date-fns';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { useGetAllPaymentQuery } from '@/redux/features/payment/paymentApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { TPayment } from '@/types/payment.type';
 import Spinner from '@/components/shared/Spinner';
 
@@ -35,8 +34,7 @@ const TransactionHistory = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, isLoading } = useGetAllPaymentQuery({
     vendorId,

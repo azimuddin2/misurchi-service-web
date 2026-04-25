@@ -44,7 +44,6 @@ import {
 } from '@/redux/features/service/serviceApi';
 import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useGetUserProfileQuery } from '@/redux/features/user/userApi';
 
 const statusOptions = [
@@ -86,8 +85,7 @@ const ManageServices = () => {
   const stripeOnboardingComplete = userData?.data?.stripeOnboardingComplete;
   const isStripeReady = !!stripeAccountId && stripeOnboardingComplete;
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, isLoading, refetch } = useGetAllServicesByUserQuery({
     vendorId,

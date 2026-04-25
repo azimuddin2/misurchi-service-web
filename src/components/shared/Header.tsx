@@ -35,7 +35,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { protectedRoutes } from '@/constants';
 import Cookies from 'js-cookie';
 import { useGetAllNotificationsQuery } from '@/redux/features/notification/notificationApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const TOP_NAV_LINKS = [
   { label: 'Services', href: '/services' },
@@ -59,16 +58,16 @@ export default function Header() {
   const cartItems = useAppSelector(selectCartItems);
   const cartCount = cartItems.length;
 
+  const isVendor = user?.role === 'vendor';
+  const isUser = user?.role === 'user';
+  const isTeamMember = user?.role === 'team_member';
+
+  const vendorId = user?.vendorId as string;
   const userId = user?.userId as string;
 
-  // Get vendor profile if the user is a vendor
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email || '');
-  const vendorId = vendorData?.data?._id as string;
+  const receiver = isVendor ? vendorId : userId;
 
-  const receiver = user?.role === 'vendor' ? vendorId : userId;
-
-  // Fetch notifications
-  const { data, refetch } = useGetAllNotificationsQuery(
+  const { data: notificationData } = useGetAllNotificationsQuery(
     { receiver },
     {
       skip: !receiver,
@@ -76,7 +75,8 @@ export default function Header() {
       refetchOnMountOrArgChange: true,
     },
   );
-  const unreadCount = data?.data?.filter((n) => !n.read).length ?? 0;
+  const unreadCount =
+    notificationData?.data?.filter((n) => !n.read).length ?? 0;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -86,12 +86,16 @@ export default function Header() {
     }
   };
 
+  // profile href — team_member vendor profile এ যাবে
+  const profileHref = isTeamMember
+    ? '/vendor/profile'
+    : `/${user?.role}/profile`;
+
   const ICONS_LINKS = (
     <div className="flex items-center gap-4">
       {user?.email && (
         <Link href="/notifications" className="relative cursor-pointer">
           <Bell size={22} />
-
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               {unreadCount > 99 ? '99+' : unreadCount}
@@ -100,7 +104,8 @@ export default function Header() {
         </Link>
       )}
 
-      {(!user || user?.role === 'user') && (
+      {/* cart শুধু user এর জন্য */}
+      {(!user || isUser) && (
         <div
           className="relative cursor-pointer"
           onClick={() => router.push('/cart')}
@@ -132,15 +137,24 @@ export default function Header() {
               </Avatar>
               <h2 className="mt-2 text-lg font-semibold">{user?.name}</h2>
               <p className="text-sm text-gray-500">{user?.email}</p>
+              {user?.teamRole && (
+                <p className="text-base text-green-900 font-medium capitalize rounded-full py-1">
+                  Role: {user?.teamRole}
+                </p>
+              )}
             </div>
+
             <DropdownMenuSeparator />
-            <Link href={`/${user?.role}/profile`}>
+
+            {/* Profile — সবার জন্য */}
+            <Link href={profileHref}>
               <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
                 <User size={18} /> View Profile
               </DropdownMenuItem>
             </Link>
 
-            {user?.role === 'vendor' && (
+            {/* Vendor menu */}
+            {isVendor && (
               <>
                 <Link href="/vendor/dashboard">
                   <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
@@ -155,7 +169,17 @@ export default function Header() {
               </>
             )}
 
-            {user?.role === 'user' && (
+            {/* Team member menu */}
+            {isTeamMember && (
+              <Link href="/vendor/dashboard">
+                <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
+                  <LayoutDashboard size={18} /> Dashboard
+                </DropdownMenuItem>
+              </Link>
+            )}
+
+            {/* User menu */}
+            {isUser && (
               <>
                 <Link href="/my-orders">
                   <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
@@ -220,22 +244,18 @@ export default function Header() {
 
       {/* Main Nav */}
       <div className="flex justify-between items-center container mx-auto px-5 lg:px-4 py-3 bg-white">
-        {/* Desktop Top Nav */}
         <nav className="hidden md:flex gap-6">
           {TOP_NAV_LINKS.map(({ label, href }) => (
             <NavLink key={label} label={label} href={href} />
           ))}
         </nav>
 
-        {/* Logo Center */}
         <Link href="/" className="flex">
           <Image src={logo} alt="Logo" width={100} height={40} />
         </Link>
 
-        {/* Right Icons Desktop */}
         <div className="hidden md:flex items-center gap-6">{ICONS_LINKS}</div>
 
-        {/* Mobile: Icons + Menu */}
         <div className="md:hidden flex items-center gap-3">
           {ICONS_LINKS}
           <button onClick={() => setMobileOpen(!mobileOpen)}>

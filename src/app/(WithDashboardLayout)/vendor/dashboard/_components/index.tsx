@@ -7,7 +7,6 @@ import RecentActivity from './recent-activity';
 import SalesOverviewChart from './sales-overview-chart';
 import TotalStats from './total-stats';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useGetVendorDashboardDataQuery } from '@/redux/features/dashboard/dashboardApi';
 import {
   TPendingBooking,
@@ -18,8 +17,7 @@ import PendingBookings from './pending-bookings';
 
 const Dashboard = () => {
   const user = useAppSelector(selectCurrentUser);
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email ?? '');
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data } = useGetVendorDashboardDataQuery(
     { id: vendorId },

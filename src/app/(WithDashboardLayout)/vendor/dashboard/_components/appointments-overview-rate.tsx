@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { Loader2 } from 'lucide-react';
@@ -39,8 +38,7 @@ const getPathColor = (rate: number) => {
 
 const AppointmentsOverviewRate = () => {
   const user = useAppSelector(selectCurrentUser);
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email ?? '');
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const [selectedMonth, setSelectedMonth] = useState<number>(
     new Date().getMonth() + 1,

@@ -39,7 +39,7 @@ const ReturnPolicyForm = () => {
     formState: { isSubmitting },
   } = form;
 
-  const { data } = useGetVendorProfileQuery(user?.email as string);
+  const { data } = useGetVendorProfileQuery(user?.vendorEmail as string);
   const vendor = data?.data;
 
   // Fetch existing About Us content

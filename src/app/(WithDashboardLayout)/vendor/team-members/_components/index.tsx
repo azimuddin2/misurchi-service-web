@@ -28,7 +28,6 @@ import {
   useGetAllMembersQuery,
 } from '@/redux/features/member/memberApi';
 import { TMember } from '@/types/member.type';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const ManageTeamMembers = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -54,8 +53,7 @@ const ManageTeamMembers = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, isLoading, refetch } = useGetAllMembersQuery({
     vendorId,

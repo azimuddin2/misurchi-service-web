@@ -13,7 +13,6 @@ import Spinner from '@/components/shared/Spinner';
 import { TextEditor } from '@/components/ui/core/text-editor';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import {
   useAddCancellationPolicyMutation,
   useGetCancellationPolicyQuery,
@@ -41,12 +40,11 @@ const CancellationPolicyForm = () => {
     formState: { isSubmitting },
   } = form;
 
-  const { data } = useGetVendorProfileQuery(user?.email as string);
-  const vendor = data?.data;
+  const vendorId = user?.vendorId as string;
 
   // Fetch existing About Us content
   const { data: cancellationData, isLoading } = useGetCancellationPolicyQuery(
-    vendor?._id as string,
+    vendorId as string,
   );
 
   useEffect(() => {
@@ -63,7 +61,7 @@ const CancellationPolicyForm = () => {
     try {
       const res = await AddCancellationPolicy({
         ...data,
-        vendor: vendor?._id,
+        vendor: vendorId,
       }).unwrap();
       toast.success(res.message || 'Cancellation policy saved successfully');
     } catch {

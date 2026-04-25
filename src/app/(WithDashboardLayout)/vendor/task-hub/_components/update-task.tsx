@@ -43,7 +43,6 @@ import { TTask } from '@/types/task.type';
 import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
 import Link from 'next/link';
 import { taskSchema } from './taskValidation';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 type Props = {
   taskId: string;
@@ -56,8 +55,7 @@ const UpdateTask = ({ taskId }: Props) => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data: membersData } = useGetAllMembersQuery({
     vendorId,

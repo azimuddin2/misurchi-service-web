@@ -49,31 +49,35 @@ const LoginForm = () => {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const response = await login(data).unwrap();
-
       const accessToken = response?.data?.accessToken;
       if (!accessToken) {
         toast.error('Access token missing from server response.');
         return;
       }
 
-      // Decode/verify token
       const user = verifyToken(accessToken) as TUser;
       if (!user) {
         toast.error('Invalid access token.');
         return;
       }
 
-      // Update Redux state
       dispatch(setUser({ user, token: accessToken }));
-
-      // ✅ Persist token in cookie for client-side access
       Cookies.set('accessToken', accessToken, { expires: 1, sameSite: 'lax' });
-
       toast.success(response.message || 'Login successful');
       form.reset();
 
-      // Redirect to intended page or home
-      router.push(redirect ? decodeURIComponent(redirect) : '/');
+      if (redirect) {
+        router.push(decodeURIComponent(redirect));
+        return;
+      }
+
+      if (user.role === 'vendor') {
+        router.push('/vendor/dashboard');
+      } else if (user.role === 'team_member') {
+        router.push('/vendor/dashboard');
+      } else {
+        router.push('/');
+      }
     } catch (error: any) {
       const message =
         error?.data?.message ||

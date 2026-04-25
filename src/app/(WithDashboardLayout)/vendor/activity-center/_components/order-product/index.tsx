@@ -17,7 +17,6 @@ import {
   useOrderApprovedRequestMutation,
   useUpdateOrderStatusMutation,
 } from '@/redux/features/order/orderApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useAppSelector } from '@/redux/hooks';
 import { TOrder } from '@/types/order.type';
 import { ColumnDef } from '@tanstack/react-table';
@@ -89,8 +88,7 @@ const ManageOrderProducts = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, isLoading, refetch } = useGetAllOrdersByUserQuery({
     vendorId,
@@ -318,7 +316,7 @@ const ManageOrderProducts = () => {
         const requestType = request.type ?? 'none';
 
         const isVendor = user?.role === 'vendor';
-        const isBuyer = user?.role === 'buyer';
+        const isBuyer = user?.role === 'user';
 
         return (
           <div className="flex flex-col gap-2">
@@ -481,9 +479,7 @@ const ManageOrderProducts = () => {
               <TabsTrigger
                 value="cancellation"
                 onClick={() =>
-                  router.push(
-                    `/${user?.role}/activity-center/order-cancellation`,
-                  )
+                  router.push(`/vendor/activity-center/order-cancellation`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
     font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
@@ -496,7 +492,7 @@ const ManageOrderProducts = () => {
               <TabsTrigger
                 value="return-request"
                 onClick={() =>
-                  router.push(`/${user?.role}/activity-center/order-return`)
+                  router.push(`/vendor/activity-center/order-return`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
     font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"

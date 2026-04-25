@@ -48,11 +48,12 @@ export function NavMain({
 }) {
   const pathname = usePathname();
   const user = useAppSelector(selectCurrentUser);
+  const email = user?.vendorEmail as string;
 
-  const { data } = useGetVendorProfileQuery(user?.email as string);
+  const { data } = useGetVendorProfileQuery(email);
   const vendor = data?.data;
 
-  const { data: userData } = useGetUserProfileQuery(user?.email as string);
+  const { data: userData } = useGetUserProfileQuery(email);
   const userInfo: IUser | undefined = userData?.data;
 
   return (

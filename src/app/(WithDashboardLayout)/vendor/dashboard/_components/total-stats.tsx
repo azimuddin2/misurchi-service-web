@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { useGetVendorDashboardStatsQuery } from '@/redux/features/dashboard/dashboardApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useAppSelector } from '@/redux/hooks';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import CountUp from 'react-countup';
@@ -11,8 +10,7 @@ import CountUp from 'react-countup';
 const TotalStats = () => {
   const user = useAppSelector(selectCurrentUser);
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data } = useGetVendorDashboardStatsQuery(vendorId, {
     pollingInterval: 1000,

@@ -5,7 +5,6 @@ import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { Input } from '@/components/ui/input';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useAppSelector } from '@/redux/hooks';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
@@ -36,8 +35,7 @@ const RescheduleRequest = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, isLoading } = useGetAllBookingsByUserQuery({
     vendorId,
@@ -165,7 +163,7 @@ const RescheduleRequest = () => {
         const vendorApproved = request.vendorApproved;
         const requestType = request.type ?? 'none';
 
-        const isBuyer = user?.role === 'buyer';
+        const isBuyer = user?.role === 'user';
 
         // Status text and color
         let statusText = '';
@@ -260,7 +258,7 @@ const RescheduleRequest = () => {
               <TabsTrigger
                 value="cancel-request"
                 onClick={() =>
-                  router.push(`/${user?.role}/activity-center/booking-cancel`)
+                  router.push(`/vendor/activity-center/booking-cancel`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
     font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
@@ -273,9 +271,7 @@ const RescheduleRequest = () => {
               <TabsTrigger
                 value="reschedule-request"
                 onClick={() =>
-                  router.push(
-                    `/${user?.role}/activity-center/booking-reschedule`,
-                  )
+                  router.push(`/vendor/activity-center/booking-reschedule`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
     font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"

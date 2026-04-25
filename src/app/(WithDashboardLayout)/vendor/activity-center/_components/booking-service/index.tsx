@@ -18,7 +18,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import {
   useGetAllBookingsByUserQuery,
   useUpdateBookingRequestApprovalMutation,
@@ -110,8 +109,7 @@ const ManageBookingServices = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, isLoading, refetch } = useGetAllBookingsByUserQuery({
     vendorId,
@@ -367,7 +365,7 @@ const ManageBookingServices = () => {
         const requestType = request.type ?? 'none';
 
         const isVendor = user?.role === 'vendor';
-        const isBuyer = user?.role === 'buyer';
+        const isBuyer = user?.role === 'user';
 
         return (
           <div className="flex flex-col gap-2">
@@ -519,7 +517,7 @@ const ManageBookingServices = () => {
               <TabsTrigger
                 value="cancel-request"
                 onClick={() =>
-                  router.push(`/${user?.role}/activity-center/booking-cancel`)
+                  router.push(`/vendor/activity-center/booking-cancel`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] border[#165940] text-base font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
               >
@@ -529,9 +527,7 @@ const ManageBookingServices = () => {
               <TabsTrigger
                 value="reschedule-request"
                 onClick={() =>
-                  router.push(
-                    `/${user?.role}/activity-center/booking-reschedule`,
-                  )
+                  router.push(`/vendor/activity-center/booking-reschedule`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
               >

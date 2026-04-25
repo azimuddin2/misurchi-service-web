@@ -15,14 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  ChevronDown,
-  ChevronUp,
-  Edit,
-  PlusCircle,
-  Search,
-  Trash2,
-} from 'lucide-react';
+import { Edit, PlusCircle, Search, Trash2 } from 'lucide-react';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
@@ -42,7 +35,6 @@ import {
   useGetAllTasksQuery,
   useUpdateTaskStatusMutation,
 } from '@/redux/features/task/taskApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import DescriptionCell from '@/components/ui/core/description-cell';
 
 const statusOptions = [
@@ -78,8 +70,7 @@ const ManageTaskHub = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, isLoading, refetch } = useGetAllTasksQuery({
     vendorId,

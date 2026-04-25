@@ -22,7 +22,6 @@ import { useAddServiceMutation } from '@/redux/features/service/serviceApi';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const steps = [
   {
@@ -78,8 +77,7 @@ export function AddService() {
 
   const progress = ((currentStep - 1) / (steps.length - 1)) * 100;
 
-  const { data } = useGetVendorProfileQuery(user?.email as string);
-  const vendor = data?.data;
+  const vendorId = user?.vendorId as string;
 
   const [addService] = useAddServiceMutation();
 
@@ -88,7 +86,7 @@ export function AddService() {
     const files: File[] = serviceData?.imageFiles || [];
 
     const modifiedData = {
-      vendor: vendor?._id,
+      vendor: vendorId,
       user: user?.userId,
       ...serviceData,
     };

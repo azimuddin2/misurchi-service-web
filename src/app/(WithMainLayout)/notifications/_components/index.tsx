@@ -4,7 +4,6 @@ import { Bell, Trash2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import {
   useDeleteNotificationsMutation,
   useGetAllNotificationsQuery,
@@ -24,9 +23,10 @@ const Notifications = () => {
   const user = useAppSelector(selectCurrentUser);
   const userId = user?.userId as string;
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email || '');
-  const vendorId = vendorData?.data?._id as string;
-  const receiver = user?.role === 'vendor' ? vendorId : userId;
+  const vendorId = user?.vendorId as string;
+
+  const receiver =
+    user?.role === 'vendor' || user?.role === 'team_member' ? vendorId : userId;
 
   const { data, isLoading } = useGetAllNotificationsQuery(
     { page, limit, receiver },

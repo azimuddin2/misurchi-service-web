@@ -9,10 +9,7 @@ import rectangleBgImg from '@/assets/images/rectangle.png';
 import { toast } from 'sonner';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import {
-  useChooseOfferMutation,
-  useGetVendorProfileQuery,
-} from '@/redux/features/vendor/vendorApi';
+import { useChooseOfferMutation } from '@/redux/features/vendor/vendorApi';
 import { useRouter } from 'next/navigation';
 
 const ChooseOffer = () => {
@@ -20,8 +17,7 @@ const ChooseOffer = () => {
   const router = useRouter();
   const [selected, setSelected] = useState<string>('both');
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const options = [
     { key: 'services', label: 'List Services' },

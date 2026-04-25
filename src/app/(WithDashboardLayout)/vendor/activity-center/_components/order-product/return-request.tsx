@@ -6,7 +6,6 @@ import { MSWTable } from '@/components/ui/core/MSWTable';
 import { Input } from '@/components/ui/input';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { useGetAllOrdersByUserQuery } from '@/redux/features/order/orderApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useAppSelector } from '@/redux/hooks';
 import { TOrder } from '@/types/order.type';
 import { ColumnDef } from '@tanstack/react-table';
@@ -36,8 +35,7 @@ const ReturnRequest = () => {
   const searchTerm = searchParams.get('searchTerm') || '';
   const createdAt = searchParams.get('createdAt') || '';
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, isLoading } = useGetAllOrdersByUserQuery({
     vendorId,
@@ -170,7 +168,7 @@ const ReturnRequest = () => {
         const vendorApproved = request.vendorApproved;
         const requestType = request.type ?? 'none';
 
-        const isBuyer = user?.role === 'buyer';
+        const isBuyer = user?.role === 'user';
 
         // Status text and color
         let statusText = '';
@@ -265,9 +263,7 @@ const ReturnRequest = () => {
               <TabsTrigger
                 value="cancellation"
                 onClick={() =>
-                  router.push(
-                    `/${user?.role}/activity-center/order-cancellation`,
-                  )
+                  router.push(`/vendor/activity-center/order-cancellation`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
     font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
@@ -280,7 +276,7 @@ const ReturnRequest = () => {
               <TabsTrigger
                 value="return-request"
                 onClick={() =>
-                  router.push(`/${user?.role}/activity-center/order-return`)
+                  router.push(`/vendor/activity-center/order-return`)
                 }
                 className="relative w-full cursor-pointer text-[#165940] text-base
     font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"

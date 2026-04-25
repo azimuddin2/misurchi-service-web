@@ -33,7 +33,6 @@ import { roleOptions } from '@/constants/teamMemberRoles';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import { addMemberSchema } from './addMemberValidation';
 import { useAddMemberMutation } from '@/redux/features/member/memberApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const AddMember = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -49,8 +48,7 @@ const AddMember = () => {
     formState: { isSubmitting },
   } = form;
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const [addMember] = useAddMemberMutation();
 

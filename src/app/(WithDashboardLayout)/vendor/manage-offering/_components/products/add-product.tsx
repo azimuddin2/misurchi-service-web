@@ -31,7 +31,6 @@ import { addProductSchema } from './addProductValidation';
 import { useAddProductMutation } from '@/redux/features/product/productApi';
 import { toast } from 'sonner';
 import { ProductStatus } from '@/constants/product';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useGetAllProductTypeQuery } from '@/redux/features/productType/productTypeApi';
 import { ColorInput } from '@/components/ui/core/color-input';
 import RecommendedType from '@/components/modules/recommended-type';
@@ -55,14 +54,13 @@ const AddProduct = () => {
 
   const { data: productTypeData } = useGetAllProductTypeQuery({});
 
-  const { data } = useGetVendorProfileQuery(user?.email as string);
-  const vendor = data?.data;
+  const vendorId = user?.vendorId as string;
 
   const [addProduct] = useAddProductMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const modifiedData = {
-      vendor: vendor?._id,
+      vendor: vendorId,
       user: user?.userId,
       ...data,
       quantity: Number(data.quantity),

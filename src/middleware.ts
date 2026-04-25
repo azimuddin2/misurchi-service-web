@@ -17,6 +17,7 @@ const roleBasedPrivateRoutes = {
     /^\/notifications(\/.*)?$/,
   ],
   vendor: [/^\/vendor/, /^\/choose-offer/, /^\/notifications/],
+  team_member: [/^\/vendor/, /^\/notifications/],
 };
 
 export const middleware = async (request: NextRequest) => {

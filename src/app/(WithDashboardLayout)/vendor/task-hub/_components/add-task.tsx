@@ -38,7 +38,6 @@ import { useAddTaskMutation } from '@/redux/features/task/taskApi';
 import { useGetAllMembersQuery } from '@/redux/features/member/memberApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { taskSchema } from './taskValidation';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 
 const AddTask = () => {
   const [date, setDate] = useState<Date>();
@@ -67,8 +66,7 @@ const AddTask = () => {
     formState: { isSubmitting },
   } = form;
 
-  const { data: vendorData } = useGetVendorProfileQuery(user?.email as string);
-  const vendorId = vendorData?.data?._id as string;
+  const vendorId = user?.vendorId as string;
 
   const { data, refetch } = useGetAllMembersQuery({
     vendorId,
