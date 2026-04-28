@@ -32,14 +32,13 @@ import { IUser } from '@/types';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAppSelector(selectCurrentUser);
+  const email = user?.vendorEmail as string;
   const pathname = usePathname();
 
   const isVendor = user?.role === 'vendor';
+  const isTeamMember = user?.role === 'team_member';
 
-  // ✅ শুধু vendor এর জন্য — team_member এর জন্য call করবে না
-  const { data: userData } = useGetUserProfileQuery(user?.email as string, {
-    skip: !isVendor,
-  });
+  const { data: userData } = useGetUserProfileQuery(email as string);
   const userInfo: IUser | undefined = userData?.data;
   const isAdvance = userInfo?.subscribed === 'advance';
 
@@ -150,10 +149,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     );
   }
 
-  // ─────────────────────────────────────────
-  // Team member menu — permissions দিয়ে filter
-  // ─────────────────────────────────────────
-  if (user?.role === 'team_member') {
+  if (isTeamMember) {
     navMain.push(
       {
         title: 'Dashboard',
@@ -171,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
     );
 
-    if (can('create_edit_offerings')) {
+    if (can('manage_offering')) {
       navMain.push({
         title: 'Manage Offering',
         url: `/vendor/manage-offering`,
@@ -181,21 +177,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       });
     }
 
-    if (can('cancel_reschedule_appointments')) {
+    if (can('activity_center')) {
       navMain.push({
         title: 'Activity Center',
         url: `/vendor/activity-center`,
         icon: SquareActivity,
-        disabled: false,
-        lockIcon: false,
-      });
-    }
-
-    if (can('respond_to_messages')) {
-      navMain.push({
-        title: 'Messages',
-        url: `/vendor/messages`,
-        icon: MessageCircleMore,
         disabled: false,
         lockIcon: false,
       });
@@ -211,23 +197,75 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       });
     }
 
-    if (can('assign_tasks')) {
+    if (can('respond_to_messages')) {
       navMain.push({
-        title: 'Task Hub',
-        url: `/vendor/task-hub`,
-        icon: ListTodo,
+        title: 'Messages',
+        url: `/vendor/messages`,
+        icon: MessageCircleMore,
         disabled: false,
         lockIcon: false,
       });
     }
 
-    if (can('add_edit_users')) {
+    if (can('feedback_history')) {
+      navMain.push({
+        title: 'Feedback History',
+        url: `/vendor/feedback-history`,
+        icon: MessageSquareText,
+        disabled: false,
+        lockIcon: false,
+      });
+    }
+
+    if (can('shared_calendar')) {
+      navMain.push({
+        title: 'Shared Calendar',
+        url: `/vendor/shared-calendar`,
+        icon: Calendar,
+        disabled: !isAdvance,
+        lockIcon: !isAdvance,
+      });
+    }
+
+    if (can('assign_tasks')) {
+      navMain.push({
+        title: 'Task Hub',
+        url: `/vendor/task-hub`,
+        icon: ListTodo,
+        disabled: !isAdvance,
+        lockIcon: !isAdvance,
+      });
+    }
+
+    if (can('team_members')) {
       navMain.push({
         title: 'Team Members',
         url: `/vendor/team-members`,
         icon: UsersRound,
+        disabled: !isAdvance,
+        lockIcon: !isAdvance,
+      });
+    }
+
+    if (can('settings')) {
+      navMain.push({
+        title: 'Settings',
+        url: '/vendor/settings',
+        icon: Settings,
         disabled: false,
         lockIcon: false,
+        items: [
+          {
+            title: 'Return Policy',
+            url: '/vendor/settings/return-policy',
+            icon: ShieldCheck,
+          },
+          {
+            title: 'Cancellation Policy',
+            url: '/vendor/settings/cancellation-policy',
+            icon: FileCheck,
+          },
+        ],
       });
     }
 
@@ -241,12 +279,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar className="h-full" collapsible="icon" {...props}>
-      <SidebarHeader />
-      <SidebarContent>
-        <NavMain items={navMain} currentPath={pathname} />
-      </SidebarContent>
-      <SidebarFooter>
+    <Sidebar className="h-[calc(100vh-70px)]" collapsible="icon" {...props}>
+      <div className="">
+        <SidebarHeader />
+        <SidebarContent>
+          <NavMain items={navMain} currentPath={pathname} />
+        </SidebarContent>
+      </div>
+      <SidebarFooter
+        className="mt-auto"
+        style={{ position: 'sticky', bottom: 0 }}
+      >
         <NavUser />
       </SidebarFooter>
     </Sidebar>

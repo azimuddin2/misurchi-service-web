@@ -56,7 +56,7 @@ const PendingOrders = ({ pendingOrders }: TPendingOrdersProps) => {
               height={100}
               className="mx-auto"
             />
-            <p>No pending orders available.</p>
+            <p>No Pending Orders Available.</p>
           </div>
         )}
       </CardContent>

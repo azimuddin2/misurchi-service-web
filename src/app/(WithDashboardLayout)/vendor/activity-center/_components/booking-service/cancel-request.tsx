@@ -10,15 +10,17 @@ import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { FolderSymlink, Search } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetAllBookingsByUserQuery } from '@/redux/features/booking/bookingApi';
 import { TBooking } from '@/types/booking.type';
+import { PaymentBadge } from './payment-badge';
 
 const CancelRequest = () => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [search, setSearch] = useState<string>(
@@ -132,23 +134,61 @@ const CancelRequest = () => {
       cell: ({ row }) => (
         <div>
           <p>{format(new Date(row.original.date), 'dd MMM, yyyy')}</p>
-          <p className="truncate">{row.original.time}</p>
+          <p className="truncate text-sm text-gray-500">{row.original.time}</p>
+          <p className="truncate text-gray-500 text-sm">
+            Duration - {row.original.duration}s
+          </p>
         </div>
       ),
     },
     {
-      accessorKey: 'duration',
-      header: 'Duration',
-      cell: ({ row }) => (
-        <span className="truncate">{row.original.duration}s</span>
-      ),
-    },
-    {
-      accessorKey: 'paymentType',
-      header: 'Payment Type',
-      cell: ({ row }) => (
-        <span className="capitalize">Pay {row.original.paymentType}</span>
-      ),
+      accessorKey: 'payment',
+      header: 'Payment',
+      cell: ({ row }) => {
+        const {
+          paymentType,
+          isPaid,
+          paidAmount,
+          remainingAmount = 0,
+          price,
+          trnId,
+        } = row.original;
+
+        return (
+          <div className="flex flex-col gap-1 text-sm min-w-[140px]">
+            {/* Payment Type */}
+            <span className="capitalize">{paymentType} payment</span>
+
+            {/* Badge */}
+            <PaymentBadge
+              isPaid={isPaid}
+              paidAmount={paidAmount}
+              totalAmount={price}
+            />
+
+            {/* Paid Amount */}
+            {paidAmount !== undefined && (
+              <span className="text-xs text-gray-500">Paid: ${paidAmount}</span>
+            )}
+
+            {/* Remaining Amount */}
+            {remainingAmount > 0 ? (
+              <span className="text-xs text-red-500">
+                Due: ${remainingAmount}
+              </span>
+            ) : (
+              <span className="text-xs text-green-600">No due</span>
+            )}
+
+            {/* Transaction ID */}
+            {trnId && (
+              <span className="text-xs text-gray-400 break-all">
+                TXN: {trnId}
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: 'price',
@@ -187,7 +227,7 @@ const CancelRequest = () => {
           <div className="flex flex-col gap-1 w-44">
             {request.updatedAt && (
               <p>
-                Cancel date:{' '}
+                Cancel Date:{' '}
                 {format(new Date(request.updatedAt), 'dd MMM, yyyy')}
               </p>
             )}
@@ -256,27 +296,35 @@ const CancelRequest = () => {
               style={{ background: 'none' }}
               className="flex rounded-md w-full py-6 lg:max-w-6xl gap-1 mx-auto lg:gap-3 shadow-none"
             >
-              {/* Cancellation Tab */}
+              {/* Cancel Request Tab */}
               <TabsTrigger
                 value="cancel-request"
                 onClick={() =>
                   router.push(`/vendor/activity-center/booking-cancel`)
                 }
-                className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
+                className={`relative w-full cursor-pointer text-base font-medium py-4 rounded px-4 transition-all duration-200 border
+          ${
+            pathname === '/vendor/activity-center/booking-cancel'
+              ? 'bg-red-100 text-red-600 border-b-2 border-red-500'
+              : 'text-black bg-white shadow border border-gray-100'
+          }`}
               >
                 Cancel Request
                 <FolderSymlink />
               </TabsTrigger>
 
-              {/* Services Tab */}
+              {/* Reschedule Request Tab */}
               <TabsTrigger
                 value="reschedule-request"
                 onClick={() =>
                   router.push(`/vendor/activity-center/booking-reschedule`)
                 }
-                className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
+                className={`relative w-full cursor-pointer text-[#165940] text-base font-medium py-4 rounded px-4 transition-all duration-200
+          ${
+            pathname === '/vendor/activity-center/booking-reschedule'
+              ? 'bg-green-100 text-green-700 border-b-2 border-green-700'
+              : 'text-black bg-white shadow border border-gray-100'
+          }`}
               >
                 Reschedule Request
                 <FolderSymlink />

@@ -77,9 +77,12 @@ const ManageServices = () => {
   const createdAt = searchParams.get('createdAt') || '';
 
   // Fetch user profile
-  const { data: userData } = useGetUserProfileQuery(user?.email as string, {
-    skip: !user?.email,
-  });
+  const { data: userData } = useGetUserProfileQuery(
+    user?.vendorEmail as string,
+    {
+      skip: !user?.vendorEmail,
+    },
+  );
 
   const stripeAccountId = userData?.data?.stripeAccountId;
   const stripeOnboardingComplete = userData?.data?.stripeOnboardingComplete;
@@ -296,7 +299,7 @@ const ManageServices = () => {
                 <Eye
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/manage-offering/view-service/${row.original._id}`,
+                      `/vendor/manage-offering/view-service/${row.original._id}`,
                     )
                   }
                   size={20}
@@ -312,7 +315,7 @@ const ManageServices = () => {
                 <Edit
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/manage-offering/update-service/${row.original._id}`,
+                      `/vendor/manage-offering/update-service/${row.original._id}`,
                     )
                   }
                   size={20}
@@ -372,7 +375,7 @@ const ManageServices = () => {
         content={
           isStripeReady ? (
             <Link
-              href={`/${user?.role}/manage-offering/add-service`}
+              href={`/vendor/manage-offering/add-service`}
               className="flex justify-center items-center space-x-1 font-semibold"
             >
               <PlusCircle size={24} />

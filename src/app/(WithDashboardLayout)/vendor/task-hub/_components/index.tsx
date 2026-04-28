@@ -280,7 +280,7 @@ const ManageTaskHub = () => {
                 <Edit
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/task-hub/update-task/${row.original._id}`,
+                      `/vendor/task-hub/update-task/${row.original._id}`,
                     )
                   }
                   size={20}
@@ -318,7 +318,7 @@ const ManageTaskHub = () => {
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
           <Link
-            href={`/${user?.role}/task-hub/add-task`}
+            href={`/vendor/task-hub/add-task`}
             className="flex justify-center items-center space-x-1 font-semibold"
           >
             <PlusCircle size={24} />

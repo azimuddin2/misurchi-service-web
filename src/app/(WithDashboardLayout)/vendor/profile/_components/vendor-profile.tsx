@@ -546,30 +546,34 @@ const VendorProfile = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
-            {/* Submit Button */}
-            <AppButton
-              className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
-              content={
-                <div className="flex justify-center items-center space-x-2 font-semibold">
-                  <p className="uppercase">
-                    {isSubmitting ? 'Updating...' : 'Update'}
-                  </p>
-                  <ArrowRight />
-                </div>
-              }
-            />
+          {user?.teamRole !== 'team_member' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-3">
+              {/* Submit Button */}
+              <AppButton
+                className="w-full text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80"
+                content={
+                  <div className="flex justify-center items-center space-x-2 font-semibold">
+                    <p className="uppercase">
+                      {isSubmitting ? 'Updating...' : 'Update'}
+                    </p>
+                    <ArrowRight />
+                  </div>
+                }
+              />
 
-            <div className="p-3 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80">
-              <Link
-                href={`/`}
-                className="w-full inline-flex justify-center items-center space-x-1 font-semibold"
-              >
-                <span className="uppercase text-sm font-semibold">Cancel</span>
-                <ArrowRight size={16} />
-              </Link>
+              <div className="p-3 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80">
+                <Link
+                  href={`/vendor/dashboard`}
+                  className="w-full inline-flex justify-center items-center space-x-1 font-semibold"
+                >
+                  <span className="uppercase text-sm font-semibold">
+                    Cancel
+                  </span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
-          </div>
+          )}
         </form>
       </Form>
     </div>

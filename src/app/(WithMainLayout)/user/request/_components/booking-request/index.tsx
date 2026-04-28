@@ -120,23 +120,47 @@ const BookingsRequest = () => {
 
     if (requestType === 'none') return null;
 
+    const requestLabel =
+      requestType === 'cancel' ? 'Cancellation' : 'Reschedule';
+
     return (
       <div className="flex flex-col gap-1">
-        {vendorApproved === false && (
-          <span className="text-yellow-600 text-sm font-medium">
-            ⏳ Pending Vendor Approval
-          </span>
+        {/* ✅ Pending — null  */}
+        {vendorApproved === null && (
+          <div className="flex flex-col gap-1">
+            <span className="text-yellow-600 text-sm font-medium flex items-center gap-1">
+              ⏳ Awaiting Vendor Response
+            </span>
+            <span className="text-sm text-gray-500">
+              Your {requestLabel.toLowerCase()} request is under review.
+            </span>
+          </div>
         )}
 
+        {/* ✅ Approved */}
         {vendorApproved === true && (
-          <span className="text-green-600 text-sm font-medium">
-            ✅ Approved by Vendor
-          </span>
+          <div className="flex flex-col gap-1">
+            <span className="text-green-600 text-sm font-medium flex items-center gap-1">
+              ✅ {requestLabel} Approved
+            </span>
+            <span className="text-sm text-gray-500">
+              Your {requestLabel.toLowerCase()} request has been approved.
+            </span>
+          </div>
         )}
 
-        <span className="text-gray-500 text-sm capitalize">
-          Request: {requestType}
-        </span>
+        {/* ✅ Rejected */}
+        {vendorApproved === false && (
+          <div className="flex flex-col gap-1">
+            <span className="text-red-600 text-sm font-medium flex items-center gap-1">
+              ❌ {requestLabel} Rejected
+            </span>
+            <span className="text-sm text-gray-500">
+              Your {requestLabel.toLowerCase()} request was declined by the
+              vendor.
+            </span>
+          </div>
+        )}
       </div>
     );
   };
@@ -155,7 +179,7 @@ const BookingsRequest = () => {
           <Button
             size="sm"
             variant="outline"
-            className="border border-green-500 text-green-600"
+            className="border border-green-600 text-green-600 hover:text-green-700 hover:border-green-700 hover:bg-white rounded cursor-pointer"
             onClick={() => {
               setSelectedRescheduleBooking(booking);
               setRescheduleModalOpen(true);
@@ -168,7 +192,7 @@ const BookingsRequest = () => {
           <Button
             size="sm"
             variant="outline"
-            className="border border-red-500 text-red-600"
+            className="border border-red-600 text-red-600 rounded hover:text-red-700 hover:border-red-700 hover:bg-white cursor-pointer"
             onClick={() => {
               setSelectedCancelBooking(booking);
               setCancelModalOpen(true);
@@ -217,16 +241,16 @@ const BookingsRequest = () => {
         const imageUrl = service?.images?.[0]?.url || '/placeholder.png';
 
         return (
-          <div className="flex gap-3 min-w-[260px]">
+          <div className="lg:flex gap-3 min-w-[260px]">
             <Image
               src={imageUrl}
               alt={service?.name || 'Service'}
-              width={90}
-              height={90}
-              className="w-20 h-24 rounded border object-cover"
+              width={100}
+              height={100}
+              className="w-20 h-20 rounded border object-cover"
             />
 
-            <div>
+            <div className="lg:mt-0 mt-2">
               <p className="font-medium">{row.original.serviceName}</p>
 
               <p className="text-sm text-gray-500">

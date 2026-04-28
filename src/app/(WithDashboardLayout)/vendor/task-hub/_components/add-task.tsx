@@ -106,7 +106,7 @@ const AddTask = () => {
       console.log(res);
 
       toast.success(res.message || 'Task added successfully');
-      router.push(`/${user?.role}/task-hub`);
+      router.push(`/vendor/task-hub`);
       refetch();
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to add task');

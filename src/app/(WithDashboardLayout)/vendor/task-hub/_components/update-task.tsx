@@ -323,7 +323,7 @@ const UpdateTask = ({ taskId }: Props) => {
 
             <div className="p-3 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80">
               <Link
-                href={`/${user?.role || 'vendor'}/task-hub`}
+                href={`/vendor/task-hub`}
                 className="w-full inline-flex justify-center items-center space-x-1 font-semibold"
               >
                 <span className="uppercase text-sm font-semibold">Cancel</span>

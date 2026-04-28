@@ -17,13 +17,12 @@ import { useState } from 'react';
 
 const BankAccount = () => {
   const user = useAppSelector(selectCurrentUser);
+  const email = user?.vendorEmail as string;
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   // Fetch user profile
   const { data: vendorData, isLoading: isVendorLoading } =
-    useGetUserProfileQuery(user?.email as string, {
-      skip: !user?.email,
-    });
+    useGetUserProfileQuery(email as string);
 
   const vendorId = vendorData?.data?._id;
   const stripeAccountId = vendorData?.data?.stripeAccountId;

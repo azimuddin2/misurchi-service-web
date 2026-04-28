@@ -65,7 +65,7 @@ const RecentActivity = ({ recentActivity }: TRecentActivityProps) => {
                 height={100}
                 className="mx-auto"
               />
-              <p> No recent activity found.</p>
+              <p> No Recent Activity Found.</p>
             </div>
           )}
         </CardContent>

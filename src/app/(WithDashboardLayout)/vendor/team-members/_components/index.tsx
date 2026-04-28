@@ -227,7 +227,7 @@ const ManageTeamMembers = () => {
                 <Eye
                   // onClick={() =>
                   //   router.push(
-                  //     `/${user?.role}/manage-offering/view-product/${row.original._id}`,
+                  //     `/vendor/manage-offering/view-product/${row.original._id}`,
                   //   )
                   // }
                   size={20}
@@ -243,7 +243,7 @@ const ManageTeamMembers = () => {
                 <Edit
                   onClick={() =>
                     router.push(
-                      `/${user?.role}/team-members/update-member/${row.original._id}`,
+                      `/vendor/team-members/update-member/${row.original._id}`,
                     )
                   }
                   size={20}
@@ -281,7 +281,7 @@ const ManageTeamMembers = () => {
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
           <Link
-            href={`/${user?.role}/team-members/add-member`}
+            href={`/vendor/team-members/add-member`}
             className="flex justify-center items-center space-x-1 font-semibold"
           >
             <PlusCircle size={24} />

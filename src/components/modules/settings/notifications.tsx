@@ -25,12 +25,11 @@ type NotificationFormValues = {
 
 const Notifications = () => {
   const user = useAppSelector(selectCurrentUser);
+  const email = user?.vendorEmail as string;
 
   const [updateNotificationSettings] = useUpdateNotificationSettingsMutation();
 
-  const { data: userData } = useGetUserProfileQuery(user?.email as string, {
-    skip: !user?.email,
-  });
+  const { data: userData } = useGetUserProfileQuery(email as string);
 
   const form = useForm<NotificationFormValues>({
     defaultValues: {
@@ -111,7 +110,7 @@ const Notifications = () => {
         </h2>
 
         <Link
-          href={`/${user?.role}/feedback-history`}
+          href={`/vendor/feedback-history`}
           className="mt-2 sm:mt-0 text-[#0078BF] border-b border-[#0078BF] hover:text-blue-600 transition-colors"
         >
           Go to Feedback

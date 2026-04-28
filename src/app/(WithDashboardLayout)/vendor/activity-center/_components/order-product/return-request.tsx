@@ -192,7 +192,7 @@ const ReturnRequest = () => {
           <div className="flex flex-col gap-1 w-44">
             {request.updatedAt && (
               <p>
-                Cancel date:{' '}
+                Return Date:{' '}
                 {format(new Date(request.updatedAt), 'dd MMM, yyyy')}
               </p>
             )}

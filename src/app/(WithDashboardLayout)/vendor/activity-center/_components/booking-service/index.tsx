@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PaymentBadge } from './payment-badge';
 
 // ✅ Booking status options
 const statusOptions = [
@@ -47,48 +48,6 @@ const statusOptions = [
   { label: 'Completed', key: 'completed' },
   { label: 'Cancelled', key: 'cancelled' },
 ];
-
-type PaymentBadgeProps = {
-  isPaid: boolean;
-  paidAmount?: number;
-  totalAmount: number;
-};
-
-export const PaymentBadge = ({
-  isPaid,
-  paidAmount,
-  totalAmount,
-}: PaymentBadgeProps) => {
-  const percentage =
-    paidAmount !== undefined
-      ? Math.min(100, Math.max(0, Math.round((paidAmount / totalAmount) * 100)))
-      : 0;
-
-  // ✅ Fully Paid
-  if (isPaid) {
-    return (
-      <span className="text-xs px-2 py-1 rounded-full w-fit bg-green-100 text-green-700 border border-green-300">
-        Paid (100%)
-      </span>
-    );
-  }
-
-  // ✅ Partial Payment
-  if (paidAmount !== undefined && paidAmount > 0) {
-    return (
-      <span className="text-xs px-2 py-1 rounded-full w-fit bg-yellow-100 text-yellow-700 border border-yellow-300">
-        {percentage}% Paid
-      </span>
-    );
-  }
-
-  // ❌ Unpaid
-  return (
-    <span className="text-xs px-2 py-1 rounded-full bg-red-100 w-fit text-red-600 border border-red-300">
-      Unpaid
-    </span>
-  );
-};
 
 const ManageBookingServices = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -365,106 +324,140 @@ const ManageBookingServices = () => {
         const requestType = request.type ?? 'none';
 
         const isVendor = user?.role === 'vendor';
+        const isTeamMember = user?.role === 'team_member';
         const isBuyer = user?.role === 'user';
+
+        const canApprove = isVendor || isTeamMember;
+        const hasRequest = requestType !== 'none';
+        const isPending = vendorApproved === null;
+        const isApproved = vendorApproved === true;
+        const isRejected = vendorApproved === false;
+
+        const requestLabel =
+          requestType === 'cancel' ? 'Cancellation' : 'Reschedule';
 
         return (
           <div className="flex flex-col gap-2">
-            {requestType === 'none' && (
+            {/* No request */}
+            {!hasRequest && (
               <span className="text-gray-400 text-sm italic">
                 No request submitted
               </span>
             )}
 
-            {requestType !== 'none' && isVendor && (
-              <div className="flex items-center gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded"
-                      disabled={vendorApproved === true}
-                    >
-                      Approve
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56">
-                    <p className="text-sm font-medium mb-2">
-                      Confirm approval for this request?
-                    </p>
-                    <div className="flex justify-end gap-2">
+            {/* Approve / Reject — pending */}
+            {hasRequest && canApprove && isPending && (
+              <div className="flex flex-col gap-2">
+                <span className="text-yellow-600 text-xs font-medium flex items-center gap-1">
+                  ⏳ Pending — Buyer requested a <strong>{requestLabel}</strong>
+                </span>
+                <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="border-green-600 rounded text-green-600 cursor-pointer hover:bg-white hover:text-green-700"
-                        onClick={() =>
-                          handleVendorApproval(row.original._id, true)
-                        }
+                        className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded cursor-pointer"
                       >
-                        Yes, Approve
+                        ✓ Approve
                       </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-60">
+                      <p className="text-sm font-medium mb-1">
+                        Approve {requestLabel}?
+                      </p>
+                      <p className="text-xs text-gray-500 mb-3">
+                        This will confirm the buyer's{' '}
+                        {requestLabel.toLowerCase()} request.
+                      </p>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-green-600 rounded text-green-600 cursor-pointer hover:bg-white hover:text-green-700"
+                          onClick={() =>
+                            handleVendorApproval(row.original._id, true)
+                          }
+                        >
+                          Yes, Approve
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
 
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
-                    >
-                      Reject
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56">
-                    <p className="text-sm font-medium mb-2">
-                      Confirm rejection for this request?
-                    </p>
-                    <div className="flex justify-end gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="border-red-500 rounded text-red-500 cursor-pointer bg-white hover:bg-white hover:text-red-700"
-                        onClick={() =>
-                          handleVendorApproval(row.original._id, false)
-                        }
+                        className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded cursor-pointer"
                       >
-                        Yes, Reject
+                        ✕ Reject
                       </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-60">
+                      <p className="text-sm font-medium mb-1">
+                        Reject {requestLabel}?
+                      </p>
+                      <p className="text-xs text-gray-500 mb-3">
+                        The buyer's {requestLabel.toLowerCase()} request will be
+                        declined.
+                      </p>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-red-500 rounded text-red-500 cursor-pointer bg-white hover:bg-white hover:text-red-700"
+                          onClick={() =>
+                            handleVendorApproval(row.original._id, false)
+                          }
+                        >
+                          Yes, Reject
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
             )}
 
-            {requestType !== 'none' && vendorApproved === true && (
-              <>
+            {/* Approved */}
+            {hasRequest && isApproved && (
+              <div className="flex flex-col gap-1">
                 <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
-                  Vendor <CheckCircle className="w-4 h-4" /> Approved (
-                  {requestType})
+                  <CheckCircle className="w-4 h-4" /> {requestLabel} Approved
                 </span>
-                <span className="text-sm">Buyer Request ({requestType})</span>
-              </>
+                <span className="text-xs text-gray-500">
+                  Buyer's {requestLabel.toLowerCase()} request has been
+                  approved.
+                </span>
+              </div>
             )}
 
-            {requestType !== 'none' && vendorApproved === false && (
-              <>
+            {/* Rejected */}
+            {hasRequest && isRejected && (
+              <div className="flex flex-col gap-1">
                 <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
-                  Vendor <XCircle className="w-4 h-4" /> Rejected ({requestType}
-                  )
+                  <XCircle className="w-4 h-4" /> {requestLabel} Rejected
                 </span>
-                <span className="text-sm">Buyer Request ({requestType})</span>
-              </>
+                <span className="text-xs text-gray-500">
+                  Buyer's {requestLabel.toLowerCase()} request has been
+                  declined.
+                </span>
+              </div>
             )}
 
-            {requestType !== 'none' &&
-              isBuyer &&
-              vendorApproved === undefined && (
-                <span className="text-yellow-600 font-medium text-sm">
-                  Pending Vendor Approval
+            {/* Buyer — pending */}
+            {hasRequest && isBuyer && isPending && (
+              <div className="flex flex-col gap-1">
+                <span className="text-yellow-600 font-medium text-sm flex items-center gap-1">
+                  ⏳ Awaiting Vendor Response
                 </span>
-              )}
+                <span className="text-xs text-gray-500">
+                  Your {requestLabel.toLowerCase()} request is under review.
+                </span>
+              </div>
+            )}
           </div>
         );
       },

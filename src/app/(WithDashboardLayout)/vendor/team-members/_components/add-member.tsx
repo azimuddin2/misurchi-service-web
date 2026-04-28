@@ -71,10 +71,10 @@ const AddMember = () => {
       const res = await addMember(formData).unwrap();
       console.log(res);
 
-      toast.success(res.message || 'Product added successfully');
+      toast.success(res.message || 'Team member added successfully');
       router.push(`/vendor/team-members`);
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to add product');
+      toast.error(error?.data?.message || 'Failed to add team member');
     } finally {
       toast.dismiss(toastId);
     }

@@ -316,6 +316,7 @@ const ManageOrderProducts = () => {
         const requestType = request.type ?? 'none';
 
         const isVendor = user?.role === 'vendor';
+        const isTeamMember = user?.role === 'team_member';
         const isBuyer = user?.role === 'user';
 
         return (
@@ -328,70 +329,71 @@ const ManageOrderProducts = () => {
             )}
 
             {/* Case 2: Vendor must act */}
-            {requestType !== 'none' && isVendor && (
-              <div className="flex items-center gap-2">
-                {/* Approve button with Popover */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded"
-                      disabled={vendorApproved === true}
-                    >
-                      Approve
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56">
-                    <p className="text-sm font-medium mb-2">
-                      Confirm approval for this request?
-                    </p>
-                    <div className="flex justify-end gap-2">
+            {(requestType !== 'none' && isVendor) ||
+              (requestType !== 'none' && isTeamMember && (
+                <div className="flex items-center gap-2">
+                  {/* Approve button with Popover */}
+                  <Popover>
+                    <PopoverTrigger asChild>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="border-green-600 rounded text-green-600 cursor-pointer hover:bg-white hover:text-green-700"
-                        onClick={() =>
-                          handleVendorApproval(row.original._id, true)
-                        }
+                        className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded"
+                        disabled={vendorApproved === true}
                       >
-                        Yes, Approve
+                        Approve
                       </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56">
+                      <p className="text-sm font-medium mb-2">
+                        Confirm approval for this request?
+                      </p>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-green-600 rounded text-green-600 cursor-pointer hover:bg-white hover:text-green-700"
+                          onClick={() =>
+                            handleVendorApproval(row.original._id, true)
+                          }
+                        >
+                          Yes, Approve
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
 
-                {/* Reject button with Popover */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
-                    >
-                      Reject
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56">
-                    <p className="text-sm font-medium mb-2">
-                      Confirm rejection for this request?
-                    </p>
-                    <div className="flex justify-end gap-2">
+                  {/* Reject button with Popover */}
+                  <Popover>
+                    <PopoverTrigger asChild>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="border-red-500 rounded text-red-500 cursor-pointer bg-white hover:bg-white hover:text-red-700"
-                        onClick={() =>
-                          handleVendorApproval(row.original._id, false)
-                        }
+                        className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
                       >
-                        Yes, Reject
+                        Reject
                       </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            )}
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56">
+                      <p className="text-sm font-medium mb-2">
+                        Confirm rejection for this request?
+                      </p>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-red-500 rounded text-red-500 cursor-pointer bg-white hover:bg-white hover:text-red-700"
+                          onClick={() =>
+                            handleVendorApproval(row.original._id, false)
+                          }
+                        >
+                          Yes, Reject
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              ))}
 
             {/* Case 3: Vendor already acted */}
             {requestType !== 'none' && vendorApproved === true && (

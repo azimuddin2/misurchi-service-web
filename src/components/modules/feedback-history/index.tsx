@@ -25,7 +25,7 @@ const statusColor: Record<string, string> = {
 
 const FeedbackHistory = () => {
   const user = useAppSelector(selectCurrentUser);
-  const email = user?.email as string;
+  const email = user?.vendorEmail as string;
 
   const searchParams = useSearchParams();
   const router = useRouter();

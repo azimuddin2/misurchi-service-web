@@ -60,7 +60,7 @@ const RescheduleModal = ({
         <div className="flex justify-between gap-2 mt-3">
           <Button
             type="button"
-            className="w-1/2 border-gray-800 bg-gradient-to-t to-white from-white hover:bg-green-500/80 p-5 cursor-pointer text-sm uppercase shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500 text-black"
+            className="w-1/2 border-gray-800 bg-gradient-to-t to-white from-white hover:bg-green-500/80 p-5 cursor-pointer text-sm uppercase shadow rounded-sm border-b-4 border-r-4 text-black"
             onClick={() => onOpenChange(false)}
           >
             Cancel
@@ -68,7 +68,7 @@ const RescheduleModal = ({
           <Button
             type="button"
             onClick={handleReschedule}
-            className="w-1/2 uppercase border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 p-5 cursor-pointer text-sm shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500"
+            className="w-1/2 uppercase border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 p-5 cursor-pointer text-sm shadow-sm rounded-sm border-b-4 border-r-4"
           >
             Reschedule
           </Button>
