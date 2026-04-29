@@ -300,11 +300,10 @@ const ManageBookingServices = () => {
                     option.key !== status &&
                     handleStatusUpdate(row.original._id, option.key)
                   }
-                  className={`capitalize px-3 py-2 ${
-                    option.key === status
+                  className={`capitalize px-3 py-2 ${option.key === status
                       ? 'opacity-50 cursor-not-allowed'
                       : 'hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   {option.label}
                 </DropdownMenuItem>
@@ -367,7 +366,7 @@ const ManageBookingServices = () => {
                         Approve {requestLabel}?
                       </p>
                       <p className="text-xs text-gray-500 mb-3">
-                        This will confirm the buyer's{' '}
+                        This will confirm the buyer&apos;s{' '}
                         {requestLabel.toLowerCase()} request.
                       </p>
                       <div className="flex justify-end gap-2">
@@ -400,7 +399,7 @@ const ManageBookingServices = () => {
                         Reject {requestLabel}?
                       </p>
                       <p className="text-xs text-gray-500 mb-3">
-                        The buyer's {requestLabel.toLowerCase()} request will be
+                        The buyer&apos;s {requestLabel.toLowerCase()} request will be
                         declined.
                       </p>
                       <div className="flex justify-end gap-2">
@@ -428,7 +427,7 @@ const ManageBookingServices = () => {
                   <CheckCircle className="w-4 h-4" /> {requestLabel} Approved
                 </span>
                 <span className="text-xs text-gray-500">
-                  Buyer's {requestLabel.toLowerCase()} request has been
+                  Buyer&apos;s {requestLabel.toLowerCase()} request has been
                   approved.
                 </span>
               </div>
@@ -441,7 +440,7 @@ const ManageBookingServices = () => {
                   <XCircle className="w-4 h-4" /> {requestLabel} Rejected
                 </span>
                 <span className="text-xs text-gray-500">
-                  Buyer's {requestLabel.toLowerCase()} request has been
+                  Buyer&apos;s {requestLabel.toLowerCase()} request has been
                   declined.
                 </span>
               </div>

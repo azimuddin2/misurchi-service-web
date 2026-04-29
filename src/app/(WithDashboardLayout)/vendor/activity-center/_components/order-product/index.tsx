@@ -336,7 +336,7 @@ const ManageOrderProducts = () => {
                         Approve {requestLabel}?
                       </p>
                       <p className="text-sm text-gray-500 mb-3">
-                        This will confirm the buyer's{' '}
+                        This will confirm the buyer&apos;s{' '}
                         {requestLabel.toLowerCase()} request.
                       </p>
                       <div className="flex justify-end gap-2">
@@ -369,7 +369,7 @@ const ManageOrderProducts = () => {
                         Reject {requestLabel}?
                       </p>
                       <p className="text-sm text-gray-500 mb-3">
-                        The buyer's {requestLabel.toLowerCase()} request will be
+                        The buyer&apos;s {requestLabel.toLowerCase()} request will be
                         declined.
                       </p>
                       <div className="flex justify-end gap-2">
@@ -397,7 +397,7 @@ const ManageOrderProducts = () => {
                   <CheckCircle className="w-4 h-4" /> {requestLabel} Approved
                 </span>
                 <span className="text-sm text-gray-500">
-                  Buyer's {requestLabel.toLowerCase()} request has been
+                  Buyer&apos;s {requestLabel.toLowerCase()} request has been
                   approved.
                 </span>
               </div>
@@ -410,7 +410,7 @@ const ManageOrderProducts = () => {
                   <XCircle className="w-4 h-4" /> {requestLabel} Rejected
                 </span>
                 <span className="text-sm text-gray-500">
-                  Buyer's {requestLabel.toLowerCase()} request has been
+                  Buyer&apos;s {requestLabel.toLowerCase()} request has been
                   declined.
                 </span>
               </div>
