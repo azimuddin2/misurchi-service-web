@@ -253,15 +253,29 @@ const BookingsRequest = () => {
             <div className="lg:mt-0 mt-2">
               <p className="font-medium">{row.original.serviceName}</p>
 
-              <p className="text-sm text-gray-500">
+              {/* <p className="text-sm text-gray-500">
                 Provider: {row.original.vendor?.businessName}
-              </p>
+              </p> */}
 
               <p className="text-xs text-gray-400">ID: {service?.serviceId}</p>
             </div>
           </div>
         );
       },
+    },
+
+    {
+      accessorKey: 'vendor',
+      header: 'Vendor Provider',
+      cell: ({ row }) => (
+        <div>
+          <p className="text-base font-semibold text-gray-600">
+            {row.original.vendor?.businessName || 'Unknown Vendor'}
+          </p>
+          <p className="text-sm text-gray-500">{row.original.vendor?.email}</p>
+          <p className="text-xs text-gray-500">{row.original.vendor?.phone}</p>
+        </div>
+      ),
     },
 
     {
@@ -370,7 +384,7 @@ const BookingsRequest = () => {
   if (isLoading) return <Spinner />;
 
   return (
-    <div className="container mx-auto my-5 p-3">
+    <div className="container mx-auto lg:my-6 p-3">
       <h1 className="text-xl mb-3">My Bookings</h1>
 
       <MSWTable columns={columns} data={bookings} />

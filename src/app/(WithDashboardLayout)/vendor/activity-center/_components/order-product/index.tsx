@@ -38,36 +38,13 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import PaymentBadge from './payment-badge';
 
 const statusOptions = [
   { label: 'Pending', key: 'pending' },
   { label: 'Shipped', key: 'shipped' },
   { label: 'Delivered', key: 'delivered' },
 ];
-
-const PAYMENT_BADGE_CONFIG = {
-  paid: {
-    label: 'Paid',
-    className: 'bg-green-100 text-green-700 border-green-300',
-  },
-  unpaid: {
-    label: 'Unpaid',
-    className: 'bg-yellow-100 text-yellow-700 border-yellow-300',
-  },
-} as const;
-
-const PaymentBadge = ({ isPaid }: { isPaid: boolean }) => {
-  const config = isPaid
-    ? PAYMENT_BADGE_CONFIG.paid
-    : PAYMENT_BADGE_CONFIG.unpaid;
-  return (
-    <span
-      className={`inline-flex items-center w-fit rounded-full border px-2 py-1 text-xs font-medium ${config.className}`}
-    >
-      {config.label}
-    </span>
-  );
-};
 
 const ManageOrderProducts = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -228,7 +205,7 @@ const ManageOrderProducts = () => {
     },
     {
       accessorKey: 'createdAt',
-      header: 'Date',
+      header: 'Date & Time',
       cell: ({ row }) => (
         <span className="text-base">
           {format(new Date(row.original.createdAt), 'dd MMM, yyyy hh:mm a')}
@@ -319,34 +296,48 @@ const ManageOrderProducts = () => {
         const isTeamMember = user?.role === 'team_member';
         const isBuyer = user?.role === 'user';
 
+        const canApprove = isVendor || isTeamMember;
+        const hasRequest = requestType !== 'none';
+        const isPending = vendorApproved === null;
+        const isApproved = vendorApproved === true;
+        const isRejected = vendorApproved === false;
+
+        const requestLabel =
+          requestType === 'cancelled' ? 'Cancellation' : 'Return';
+
         return (
           <div className="flex flex-col gap-2">
-            {/* Case 1: No request submitted */}
-            {requestType === 'none' && (
+            {/* No request */}
+            {!hasRequest && (
               <span className="text-gray-400 text-sm italic">
                 No request submitted
               </span>
             )}
 
-            {/* Case 2: Vendor must act */}
-            {(requestType !== 'none' && isVendor) ||
-              (requestType !== 'none' && isTeamMember && (
+            {/* Approve / Reject — pending হলে */}
+            {hasRequest && canApprove && isPending && (
+              <div className="flex flex-col gap-2">
+                <span className="text-yellow-600 text-sm font-medium flex items-center gap-1">
+                  ⏳ Pending — Buyer requested a <strong>{requestLabel}</strong>
+                </span>
                 <div className="flex items-center gap-2">
-                  {/* Approve button with Popover */}
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded"
-                        disabled={vendorApproved === true}
+                        className="text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 hover:text-white py-3 rounded cursor-pointer"
                       >
-                        Approve
+                        ✓ Approve
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-56">
-                      <p className="text-sm font-medium mb-2">
-                        Confirm approval for this request?
+                    <PopoverContent className="w-60">
+                      <p className="text-sm font-medium mb-1">
+                        Approve {requestLabel}?
+                      </p>
+                      <p className="text-sm text-gray-500 mb-3">
+                        This will confirm the buyer's{' '}
+                        {requestLabel.toLowerCase()} request.
                       </p>
                       <div className="flex justify-end gap-2">
                         <Button
@@ -363,20 +354,23 @@ const ManageOrderProducts = () => {
                     </PopoverContent>
                   </Popover>
 
-                  {/* Reject button with Popover */}
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded"
+                        className="text-gray-50 bg-gradient-to-t to-red-700 from-red-500/70 hover:bg-red-500/80 hover:text-white py-3 rounded cursor-pointer"
                       >
-                        Reject
+                        ✕ Reject
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-56">
-                      <p className="text-sm font-medium mb-2">
-                        Confirm rejection for this request?
+                    <PopoverContent className="w-60">
+                      <p className="text-sm font-medium mb-1">
+                        Reject {requestLabel}?
+                      </p>
+                      <p className="text-sm text-gray-500 mb-3">
+                        The buyer's {requestLabel.toLowerCase()} request will be
+                        declined.
                       </p>
                       <div className="flex justify-end gap-2">
                         <Button
@@ -393,37 +387,46 @@ const ManageOrderProducts = () => {
                     </PopoverContent>
                   </Popover>
                 </div>
-              ))}
+              </div>
+            )}
 
-            {/* Case 3: Vendor already acted */}
-            {requestType !== 'none' && vendorApproved === true && (
-              <>
+            {/* Approved */}
+            {hasRequest && isApproved && (
+              <div className="flex flex-col gap-1">
                 <span className="flex items-center gap-1 text-green-600 font-medium text-sm">
-                  Vendor <CheckCircle className="w-4 h-4" />
-                  Approved ({requestType})
+                  <CheckCircle className="w-4 h-4" /> {requestLabel} Approved
                 </span>
-                <span className="text-sm">Buyer Request ({requestType})</span>
-              </>
+                <span className="text-sm text-gray-500">
+                  Buyer's {requestLabel.toLowerCase()} request has been
+                  approved.
+                </span>
+              </div>
             )}
 
-            {requestType !== 'none' && vendorApproved === false && (
-              <>
+            {/* Rejected */}
+            {hasRequest && isRejected && (
+              <div className="flex flex-col gap-1">
                 <span className="flex items-center gap-1 text-red-600 font-medium text-sm">
-                  Vendor <XCircle className="w-4 h-4" />
-                  Rejected ({requestType})
+                  <XCircle className="w-4 h-4" /> {requestLabel} Rejected
                 </span>
-                <span className="text-sm">Buyer Request ({requestType})</span>
-              </>
+                <span className="text-sm text-gray-500">
+                  Buyer's {requestLabel.toLowerCase()} request has been
+                  declined.
+                </span>
+              </div>
             )}
 
-            {/* Case 4: Buyer sees pending */}
-            {requestType !== 'none' &&
-              isBuyer &&
-              vendorApproved === undefined && (
-                <span className="text-yellow-600 font-medium text-sm">
-                  Pending Vendor Approval
+            {/* Buyer — pending */}
+            {hasRequest && isBuyer && isPending && (
+              <div className="flex flex-col gap-1">
+                <span className="text-yellow-600 font-medium text-sm flex items-center gap-1">
+                  ⏳ Awaiting Vendor Response
                 </span>
-              )}
+                <span className="text-sm text-gray-500">
+                  Your {requestLabel.toLowerCase()} request is under review.
+                </span>
+              </div>
+            )}
           </div>
         );
       },
@@ -483,8 +486,7 @@ const ManageOrderProducts = () => {
                 onClick={() =>
                   router.push(`/vendor/activity-center/order-cancellation`)
                 }
-                className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
+                className="relative w-full cursor-pointer text-[#165940] border[#165940] text-base font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
               >
                 Cancellation Request
                 <FolderSymlink />
@@ -496,8 +498,7 @@ const ManageOrderProducts = () => {
                 onClick={() =>
                   router.push(`/vendor/activity-center/order-return`)
                 }
-                className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
+                className="relative w-full cursor-pointer text-[#165940] text-base font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
               >
                 Return Request
                 <FolderSymlink />

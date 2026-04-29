@@ -12,14 +12,16 @@ import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { FolderSymlink, Search } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import PaymentBadge from './payment-badge';
 
 const ReturnRequest = () => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const [search, setSearch] = useState<string>(
     searchParams.get('searchTerm') || '',
@@ -161,6 +163,24 @@ const ReturnRequest = () => {
     },
 
     {
+      accessorKey: 'isPaid',
+      header: 'Payment Status',
+      cell: ({ row }) => {
+        const { isPaid, trnId } = row.original;
+        return (
+          <div className="flex flex-col gap-1">
+            <PaymentBadge isPaid={isPaid} />
+            {trnId && (
+              <span className="text-xs text-gray-500 font-mono break-all">
+                TXN ID: {trnId}
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
+
+    {
       accessorKey: 'request',
       header: 'Request',
       cell: ({ row }) => {
@@ -265,8 +285,12 @@ const ReturnRequest = () => {
                 onClick={() =>
                   router.push(`/vendor/activity-center/order-cancellation`)
                 }
-                className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-red-100 hover:bg-red-200 underline"
+                className={`relative w-full cursor-pointer text-base font-medium py-4 rounded px-4 transition-all duration-200
+          ${
+            pathname === '/vendor/activity-center/order-cancellation'
+              ? 'bg-red-100 text-red-600 border-b-2 border-red-500'
+              : 'text-black bg-white shadow border border-gray-100'
+          }`}
               >
                 Cancellation Request
                 <FolderSymlink />
@@ -278,8 +302,12 @@ const ReturnRequest = () => {
                 onClick={() =>
                   router.push(`/vendor/activity-center/order-return`)
                 }
-                className="relative w-full cursor-pointer text-[#165940] text-base
-    font-medium py-4 rounded px-4 transition bg-green-100 hover:bg-green-200 underline"
+                className={`relative w-full cursor-pointer text-[#165940] text-base font-medium py-4 rounded px-4 transition-all duration-200
+          ${
+            pathname === '/vendor/activity-center/order-return'
+              ? 'bg-green-100 text-green-700 border-b-2 border-green-600'
+              : 'text-black bg-white shadow border border-gray-100'
+          }`}
               >
                 Return Request
                 <FolderSymlink />

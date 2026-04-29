@@ -175,7 +175,7 @@ const ReturnModal = ({
               )}
             />
 
-            <div className="flex items-center  space-x-2 mt-6">
+            <div className="flex items-center  space-x-2 mt-6 mb-2">
               <Checkbox
                 onClick={() => setAccept((prev) => !prev)}
                 id="terms"

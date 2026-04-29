@@ -88,32 +88,60 @@ const OrdersRequest = () => {
     const requestType = request?.type ?? 'none';
     const vendorApproved = request?.vendorApproved;
 
+    const requestLabel =
+      requestType === 'cancelled' ? 'Cancellation' : 'Return';
+
+    // ✅ Request already submitted
     if (requestType !== 'none') {
       return (
         <div className="flex flex-col gap-1">
-          {vendorApproved === false && (
-            <span className="text-yellow-600 font-medium text-sm">
-              ⏳ Pending Vendor Approval
-            </span>
+          {/* Pending */}
+          {vendorApproved === null && (
+            <div className="flex flex-col gap-1">
+              <span className="text-yellow-600 font-medium text-sm flex items-center gap-1">
+                ⏳ Awaiting Vendor Response
+              </span>
+              <span className="text-sm text-gray-500">
+                Your {requestLabel.toLowerCase()} request is under review.
+              </span>
+            </div>
           )}
+
+          {/* Approved */}
           {vendorApproved === true && (
-            <span className="text-green-600 font-medium text-sm">
-              ✅ Approved by Vendor
-            </span>
+            <div className="flex flex-col gap-1">
+              <span className="text-green-600 font-medium text-sm flex items-center gap-1">
+                ✅ {requestLabel} Approved
+              </span>
+              <span className="text-sm text-gray-500">
+                Your {requestLabel.toLowerCase()} request has been approved.
+              </span>
+            </div>
           )}
-          <span className="text-gray-500 text-sm capitalize">
-            Request: {requestType}
-          </span>
+
+          {/* Rejected */}
+          {vendorApproved === false && (
+            <div className="flex flex-col gap-1">
+              <span className="text-red-600 font-medium text-sm flex items-center gap-1">
+                ❌ {requestLabel} Rejected
+              </span>
+              <span className="text-sm text-gray-500">
+                Your {requestLabel.toLowerCase()} request was declined by the
+                vendor.
+              </span>
+            </div>
+          )}
         </div>
       );
     }
 
+    // ✅ Unpaid + Pending → Cancel
     if (!isPaid && status === 'pending') {
       return (
         <Button
           size="sm"
           variant="outline"
-          className="border border-red-400 rounded text-red-500 hover:text-red-600"
+          className="border border-red-400 rounded text-red-500 hover:text-red-600 w-1/2 cursor-pointer"
           onClick={() => {
             setSelectedCancelOrder(order);
             setCancelModalOpen(true);
@@ -124,12 +152,13 @@ const OrdersRequest = () => {
       );
     }
 
+    // ✅ Paid + Pending or Shipped → Cancel
     if (isPaid && (status === 'pending' || status === 'shipped')) {
       return (
         <Button
           size="sm"
           variant="outline"
-          className="border border-red-400 rounded text-red-500 hover:text-red-600"
+          className="border border-red-400 rounded text-red-500 hover:text-red-600 cursor-pointer w-1/2"
           onClick={() => {
             setSelectedCancelOrder(order);
             setCancelModalOpen(true);
@@ -140,14 +169,14 @@ const OrdersRequest = () => {
       );
     }
 
-    // ✅ Paid & Delivered: Show both Return and Review buttons
+    // ✅ Paid + Delivered → Return + Review
     if (isPaid && status === 'delivered') {
       return (
         <div className="flex flex-col gap-2">
           <Button
             size="sm"
             variant="outline"
-            className="border border-green-500 rounded text-green-500 hover:text-green-600 cursor-pointer"
+            className="border border-green-500 rounded text-green-500 hover:text-green-600 cursor-pointer w-1/2"
             onClick={() => {
               setSelectedReturnOrder(order);
               setReturnModalOpen(true);
@@ -158,7 +187,7 @@ const OrdersRequest = () => {
           <Button
             size="sm"
             variant="outline"
-            className="border border-blue-400 rounded text-blue-500 hover:text-blue-600 cursor-pointer"
+            className="border border-blue-400 rounded text-blue-500 hover:text-blue-600 cursor-pointer w-1/2"
             onClick={() => {
               setSelectedReviewOrder(order);
               setReviewModalOpen(true);
@@ -170,6 +199,7 @@ const OrdersRequest = () => {
       );
     }
 
+    // ✅ Unpaid + Delivered → No action
     if (!isPaid && status === 'delivered') {
       return <span className="text-gray-400 text-sm">No action available</span>;
     }
@@ -236,7 +266,7 @@ const OrdersRequest = () => {
       header: 'Vendor Provider',
       cell: ({ row }) => (
         <div>
-          <p className="text-base font-semibold">
+          <p className="text-base font-semibold text-gray-600">
             {row.original.vendor?.businessName || 'Unknown Vendor'}
           </p>
           <p className="text-sm text-gray-500">{row.original.vendor?.email}</p>
@@ -282,7 +312,7 @@ const OrdersRequest = () => {
     },
     {
       accessorKey: 'createdAt',
-      header: 'Date',
+      header: 'Date & Time',
       cell: ({ row }) => (
         <span className="text-sm">
           {format(new Date(row.original.createdAt), 'dd MMM, yyyy hh:mm a')}
@@ -308,7 +338,7 @@ const OrdersRequest = () => {
   if (isLoading) return <Spinner />;
 
   return (
-    <div className="container mx-auto my-10 p-3">
+    <div className="container mx-auto lg:my-6 p-3">
       <h1 className="text-xl mb-3">My Orders</h1>
       <MSWTable columns={columns} data={orders} />
 

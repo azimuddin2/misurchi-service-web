@@ -131,7 +131,9 @@ const TransactionHistory = () => {
           <div className="flex items-start gap-3">
             <div className="flex flex-col gap-1">
               <p className="font-medium text-gray-900">{refId}</p>
-              <p className="text-gray-700 text-sm">Trx: {row.original.trnId}</p>
+              <p className="text-gray-700 text-sm">
+                TXN ID: {row.original.trnId}
+              </p>
               <p className="font-medium text-sm text-gray-900">
                 Buyer: {user?.fullName || 'Unknown'}
               </p>
