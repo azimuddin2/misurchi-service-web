@@ -28,6 +28,7 @@ import {
   useGetAllMembersQuery,
 } from '@/redux/features/member/memberApi';
 import { TMember } from '@/types/member.type';
+import ViewMemberModal from './view-member-modal';
 
 const ManageTeamMembers = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -35,6 +36,9 @@ const ManageTeamMembers = () => {
   const searchParams = useSearchParams();
 
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isViewModalOpen, setViewModalOpen] = useState(false);
+
+  const [selectedMember, setSelectedMember] = useState<TMember | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -225,11 +229,10 @@ const ManageTeamMembers = () => {
             <Tooltip>
               <TooltipTrigger>
                 <Eye
-                  // onClick={() =>
-                  //   router.push(
-                  //     `/vendor/manage-offering/view-product/${row.original._id}`,
-                  //   )
-                  // }
+                  onClick={() => {
+                    setSelectedMember(row.original);
+                    setViewModalOpen(true);
+                  }}
                   size={20}
                   className="text-blue-400 cursor-pointer"
                 />
@@ -336,6 +339,13 @@ const ManageTeamMembers = () => {
         isOpen={isModalOpen}
         onOpenChange={setModalOpen}
         onConfirm={handleDeleteConfirm}
+      />
+
+      {/* View Member Modal */}
+      <ViewMemberModal
+        selectedMember={selectedMember}
+        isOpen={isViewModalOpen}
+        onOpenChange={setViewModalOpen}
       />
     </div>
   );

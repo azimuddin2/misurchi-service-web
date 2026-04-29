@@ -7,6 +7,7 @@ export type TMember = {
   email: string;
   image: string;
   role: TTeamMemberRole;
+  permissions?: string[];
   speciality: string;
   timeZone: string;
   workHours: string;

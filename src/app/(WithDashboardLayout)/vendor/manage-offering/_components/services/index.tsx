@@ -240,6 +240,11 @@ const ManageServices = () => {
       },
     },
     {
+      accessorKey: 'type',
+      header: 'Category',
+      cell: ({ row }) => <span>{row.original.type}</span>,
+    },
+    {
       accessorKey: 'price',
       header: 'Price',
       cell: ({ row }) => {
@@ -284,7 +289,7 @@ const ManageServices = () => {
     },
     {
       accessorKey: 'createdAt',
-      header: 'Date',
+      header: 'Created Date',
       cell: ({ row }) =>
         format(new Date(row.original.createdAt), 'dd MMM, yyyy'),
     },

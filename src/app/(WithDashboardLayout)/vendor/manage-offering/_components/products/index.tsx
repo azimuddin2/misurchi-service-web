@@ -241,9 +241,45 @@ const ManageProducts = () => {
       },
     },
     {
+      accessorKey: 'productType',
+      header: 'Category',
+      cell: ({ row }) => <span>{row.original.productType}</span>,
+    },
+    {
       accessorKey: 'price',
       header: 'Price',
       cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
+    },
+    {
+      accessorKey: 'quantity',
+      header: 'Quantity',
+      cell: ({ row }) => {
+        const quantity = row.original.quantity;
+        const isLow = quantity > 0 && quantity <= 10;
+        const isOut = quantity === 0;
+
+        return (
+          <div className="flex flex-col gap-1">
+            <span
+              className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-semibold text-sm border
+            ${isOut
+                  ? 'bg-red-100 text-red-600 border-red-300'
+                  : isLow
+                    ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
+                    : 'bg-green-100 text-green-700 border-green-300'
+                }`}
+            >
+              {quantity}
+            </span>
+            {isOut && (
+              <span className="text-xs text-red-500 font-medium">Out of stock</span>
+            )}
+            {isLow && (
+              <span className="text-xs text-yellow-600 font-medium">Low stock</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: 'status',
@@ -284,7 +320,7 @@ const ManageProducts = () => {
     },
     {
       accessorKey: 'createdAt',
-      header: 'Date',
+      header: 'Created Date',
       cell: ({ row }) =>
         format(new Date(row.original.createdAt), 'dd MMM, yyyy'),
     },
