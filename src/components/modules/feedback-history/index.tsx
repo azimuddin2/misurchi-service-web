@@ -26,6 +26,7 @@ const statusColor: Record<string, string> = {
 const FeedbackHistory = () => {
   const user = useAppSelector(selectCurrentUser);
   const email = user?.vendorEmail as string;
+  const currentEmail = user?.email as string;
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -48,13 +49,13 @@ const FeedbackHistory = () => {
   // ── API call ────────────────────────────────────────────────
   const { data, isLoading, refetch } = useGetSupportByEmailQuery(
     {
-      email,
+      email: email || currentEmail,
       page,
       limit,
       query: { searchTerm, createdAt },
     },
     {
-      skip: !email,
+      skip: !email && !currentEmail,
     },
   );
 
@@ -196,21 +197,25 @@ const FeedbackHistory = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleHelpful(ticket._id!, true)}
-                    className={`flex items-center gap-1 text-sm px-3 py-1 rounded border transition cursor-pointer ${
-                      ticket.isHelpful === true
-                        ? 'border-green-500 text-green-600 bg-green-50'
-                        : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                    }`}
+                    disabled={ticket.status === 'Pending'}
+                    className={`flex items-center gap-1 text-sm px-3 py-1 rounded border transition cursor-pointer ${ticket.status === 'Pending'
+                        ? 'border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed'
+                        : ticket.isHelpful === true
+                          ? 'border-green-500 text-green-600 bg-green-50'
+                          : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                      }`}
                   >
                     👍 Yes
                   </button>
                   <button
                     onClick={() => handleHelpful(ticket._id!, false)}
-                    className={`flex items-center gap-1 text-sm px-3 py-1 rounded border transition cursor-pointer ${
-                      ticket.isHelpful === false
-                        ? 'border-red-400 text-red-500 bg-red-50'
-                        : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                    }`}
+                    disabled={ticket.status === 'Pending'}
+                    className={`flex items-center gap-1 text-sm px-3 py-1 rounded border transition cursor-pointer ${ticket.status === 'Pending'
+                        ? 'border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed'
+                        : ticket.isHelpful === false
+                          ? 'border-red-400 text-red-500 bg-red-50'
+                          : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                      }`}
                   >
                     👎 No
                   </button>

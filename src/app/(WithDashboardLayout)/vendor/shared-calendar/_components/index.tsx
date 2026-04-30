@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { TBooking } from '@/types/booking.type';
 import { useGetBookingAppointmentsQuery } from '@/redux/features/booking/bookingApi';
-import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import Spinner from '@/components/shared/Spinner';

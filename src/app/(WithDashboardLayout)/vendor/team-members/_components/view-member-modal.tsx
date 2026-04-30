@@ -37,7 +37,7 @@ const ViewMemberModal = ({ selectedMember, isOpen, onOpenChange }: Props) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-2xl">
+            <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-2xl gap-0">
 
                 {/* Header */}
                 <DialogHeader className="px-6 pt-5 pb-4 border-b">
@@ -82,7 +82,7 @@ const ViewMemberModal = ({ selectedMember, isOpen, onOpenChange }: Props) => {
 
                 {/* Permissions */}
                 {selectedMember.permissions && selectedMember.permissions.length > 0 && (
-                    <div className="px-6 pt-1 py-4 border-b">
+                    <div className="px-6 pt-5 py-4 border-b">
                         <p className="text-xs text-gray-400 uppercase tracking-wide mb-3">Permissions</p>
                         <div className="flex flex-wrap gap-2">
                             {selectedMember.permissions.map((perm) => (
@@ -98,7 +98,7 @@ const ViewMemberModal = ({ selectedMember, isOpen, onOpenChange }: Props) => {
                 )}
 
                 {/* Footer */}
-                <div className="flex justify-between gap-2 mt-3 px-5 pb-5">
+                <div className="flex justify-between gap-2 mt-8 px-5 pb-5">
                     <Button
                         type="button"
                         className="w-1/2 border-gray-800 bg-gradient-to-t to-white from-white hover:bg-green-500/80 p-5 cursor-pointer text-sm uppercase shadow rounded-sm border-b-4 border-r-4 text-black"

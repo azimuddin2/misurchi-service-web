@@ -86,7 +86,7 @@ export default function Header() {
     }
   };
 
-  // profile href — team_member vendor profile এ যাবে
+  // profile href — team_member will go to vendor profile
   const profileHref = isTeamMember
     ? '/vendor/profile'
     : `/${user?.role}/profile`;
@@ -104,7 +104,7 @@ export default function Header() {
         </Link>
       )}
 
-      {/* cart শুধু user এর জন্য */}
+      {/* cart only user */}
       {(!user || isUser) && (
         <div
           className="relative cursor-pointer"
@@ -146,7 +146,7 @@ export default function Header() {
 
             <DropdownMenuSeparator />
 
-            {/* Profile — সবার জন্য */}
+            {/* Profile */}
             <Link href={profileHref}>
               <DropdownMenuItem className="rounded-md gap-2 cursor-pointer">
                 <User size={18} /> View Profile
