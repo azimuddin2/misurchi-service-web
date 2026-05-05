@@ -23,7 +23,7 @@ const Pricing = () => {
   const router = useRouter();
   const [addSubPayment] = useAddSubPaymentMutation();
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
-  const [activeError, setActiveError] = useState<string | null>(null); // ✅ active subscription error
+  const [activeError, setActiveError] = useState<string | null>(null);
 
   const handleSubscribe: SubmitHandler<FieldValues> = async (plan) => {
     setActiveError(null); // clear previous error
