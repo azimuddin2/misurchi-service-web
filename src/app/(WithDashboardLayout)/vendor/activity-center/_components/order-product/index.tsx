@@ -369,8 +369,8 @@ const ManageOrderProducts = () => {
                         Reject {requestLabel}?
                       </p>
                       <p className="text-sm text-gray-500 mb-3">
-                        The buyer&apos;s {requestLabel.toLowerCase()} request will be
-                        declined.
+                        The buyer&apos;s {requestLabel.toLowerCase()} request
+                        will be declined.
                       </p>
                       <div className="flex justify-end gap-2">
                         <Button

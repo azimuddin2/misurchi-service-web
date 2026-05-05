@@ -12,7 +12,8 @@ import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const Pricing = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -22,22 +23,23 @@ const Pricing = () => {
   const router = useRouter();
   const [addSubPayment] = useAddSubPaymentMutation();
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
+  const [activeError, setActiveError] = useState<string | null>(null); // ✅ active subscription error
 
   const handleSubscribe: SubmitHandler<FieldValues> = async (plan) => {
-    // 🧭 If user not logged in → redirect to login with "redirect" param
+    setActiveError(null); // clear previous error
+
     if (!user?.email) {
       router.push(`/login?redirectPath=/pricing`);
       return;
     }
 
-    // 🚫 Only vendors can subscribe
     if (user?.role !== 'vendor') {
-      alert('Only vendors can subscribe to a plan.');
+      toast.error('Only vendors can subscribe to a plan.');
       return;
     }
 
     try {
-      setLoadingPlanId(plan._id); // ✅ show loading only for clicked plan
+      setLoadingPlanId(plan._id);
 
       const payload = { plan: plan._id };
 
@@ -45,24 +47,35 @@ const Pricing = () => {
       if (plan.cost === 0) {
         const res = await addSubPayment(payload).unwrap();
         if (res.success) {
-          alert('✅ Free subscription activated successfully!');
+          toast.success('Free subscription activated successfully!');
           router.push('/vendor/profile');
         }
         return;
       }
 
-      // 💳 Paid plan → Stripe checkout redirect URL
+      // 💳 Paid plan
       const res = await addSubPayment(payload).unwrap();
       if (res?.data && typeof res.data === 'string') {
         window.location.href = res.data;
       }
     } catch (err: any) {
-      console.error('❌ Subscription error:', err);
-      alert('Something went wrong while processing your subscription.');
+      const msg =
+        err?.data?.message ||
+        err?.message ||
+        'Something went wrong while processing your subscription.';
+
+      // ✅ Active subscription error — special handling
+      if (msg.toLowerCase().includes('already have an active subscription')) {
+        setActiveError(msg);
+      } else {
+        toast.error(msg);
+      }
     } finally {
-      setLoadingPlanId(null); // ✅ reset loading after specific button completes
+      setLoadingPlanId(null);
     }
   };
+
+  const isSubscriptionActive = !!activeError;
 
   if (isLoading) return <Spinner />;
 
@@ -81,6 +94,17 @@ const Pricing = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-16">
+      {/* ✅ Active subscription banner */}
+      {activeError && (
+        <div className="mb-8 flex items-start gap-3 bg-amber-50 border border-amber-300 text-amber-800 rounded-lg px-5 py-4 shadow-sm">
+          <span className="text-xl mt-0.5">⚠️</span>
+          <div>
+            <p className="font-semibold text-sm">Active Subscription Found</p>
+            <p className="text-sm mt-0.5">{activeError}</p>
+          </div>
+        </div>
+      )}
+
       {subscriptionPlans.length > 0 ? (
         <div className="grid md:grid-cols-2 gap-5 mt-5">
           {subscriptionPlans.map((plan: TSubscriptionPlan) => (
@@ -115,7 +139,6 @@ const Pricing = () => {
                     Cost: {plan.cost === 0 ? 'Free' : `$${plan.cost}`}
                   </span>
                 </li>
-
                 <li className="flex items-center gap-2">
                   <Image
                     src={plan.features.teamMembers ? checkIcon : closeIcon}
@@ -126,7 +149,6 @@ const Pricing = () => {
                     Add Team Members: {plan.features.teamMembers ? 'Yes' : 'No'}
                   </span>
                 </li>
-
                 <li className="flex items-center gap-2">
                   <Image
                     src={plan.features.sharedCalendar ? checkIcon : closeIcon}
@@ -138,7 +160,6 @@ const Pricing = () => {
                     {plan.features.sharedCalendar ? 'Yes' : 'No'}
                   </span>
                 </li>
-
                 <li className="flex items-center gap-2">
                   <Image
                     src={plan.features.taskHub ? checkIcon : closeIcon}
@@ -147,7 +168,6 @@ const Pricing = () => {
                   />
                   <span>Task Hub: {plan.features.taskHub ? 'Yes' : 'No'}</span>
                 </li>
-
                 <li className="flex items-center gap-2">
                   <Image
                     src={
@@ -163,7 +183,6 @@ const Pricing = () => {
                     {plan.features.grantPermissionAccess ? 'Yes' : 'No'}
                   </span>
                 </li>
-
                 <li className="flex items-center gap-2">
                   <Image src={checkIcon} alt="check" width={20} />
                   <span>Service Max: {plan.limits.serviceMax}</span>
@@ -182,7 +201,6 @@ const Pricing = () => {
                   <Image src={checkIcon} alt="check" width={20} />
                   <span>Transaction Fee: {plan.limits.transactionFee}%</span>
                 </li>
-
                 <li className="flex items-center gap-2">
                   <Image src={checkIcon} alt="check" width={20} />
                   <span>Validity: {formatValidity(plan.validity)}</span>
@@ -191,15 +209,17 @@ const Pricing = () => {
 
               <button
                 onClick={() => handleSubscribe(plan)}
-                disabled={loadingPlanId === plan._id}
+                disabled={loadingPlanId === plan._id || isSubscriptionActive}
                 className={`w-full text-center border border-gray-300 rounded-md py-3 px-4 font-medium transition-colors ${
-                  loadingPlanId === plan._id
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:bg-gray-50'
+                  loadingPlanId === plan._id || isSubscriptionActive
+                    ? 'opacity-50 cursor-not-allowed bg-gray-100'
+                    : 'hover:bg-gray-50 cursor-pointer'
                 }`}
               >
                 {loadingPlanId === plan._id ? (
                   'Processing...'
+                ) : isSubscriptionActive ? (
+                  'Already Subscribed'
                 ) : (
                   <>
                     Get Started{' '}

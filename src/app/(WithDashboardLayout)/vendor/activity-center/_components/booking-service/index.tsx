@@ -300,10 +300,11 @@ const ManageBookingServices = () => {
                     option.key !== status &&
                     handleStatusUpdate(row.original._id, option.key)
                   }
-                  className={`capitalize px-3 py-2 ${option.key === status
+                  className={`capitalize px-3 py-2 ${
+                    option.key === status
                       ? 'opacity-50 cursor-not-allowed'
                       : 'hover:bg-gray-100'
-                    }`}
+                  }`}
                 >
                   {option.label}
                 </DropdownMenuItem>
@@ -399,8 +400,8 @@ const ManageBookingServices = () => {
                         Reject {requestLabel}?
                       </p>
                       <p className="text-xs text-gray-500 mb-3">
-                        The buyer&apos;s {requestLabel.toLowerCase()} request will be
-                        declined.
+                        The buyer&apos;s {requestLabel.toLowerCase()} request
+                        will be declined.
                       </p>
                       <div className="flex justify-end gap-2">
                         <Button

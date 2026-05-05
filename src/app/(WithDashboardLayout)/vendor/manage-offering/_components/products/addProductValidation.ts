@@ -42,11 +42,13 @@ export const addProductSchema = z.object({
       required_error: 'Product description is required',
     })
     .refine(
-      (val) =>
-        val
+      (val) => {
+        const length = val
           .replace(/<[^>]*>/g, '')
           .replace(/&nbsp;/g, ' ')
-          .trim().length >= 500,
-      { message: 'Description must be at least 500 characters' },
+          .trim().length;
+        return length >= 100 && length <= 500;
+      },
+      { message: 'Description must be between 100 and 500 characters' },
     ),
 });

@@ -55,8 +55,19 @@ const serviceSchema = z.object({
     required_error: 'Product status is required',
   }),
   description: z
-    .string({ required_error: 'Description is required' })
-    .min(100, 'Description must be at least 100 characters'),
+    .string({
+      required_error: 'Product description is required',
+    })
+    .refine(
+      (val) => {
+        const length = val
+          .replace(/<[^>]*>/g, '')
+          .replace(/&nbsp;/g, ' ')
+          .trim().length;
+        return length >= 100 && length <= 500;
+      },
+      { message: 'Description must be between 100 and 500 characters' },
+    ),
 });
 
 interface ServiceDetailsStepProps {

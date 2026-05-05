@@ -198,24 +198,26 @@ const FeedbackHistory = () => {
                   <button
                     onClick={() => handleHelpful(ticket._id!, true)}
                     disabled={ticket.status === 'Pending'}
-                    className={`flex items-center gap-1 text-sm px-3 py-1 rounded border transition cursor-pointer ${ticket.status === 'Pending'
+                    className={`flex items-center gap-1 text-sm px-3 py-1 rounded border transition cursor-pointer ${
+                      ticket.status === 'Pending'
                         ? 'border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed'
                         : ticket.isHelpful === true
                           ? 'border-green-500 text-green-600 bg-green-50'
                           : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                      }`}
+                    }`}
                   >
                     👍 Yes
                   </button>
                   <button
                     onClick={() => handleHelpful(ticket._id!, false)}
                     disabled={ticket.status === 'Pending'}
-                    className={`flex items-center gap-1 text-sm px-3 py-1 rounded border transition cursor-pointer ${ticket.status === 'Pending'
+                    className={`flex items-center gap-1 text-sm px-3 py-1 rounded border transition cursor-pointer ${
+                      ticket.status === 'Pending'
                         ? 'border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed'
                         : ticket.isHelpful === false
                           ? 'border-red-400 text-red-500 bg-red-50'
                           : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                      }`}
+                    }`}
                   >
                     👎 No
                   </button>

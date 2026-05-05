@@ -262,20 +262,25 @@ const ManageProducts = () => {
           <div className="flex flex-col gap-1">
             <span
               className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-semibold text-sm border
-            ${isOut
-                  ? 'bg-red-100 text-red-600 border-red-300'
-                  : isLow
-                    ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
-                    : 'bg-green-100 text-green-700 border-green-300'
-                }`}
+            ${
+              isOut
+                ? 'bg-red-100 text-red-600 border-red-300'
+                : isLow
+                  ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
+                  : 'bg-green-100 text-green-700 border-green-300'
+            }`}
             >
               {quantity}
             </span>
             {isOut && (
-              <span className="text-xs text-red-500 font-medium">Out of stock</span>
+              <span className="text-xs text-red-500 font-medium">
+                Out of stock
+              </span>
             )}
             {isLow && (
-              <span className="text-xs text-yellow-600 font-medium">Low stock</span>
+              <span className="text-xs text-yellow-600 font-medium">
+                Low stock
+              </span>
             )}
           </div>
         );
