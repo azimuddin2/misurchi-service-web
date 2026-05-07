@@ -36,6 +36,8 @@ import { ColorInput } from '@/components/ui/core/color-input';
 import RecommendedType from '@/components/modules/recommended-type';
 import SizeSelect from '@/components/ui/core/size-select';
 import { TextEditor } from '@/components/ui/core/text-editor';
+import Swal from 'sweetalert2';
+
 
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -50,6 +52,7 @@ const AddProduct = () => {
   const {
     control,
     formState: { isSubmitting },
+    reset,
   } = form;
 
   const { data: productTypeData } = useGetAllProductTypeQuery({});
@@ -73,18 +76,35 @@ const AddProduct = () => {
       formData.append('images', file);
     });
 
-    console.log(imageFiles);
-
     const toastId = toast.loading('Adding product...');
 
     try {
       const res = await addProduct(formData).unwrap();
-      toast.success(res.message || 'Product added successfully');
-      router.push(`/vendor/manage-offering/view-product/${res.data?._id}`);
-    } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to add product');
-    } finally {
+
       toast.dismiss(toastId);
+      toast.success(res.message || 'Product added successfully');
+      reset();
+
+      const result = await Swal.fire({
+        title: 'Product Added Successfully!',
+        icon: 'success',
+        showConfirmButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'View Product',
+        denyButtonText: 'Add Another Product',
+        confirmButtonColor: 'transparent',
+        denyButtonColor: 'transparent',
+      });
+
+      if (result.isConfirmed) {
+        router.push(`/vendor/manage-offering/view-product/${res.data?._id}`);
+      } else if (result.isDenied) {
+        router.push('/vendor/manage-offering/add-product');
+      }
+
+    } catch (error: any) {
+      toast.dismiss(toastId);
+      toast.error(error?.data?.message || 'Failed to add product');
     }
   };
 

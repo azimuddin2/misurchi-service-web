@@ -53,11 +53,9 @@ const VendorProfile = () => {
   const [coverImagePreview, setCoverImagePreview] = useState<string[] | []>([]);
 
   const { data, isLoading, refetch } = useGetVendorProfileQuery(
-    user?.email as string,
+    user?.vendorEmail as string,
   );
   const vendorUser: TVendorUser | undefined = data?.data;
-
-  console.log('Vendor User Data:', vendorUser);
 
   const [updateVendorProfile] = useUpdateVendorProfileMutation();
 

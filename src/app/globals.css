@@ -7,6 +7,63 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+.swal2-title {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+}
+
+/* sweetalert2 button override */
+.swal2-confirm {
+  flex: 1 !important;
+  width: auto !important;
+  text-transform: uppercase !important;
+  border: 1px solid #1f2937 !important;
+  background: linear-gradient(to top, #ffffff, #ffffff) !important;
+  padding: 12px !important;
+  cursor: pointer !important;
+  font-size: 0.875rem !important;
+  border-radius: 2px !important;
+  border-bottom: 4px solid #1f2937 !important;
+  border-right: 4px solid #1f2937 !important;
+  color: black !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-confirm:hover {
+  background: rgba(212, 247, 225, 0.8) !important;
+}
+
+.swal2-deny {
+  flex: 1 !important;
+  width: auto !important;
+  text-transform: uppercase !important;
+  border: 1px solid #1f2937 !important;
+  background: linear-gradient(to top, rgba(74, 222, 128, 0.7), #10582c) !important;
+  padding: 12px !important;
+  cursor: pointer !important;
+  font-size: 0.875rem !important;
+  border-radius: 2px !important;
+  border-bottom: 4px solid #1f2937 !important;
+  border-right: 4px solid #1f2937 !important;
+  color: white !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.swal2-deny:hover {
+  background: linear-gradient(to top, rgba(74, 222, 128, 0.7), #0d4723) !important;
+}
+
+.swal2-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  gap: 3px !important;
+  width: 100% !important;
+  padding: 0 24px !important;
+  margin-top: 12px !important;
+  flex-wrap: nowrap !important;
+}
+
 .lg\:h-12 {
   @media (width >=64rem) {
     height: calc(var(--spacing) * 12);

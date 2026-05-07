@@ -23,9 +23,10 @@ interface ReviewStepProps {
   data: any;
   onBack: () => void;
   onComplete: () => void;
+  isSubmitting?: boolean;
 }
 
-export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
+export function ReviewStep({ data, onBack, onComplete, isSubmitting }: ReviewStepProps) {
   const enabledDays = Object.entries(data.availability?.weeklySchedule || {})
     .filter(([_, schedule]: [string, any]) => schedule.enabled)
     .map(([day, schedule]: [string, any]) => ({
@@ -395,9 +396,10 @@ export function ReviewStep({ data, onBack, onComplete }: ReviewStepProps) {
         </Button>
         <Button
           onClick={onComplete}
+          disabled={isSubmitting}
           className="w-full lg:w-2/6 text-gray-50 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 p-5 cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 "
         >
-          Publish Service
+          {isSubmitting ? 'Publishing...' : 'Publish Service'}
           <ArrowRight className="w-5 h-5 ml-3" />
         </Button>
       </motion.div>

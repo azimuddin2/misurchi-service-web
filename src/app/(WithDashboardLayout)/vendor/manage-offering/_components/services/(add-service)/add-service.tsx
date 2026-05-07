@@ -22,6 +22,7 @@ import { useAddServiceMutation } from '@/redux/features/service/serviceApi';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 const steps = [
   {
@@ -50,6 +51,7 @@ export function AddService() {
   const [currentStep, setCurrentStep] = useState(1);
   const [serviceData, setServiceData] = useState<any>({});
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleStepComplete = (stepData: any) => {
     setServiceData((prev: any) => ({ ...prev, ...stepData }));
@@ -83,8 +85,10 @@ export function AddService() {
 
   //Todo: Database Save data
   const handleDataSave = async () => {
-    const files: File[] = serviceData?.imageFiles || [];
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
+    const files: File[] = serviceData?.imageFiles || [];
     const modifiedData = {
       vendor: vendorId,
       user: user?.userId,
@@ -93,7 +97,6 @@ export function AddService() {
 
     const formData = new FormData();
     formData.append('data', JSON.stringify(modifiedData));
-
     files.forEach((file) => {
       formData.append('images', file);
     });
@@ -102,13 +105,34 @@ export function AddService() {
 
     try {
       const res = await addService(formData).unwrap();
-      console.log(res);
+
+      toast.dismiss(toastId);
       toast.success(res.message || 'Service added successfully');
-      router.push(`/vendor/manage-offering/view-service/${res.data?._id}`);
+
+      const result = await Swal.fire({
+        title: 'Service Added Successfully!',
+        icon: 'success',
+        showConfirmButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'View Service',
+        denyButtonText: 'Add Another Service',
+        confirmButtonColor: 'transparent',
+        denyButtonColor: 'transparent',
+      });
+
+      if (result.isConfirmed) {
+        router.push(`/vendor/manage-offering/view-service/${res.data?._id}`);
+      } else if (result.isDenied) {
+        setCurrentStep(1);
+        setServiceData({});
+        setCompletedSteps([]);
+      }
+
     } catch (error: any) {
+      toast.dismiss(toastId);
       toast.error(error?.data?.message || 'Failed to add service');
     } finally {
-      toast.dismiss(toastId);
+      setIsSubmitting(false);
     }
   };
 
@@ -135,22 +159,20 @@ export function AddService() {
             return (
               <div
                 key={step.id}
-                className={`flex items-center cursor-pointer transition-all duration-200 ${
-                  isAccessible
-                    ? 'hover:scale-105'
-                    : 'cursor-not-allowed opacity-50'
-                }`}
+                className={`flex items-center cursor-pointer transition-all duration-200 ${isAccessible
+                  ? 'hover:scale-105'
+                  : 'cursor-not-allowed opacity-50'
+                  }`}
                 onClick={() => handleStepClick(step.id)}
               >
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      isCompleted
-                        ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white'
-                        : isActive
-                          ? 'bg-green-100 text-green-600 ring-4 ring-green-100'
-                          : 'bg-gray-100 text-gray-400'
-                    }`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted
+                      ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white'
+                      : isActive
+                        ? 'bg-green-100 text-green-600 ring-4 ring-green-100'
+                        : 'bg-gray-100 text-gray-400'
+                      }`}
                   >
                     {isCompleted ? (
                       <CheckCircle className="w-6 h-6" />
@@ -171,11 +193,10 @@ export function AddService() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-16 h-1 mx-4 transition-colors duration-300 ${
-                      isCompleted || currentStep > step.id
-                        ? 'bg-gradient-to-t to-green-800 from-green-500/70'
-                        : 'bg-gray-200'
-                    }`}
+                    className={`w-16 h-1 mx-4 transition-colors duration-300 ${isCompleted || currentStep > step.id
+                      ? 'bg-gradient-to-t to-green-800 from-green-500/70'
+                      : 'bg-gray-200'
+                      }`}
                   />
                 )}
               </div>
@@ -235,6 +256,7 @@ export function AddService() {
                   data={serviceData as TService}
                   onBack={handleStepBack}
                   onComplete={handleDataSave}
+                  isSubmitting={isSubmitting}
                 />
               )}
             </motion.div>
