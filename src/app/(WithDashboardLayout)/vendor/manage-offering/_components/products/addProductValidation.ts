@@ -46,6 +46,8 @@ export const addProductSchema = z.object({
         const length = val
           .replace(/<[^>]*>/g, '')
           .replace(/&nbsp;/g, ' ')
+          .replace(/\n+/g, ' ')
+          .replace(/\s+/g, ' ')
           .trim().length;
         return length >= 100 && length <= 500;
       },

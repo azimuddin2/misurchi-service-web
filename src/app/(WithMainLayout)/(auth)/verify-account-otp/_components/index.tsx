@@ -48,7 +48,7 @@ const VerifyAccountOtpForm = () => {
 
   const router = useRouter();
 
-  const [verifyOtp] = useVerifyOtpMutation();
+  const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
 
   const onSubmit: SubmitHandler<FieldValues> = async () => {
     const otpCode = otp.join('');
@@ -119,11 +119,11 @@ const VerifyAccountOtpForm = () => {
 
             {/* Submit Button */}
             <AppButton
-              disabled={!isOtpComplete}
-              className={`w-full text-white border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:from-green-600 hover:to-green-900 disabled:opacity-50 disabled:cursor-not-allowed`}
+              disabled={!isOtpComplete || isLoading}
+              className="w-full text-white border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:from-green-600 hover:to-green-900 disabled:opacity-50 disabled:cursor-not-allowed"
               content={
                 <div className="flex justify-center items-center gap-2 font-semibold">
-                  <span className="uppercase">Verify</span>
+                  <span className="uppercase">{isLoading ? 'Verifying...' : 'Verify'}</span>
                   <ArrowRight size={18} />
                 </div>
               }

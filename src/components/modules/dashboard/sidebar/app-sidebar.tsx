@@ -16,6 +16,7 @@ import {
   MessageSquareText,
   ShieldCheck,
   FileCheck,
+  Star,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -82,6 +83,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Transaction History',
         url: `/vendor/transaction-history`,
         icon: BadgeDollarSign,
+        disabled: false,
+        lockIcon: false,
+      },
+      {
+        title: 'Refer & Earn',
+        url: `/vendor/refer-earn`,
+        icon: Star,
         disabled: false,
         lockIcon: false,
       },
