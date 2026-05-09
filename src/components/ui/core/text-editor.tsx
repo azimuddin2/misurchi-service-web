@@ -106,12 +106,13 @@ const ToolbarButton = ({
 );
 
 const getStats = (el: HTMLDivElement | null) => {
-  const text = el?.innerHTML
-    ?.replace(/<[^>]*>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\n+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim() ?? '';
+  const text =
+    el?.innerHTML
+      ?.replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/\n+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim() ?? '';
   const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
   return { words, chars: text.length };
 };
@@ -161,7 +162,7 @@ export const TextEditor = ({
       ({ command }) => {
         try {
           if (document.queryCommandState(command)) formats.add(command);
-        } catch { }
+        } catch {}
       },
     );
     setActiveFormats(formats);

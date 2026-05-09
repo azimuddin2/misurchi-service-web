@@ -1,16 +1,19 @@
-export type TSubscriptionStatus = 'active' | 'expired' | 'canceled' | 'pending';
+import { TSubscriptionPlan } from './plan.type';
+import { TSubscription } from './subscription.type';
+import { IUser, TVendorUser } from './user.type';
 
-export type TSubscription = {
-  _id?: string;
-  user: string;
-  plan: string;
+export type TSubPayment = {
+  _id: string;
+  user: string | IUser;
+  vendor: string | TVendorUser;
+  plan: string | TSubscriptionPlan;
+  subscription?: string | TSubscription;
   durationType: 'monthly' | 'yearly';
-  isPaid: boolean;
   amount: number;
-  code?: string;
-  status: TSubscriptionStatus;
-  startedAt: Date;
-  expiredAt: Date;
-  isExpired: boolean;
+  tranId: string;
+  isPaid: boolean;
+  paidAt: Date;
   isDeleted: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 };

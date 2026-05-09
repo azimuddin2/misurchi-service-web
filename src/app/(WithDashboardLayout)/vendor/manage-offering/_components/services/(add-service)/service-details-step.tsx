@@ -385,7 +385,9 @@ export function ServiceDetailsStep({ data, onNext }: ServiceDetailsStepProps) {
                     </SelectTrigger>
                     <SelectContent>
                       {/* Undefined option */}
-                      <SelectItem value="no-duration">No fixed duration</SelectItem>
+                      <SelectItem value="no-duration">
+                        No fixed duration
+                      </SelectItem>
 
                       {durations.map((mins) => {
                         const hrs = mins / 60;

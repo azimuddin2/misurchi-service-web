@@ -127,7 +127,6 @@ export function AddService() {
         setServiceData({});
         setCompletedSteps([]);
       }
-
     } catch (error: any) {
       toast.dismiss(toastId);
       toast.error(error?.data?.message || 'Failed to add service');
@@ -159,20 +158,22 @@ export function AddService() {
             return (
               <div
                 key={step.id}
-                className={`flex items-center cursor-pointer transition-all duration-200 ${isAccessible
-                  ? 'hover:scale-105'
-                  : 'cursor-not-allowed opacity-50'
-                  }`}
+                className={`flex items-center cursor-pointer transition-all duration-200 ${
+                  isAccessible
+                    ? 'hover:scale-105'
+                    : 'cursor-not-allowed opacity-50'
+                }`}
                 onClick={() => handleStepClick(step.id)}
               >
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted
-                      ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white'
-                      : isActive
-                        ? 'bg-green-100 text-green-600 ring-4 ring-green-100'
-                        : 'bg-gray-100 text-gray-400'
-                      }`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isCompleted
+                        ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white'
+                        : isActive
+                          ? 'bg-green-100 text-green-600 ring-4 ring-green-100'
+                          : 'bg-gray-100 text-gray-400'
+                    }`}
                   >
                     {isCompleted ? (
                       <CheckCircle className="w-6 h-6" />
@@ -193,10 +194,11 @@ export function AddService() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-16 h-1 mx-4 transition-colors duration-300 ${isCompleted || currentStep > step.id
-                      ? 'bg-gradient-to-t to-green-800 from-green-500/70'
-                      : 'bg-gray-200'
-                      }`}
+                    className={`w-16 h-1 mx-4 transition-colors duration-300 ${
+                      isCompleted || currentStep > step.id
+                        ? 'bg-gradient-to-t to-green-800 from-green-500/70'
+                        : 'bg-gray-200'
+                    }`}
                   />
                 )}
               </div>

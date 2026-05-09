@@ -26,7 +26,12 @@ interface ReviewStepProps {
   isSubmitting?: boolean;
 }
 
-export function ReviewStep({ data, onBack, onComplete, isSubmitting }: ReviewStepProps) {
+export function ReviewStep({
+  data,
+  onBack,
+  onComplete,
+  isSubmitting,
+}: ReviewStepProps) {
   const enabledDays = Object.entries(data.availability?.weeklySchedule || {})
     .filter(([_, schedule]: [string, any]) => schedule.enabled)
     .map(([day, schedule]: [string, any]) => ({

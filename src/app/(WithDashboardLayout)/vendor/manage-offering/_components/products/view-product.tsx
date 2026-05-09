@@ -78,10 +78,11 @@ const ViewProduct = ({ productId }: Props) => {
               <button
                 key={index}
                 type="button"
-                className={`border-2 rounded-md p-1 transition ${selectedImage === image.url
-                  ? 'border-green-800'
-                  : 'border-gray-300'
-                  }`}
+                className={`border-2 rounded-md p-1 transition ${
+                  selectedImage === image.url
+                    ? 'border-green-800'
+                    : 'border-gray-300'
+                }`}
                 onClick={() => setSelectedImage(image.url)}
               >
                 <Image
@@ -128,10 +129,11 @@ const ViewProduct = ({ productId }: Props) => {
               {/* Original Price */}
               <div className="flex items-center">
                 <p
-                  className={`text-xl font-medium ${discountPercent > 0
-                    ? 'text-gray-500 line-through pr-3'
-                    : 'text-gray-800'
-                    }`}
+                  className={`text-xl font-medium ${
+                    discountPercent > 0
+                      ? 'text-gray-500 line-through pr-3'
+                      : 'text-gray-800'
+                  }`}
                 >
                   ${price.toFixed(2)}
                 </p>
@@ -243,15 +245,16 @@ const ViewProduct = ({ productId }: Props) => {
             />
           </div>
 
-          <div className='mt-3'>
+          <div className="mt-3">
             <Link href={`/vendor/manage-offering/add-product`}>
               <button className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80 p-[14px] cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500  flex justify-center items-center font-semibold">
-                <span className="uppercase text-sm font-semibold mr-2">Add Another Product</span>
+                <span className="uppercase text-sm font-semibold mr-2">
+                  Add Another Product
+                </span>
                 <PackagePlus size={20} />
               </button>
             </Link>
           </div>
-
         </div>
       </div>
 

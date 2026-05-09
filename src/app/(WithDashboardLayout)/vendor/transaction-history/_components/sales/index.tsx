@@ -15,7 +15,7 @@ import { useGetAllPaymentQuery } from '@/redux/features/payment/paymentApi';
 import { TPayment } from '@/types/payment.type';
 import Spinner from '@/components/shared/Spinner';
 
-const TransactionHistory = () => {
+const SalesHistory = () => {
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,8 +48,6 @@ const TransactionHistory = () => {
 
   const payments: TPayment[] = data?.data || [];
   const meta = data?.meta || { totalPage: 1 };
-
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Search & date filtering
   const updateSearchParams = useCallback(
@@ -225,7 +223,7 @@ const TransactionHistory = () => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search products..."
+            placeholder="Search"
             className="border px-4 py-5 pr-12 rounded w-full"
           />
           <button
@@ -250,7 +248,7 @@ const TransactionHistory = () => {
 
       {/* Header */}
       <div className="flex justify-between items-center mt-10 mb-2">
-        <h2 className="text-xl font-medium">Transaction History</h2>
+        <h2 className="text-xl font-medium">Sales Transaction History</h2>
       </div>
 
       {/* Table */}
@@ -262,4 +260,4 @@ const TransactionHistory = () => {
   );
 };
 
-export default TransactionHistory;
+export default SalesHistory;

@@ -4,16 +4,16 @@ import { ArrowRight } from 'lucide-react';
 import checkIcon from '@/assets/icons/check.png';
 import closeIcon from '@/assets/icons/close.png';
 import Image from 'next/image';
-import { useGetAllSubscriptionPlansQuery } from '@/redux/features/subscription/subscriptionApi';
-import { TSubscriptionPlan } from '@/types/subscription.type';
 import Spinner from '@/components/shared/Spinner';
-import { useAddSubPaymentMutation } from '@/redux/features/subPayment/subPaymentApi';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { TSubscriptionPlan } from '@/types/plan.type';
+import { useGetAllSubscriptionPlansQuery } from '@/redux/features/subscriptionPlan/subscriptionPlan';
+import { useAddSubscriptionMutation } from '@/redux/features/subscription/subscriptionApi';
 
 const Pricing = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -21,31 +21,38 @@ const Pricing = () => {
   const subscriptionPlans = data?.data || [];
 
   const router = useRouter();
-  const [addSubPayment] = useAddSubPaymentMutation();
+  const [addSubscription] = useAddSubscriptionMutation();
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [activeError, setActiveError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const isRequestInFlight = useRef(false);
 
   const handleSubscribe: SubmitHandler<FieldValues> = async (plan) => {
-    setActiveError(null); // clear previous error
+    if (isRequestInFlight.current) return;
+    isRequestInFlight.current = true;
+    setIsSubmitting(true);
+    setActiveError(null);
 
     if (!user?.email) {
+      isRequestInFlight.current = false;
+      setIsSubmitting(false);
       router.push(`/login?redirectPath=/pricing`);
       return;
     }
 
     if (user?.role !== 'vendor') {
+      isRequestInFlight.current = false;
+      setIsSubmitting(false);
       toast.error('Only vendors can subscribe to a plan.');
       return;
     }
 
     try {
       setLoadingPlanId(plan._id);
-
       const payload = { plan: plan._id };
 
-      // 🆓 Free plan
       if (plan.cost === 0) {
-        const res = await addSubPayment(payload).unwrap();
+        const res = await addSubscription(payload).unwrap();
         if (res.success) {
           toast.success('Free subscription activated successfully!');
           router.push('/vendor/profile');
@@ -53,8 +60,7 @@ const Pricing = () => {
         return;
       }
 
-      // 💳 Paid plan
-      const res = await addSubPayment(payload).unwrap();
+      const res = await addSubscription(payload).unwrap();
       if (res?.data && typeof res.data === 'string') {
         window.location.href = res.data;
       }
@@ -64,7 +70,6 @@ const Pricing = () => {
         err?.message ||
         'Something went wrong while processing your subscription.';
 
-      // ✅ Active subscription error — special handling
       if (msg.toLowerCase().includes('already have an active subscription')) {
         setActiveError(msg);
       } else {
@@ -72,6 +77,8 @@ const Pricing = () => {
       }
     } finally {
       setLoadingPlanId(null);
+      isRequestInFlight.current = false;
+      setIsSubmitting(false);
     }
   };
 
@@ -209,7 +216,12 @@ const Pricing = () => {
 
               <button
                 onClick={() => handleSubscribe(plan)}
-                disabled={loadingPlanId === plan._id || isSubscriptionActive}
+                disabled={
+                  isRequestInFlight.current ||
+                  loadingPlanId === plan._id ||
+                  isSubscriptionActive ||
+                  isSubmitting
+                }
                 className={`w-full text-center border border-gray-300 rounded-md py-3 px-4 font-medium transition-colors ${
                   loadingPlanId === plan._id || isSubscriptionActive
                     ? 'opacity-50 cursor-not-allowed bg-gray-100'

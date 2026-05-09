@@ -38,7 +38,6 @@ import SizeSelect from '@/components/ui/core/size-select';
 import { TextEditor } from '@/components/ui/core/text-editor';
 import Swal from 'sweetalert2';
 
-
 const AddProduct = () => {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
@@ -101,7 +100,6 @@ const AddProduct = () => {
       } else if (result.isDenied) {
         router.push('/vendor/manage-offering/add-product');
       }
-
     } catch (error: any) {
       toast.dismiss(toastId);
       toast.error(error?.data?.message || 'Failed to add product');
