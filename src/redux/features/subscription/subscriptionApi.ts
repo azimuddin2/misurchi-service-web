@@ -8,10 +8,10 @@ const subscriptionApi = baseApi.injectEndpoints({
       TResponse<TSubscription>,
       Partial<TSubscription>
     >({
-      query: (taskData) => ({
+      query: (data) => ({
         url: '/subscriptions/create-subscription',
         method: 'POST',
-        body: taskData,
+        body: data,
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',

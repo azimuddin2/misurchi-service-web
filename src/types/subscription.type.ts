@@ -12,8 +12,8 @@ export type TSubscription = {
   amount: number;
   code?: string;
   status: TSubscriptionStatus;
-  startedAt: Date;
-  expiredAt: Date;
+  startedAt: Date | string;
+  expiredAt: Date | string;
   isExpired: boolean;
   isDeleted: boolean;
 };

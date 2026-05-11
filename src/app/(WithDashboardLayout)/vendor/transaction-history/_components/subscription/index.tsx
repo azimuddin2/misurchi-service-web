@@ -7,9 +7,10 @@ import { useAppSelector } from '@/redux/hooks';
 import { TSubPayment } from '@/types/subPayment.type';
 import { ColumnDef } from '@tanstack/react-table';
 import { useSearchParams } from 'next/navigation';
-import { format, parseISO, sub } from 'date-fns';
+import { format } from 'date-fns';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import MSWPagination from '@/components/ui/core/MSWPagination';
+import ActiveSubscription from './active-subscription';
 
 const SubscriptionHistory = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -17,8 +18,7 @@ const SubscriptionHistory = () => {
   const searchParams = useSearchParams();
 
   const page = Number(searchParams.get('page')) || 1;
-  const limit = Number(searchParams.get('limit')) || 10;
-  const searchTerm = searchParams.get('searchTerm') || '';
+  const limit = Number(searchParams.get('limit')) || 3;
   const createdAt = searchParams.get('createdAt') || '';
 
   const { data, isLoading } = useGetSubPaymentByVendorQuery({
@@ -26,7 +26,6 @@ const SubscriptionHistory = () => {
     page,
     limit,
     query: {
-      searchTerm,
       createdAt,
     },
   });
@@ -127,13 +126,15 @@ const SubscriptionHistory = () => {
   return (
     <div>
       <div className="flex justify-between items-center mt-5 mb-2">
-        <h2 className="text-xl font-medium">Subscription History</h2>
+        {/* <h2 className="text-xl font-medium">Subscription History</h2> */}
       </div>
       {/* Table */}
       <MSWTable columns={columns} data={subPayments} />
 
       {/* Pagination */}
       {subPayments.length > 0 && <MSWPagination totalPage={meta.totalPage} />}
+
+      <ActiveSubscription vendorId={vendorId} />
     </div>
   );
 };

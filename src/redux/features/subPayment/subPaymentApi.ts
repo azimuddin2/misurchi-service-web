@@ -33,7 +33,22 @@ const subPaymentApi = baseApi.injectEndpoints({
       },
       providesTags: ['SubPayment'],
     }),
+
+    getActiveSubscriptionByVendor: builder.query<
+      TResponse<TSubPayment>,
+      string
+    >({
+      query: (id) => ({
+        url: `/sub-payments/vendor/active/${id}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['SubPayment'],
+    }),
   }),
 });
 
-export const { useGetSubPaymentByVendorQuery } = subPaymentApi;
+export const {
+  useGetSubPaymentByVendorQuery,
+  useGetActiveSubscriptionByVendorQuery,
+} = subPaymentApi;

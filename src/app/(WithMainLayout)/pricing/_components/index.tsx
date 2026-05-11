@@ -17,6 +17,7 @@ import { useAddSubscriptionMutation } from '@/redux/features/subscription/subscr
 
 const Pricing = () => {
   const user = useAppSelector(selectCurrentUser);
+  const vendorId = user?.vendorId as string;
   const { data, isLoading } = useGetAllSubscriptionPlansQuery({});
   const subscriptionPlans = data?.data || [];
 
@@ -49,7 +50,7 @@ const Pricing = () => {
 
     try {
       setLoadingPlanId(plan._id);
-      const payload = { plan: plan._id };
+      const payload = { plan: plan._id, vendor: vendorId };
 
       if (plan.cost === 0) {
         const res = await addSubscription(payload).unwrap();

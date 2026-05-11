@@ -2,7 +2,7 @@
 
 import { useGetProductByIdQuery } from '@/redux/features/product/productApi';
 import { TProduct } from '@/types/product.type';
-import { ArrowRight, Edit, PackagePlus } from 'lucide-react';
+import { Edit, PackagePlus } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import StarRatings from 'react-star-ratings';
