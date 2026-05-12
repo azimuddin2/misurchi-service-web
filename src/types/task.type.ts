@@ -1,3 +1,9 @@
+export type TNote = {
+  text: string;
+  status: string;
+  createdAt: Date;
+};
+
 export type TTask = {
   _id: string;
   vendor: string;
@@ -7,6 +13,7 @@ export type TTask = {
   time: string;
   assignTeamMember: string;
   status: string;
+  notes?: TNote[];
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;

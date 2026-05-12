@@ -98,6 +98,8 @@ const AddTask = () => {
       time,
     };
 
+    console.log('Submitting Task Data:', taskData);
+
     const toastId = toast.loading('Adding task...');
 
     try {
@@ -255,11 +257,8 @@ const AddTask = () => {
                   </FormControl>
                   <SelectContent className="max-h-60 overflow-y-auto">
                     {members?.map((member) => (
-                      <SelectItem
-                        key={member.firstName}
-                        value={member.firstName}
-                      >
-                        {member.firstName}
+                      <SelectItem key={member._id} value={member._id}>
+                        {member.firstName} {member.lastName} ({member.role})
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -12,7 +12,7 @@ const DescriptionCell = ({ text }: DescriptionCellProps) => {
   const displayText = expanded || !isLong ? text : text.slice(0, 50) + '...';
 
   return (
-    <div className="w-[220px] break-words whitespace-normal">
+    <div className=" break-words whitespace-normal">
       <span className="text-sm text-gray-700">{displayText}</span>
 
       {isLong && (

@@ -99,7 +99,7 @@ const UpdateTask = ({ taskId }: Props) => {
         description: task.description || '',
         date: task.date || '',
         time: task.time || '',
-        assignTeamMember: task.assignTeamMember || '',
+        assignTeamMember: task.assignTeamMember || ('' as any),
       });
 
       // Set date state from ISO date string
@@ -296,11 +296,8 @@ const UpdateTask = ({ taskId }: Props) => {
                   </FormControl>
                   <SelectContent className="max-h-60 overflow-y-auto">
                     {members?.map((member) => (
-                      <SelectItem
-                        key={member.firstName}
-                        value={member.firstName}
-                      >
-                        {member.firstName}
+                      <SelectItem key={member._id} value={member._id}>
+                        {member.firstName} {member.lastName} ({member.role})
                       </SelectItem>
                     ))}
                   </SelectContent>
