@@ -78,12 +78,12 @@ const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
           {isCanceled
             ? 'Your subscription has been canceled. Renew to regain access to premium features.'
             : `Your subscription expired on ${new Date(
-              subscription.expiredAt,
-            ).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}. Please renew to continue.`}
+                subscription.expiredAt,
+              ).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}. Please renew to continue.`}
         </p>
         <Link href="/pricing">
           <button className="inline-flex items-center gap-2 text-gray-50 bg-gradient-to-t to-green-800 from-green-500/70 hover:opacity-90 px-8 py-3 cursor-pointer text-sm mt-4 shadow-sm rounded-sm border-b-4 border-r-4 border-gray-800 shadow-gray-500 uppercase font-medium ">
@@ -102,20 +102,20 @@ const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
         <span className="text-green-600 text-sm font-normal">
           {subscription?.startedAt
             ? new Date(subscription.startedAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
             : 'N/A'}
         </span>
         {' → '}
         <span className="text-red-500 text-sm font-normal">
           {subscription?.expiredAt
             ? new Date(subscription.expiredAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
             : 'N/A'}
         </span>
       </h2>

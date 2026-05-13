@@ -183,6 +183,24 @@ const ManageOrderProducts = () => {
                     Quantity: {p.quantity}
                   </p>
                   <p className="text-sm text-gray-500">Price: ${p.price}</p>
+                  <div className="flex gap-2 flex-wrap my-1">
+                    {p.size && (
+                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded font-medium">
+                        Size: {p.size}
+                      </span>
+                    )}
+
+                    {p.color && (
+                      <span className="px-2 py-1 text-xs bg-blue-50 text-gray-800 rounded flex items-center gap-1 font-medium">
+                        Color:
+                        <span
+                          className="w-3 h-3 rounded-full border border-gray-300 ml-1"
+                          style={{ backgroundColor: p.color }}
+                        />
+                        {p.color}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

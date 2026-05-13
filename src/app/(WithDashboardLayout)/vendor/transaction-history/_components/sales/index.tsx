@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { useGetAllPaymentQuery } from '@/redux/features/payment/paymentApi';
 import { TPayment } from '@/types/payment.type';
 import Spinner from '@/components/shared/Spinner';
+import Image from 'next/image';
 
 const SalesHistory = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -48,6 +49,8 @@ const SalesHistory = () => {
 
   const payments: TPayment[] = data?.data || [];
   const meta = data?.meta || { totalPage: 1 };
+
+  console.log('Payments Data:', meta, payments);
 
   // Search & date filtering
   const updateSearchParams = useCallback(
@@ -92,7 +95,6 @@ const SalesHistory = () => {
   }
 
   const columns: ColumnDef<TPayment>[] = [
-    // Select checkbox
     {
       id: 'select',
       header: ({ table }) => (
@@ -113,30 +115,120 @@ const SalesHistory = () => {
         />
       ),
     },
-
-    // Reference & Buyer Column with optional thumbnail
     {
       accessorKey: 'reference',
-      header: 'Reference & Buyer',
+      id: 'referenceDetails',
+      header: 'Product / Service',
       cell: ({ row }) => {
         const ref = row.original.reference as any;
         const refId = ref?.bookingId || ref?.orderId || '-';
-        const user = row.original.user as any;
+        const isBooking = row.original.modelType === 'Booking';
 
-        const imageUrl = ref?.images?.[0]?.url || '/placeholder.png';
+        if (isBooking) {
+          // ✅ Booking — Service info
+          return (
+            <div className="flex flex-col gap-1">
+              <p className="font-medium text-gray-900">{refId}</p>
+              <p className="font-medium text-gray-900 text-sm">
+                {ref?.serviceName || '-'}
+              </p>
+              <p className="text-gray-500 text-xs">
+                Date:{' '}
+                {ref?.date ? format(new Date(ref.date), 'dd MMM, yyyy') : '-'}
+              </p>
+              <p className="text-gray-500 text-xs">Time: {ref?.time || '-'}</p>
+              <p className="text-gray-500 text-xs">
+                Duration: {ref?.duration || '-'}
+              </p>
+            </div>
+          );
+        }
+
+        // ✅ Order — Products list
+        const products = ref?.products || [];
+        return (
+          <div className="flex flex-col gap-1">
+            {products.length > 0 ? (
+              <>
+                {products.slice(0, 2).map((product: any, idx: number) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Image
+                      src={product?.image || '/placeholder.png'}
+                      alt={product?.name}
+                      width={100}
+                      height={100}
+                      className="w-14 h-14 rounded-sm object-cover border"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900">{refId}</p>
+                      <p className="text-sm text-gray-900 font-medium leading-tight">
+                        {product?.name || '-'}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Qty: {product?.quantity} &middot; $
+                        {product?.price?.toFixed(2) || '0.00'}
+                      </p>
+                      <div className="flex gap-2 flex-wrap my-1">
+                        {product.size && (
+                          <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded font-medium">
+                            Size: {product.size}
+                          </span>
+                        )}
+
+                        {product.color && (
+                          <span className="px-2 py-1 text-xs bg-blue-50 text-gray-800 rounded flex items-center gap-1 font-medium">
+                            Color:
+                            <span
+                              className="w-3 h-3 rounded-full border border-gray-300 ml-1"
+                              style={{ backgroundColor: product.color }}
+                            />
+                            {product.color}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {products.length > 2 && (
+                  <p className="text-xs text-gray-400">
+                    +{products.length - 2} more
+                  </p>
+                )}
+              </>
+            ) : (
+              <span className="text-gray-400 text-sm">-</span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'user',
+      header: 'Buyer Name & Email',
+      cell: ({ row }) => {
+        const user = row.original.user as any;
 
         return (
           <div className="flex items-start gap-3">
             <div className="flex flex-col gap-1">
-              <p className="font-medium text-gray-900">{refId}</p>
-              <p className="text-gray-700 text-sm">
-                TXN ID: {row.original.trnId}
-              </p>
               <p className="font-medium text-sm text-gray-900">
-                Buyer: {user?.fullName || 'Unknown'}
+                {user?.fullName || 'Unknown'}
               </p>
-              <p className="text-gray-500 text-sm">
-                Email: {user?.email || '-'}
+              <p className="text-gray-500 text-sm">{user?.email || '-'}</p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'trnId',
+      header: 'Transaction Details',
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-start gap-3">
+            <div className="flex flex-col gap-1">
+              <p className="text-gray-700 text-xs">
+                TXN ID: {row.original.trnId}
               </p>
               <p className="text-gray-500 text-sm">
                 Platform Fee: ${row.original.adminAmount.toFixed(2)}
@@ -149,15 +241,11 @@ const SalesHistory = () => {
         );
       },
     },
-
-    // Price
     {
       accessorKey: 'price',
       header: 'Amount',
       cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
     },
-
-    // Type Column (Booking / Order)
     {
       accessorKey: 'modelType',
       header: 'Type',
@@ -171,13 +259,11 @@ const SalesHistory = () => {
                 : 'bg-purple-50 text-purple-700 rounded-sm'
             }`}
           >
-            {isBooking ? 'Booking' : 'Order'}
+            {isBooking ? 'Service' : 'Product'}
           </span>
         );
       },
     },
-
-    // Payment Status Column
     {
       accessorKey: 'status',
       header: 'Payment Status',
@@ -198,8 +284,6 @@ const SalesHistory = () => {
         );
       },
     },
-
-    // Date Column
     {
       accessorKey: 'createdAt',
       header: 'Date',
