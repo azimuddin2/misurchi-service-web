@@ -30,11 +30,32 @@ const PaymentAction = ({
   }
 
   if (paymentType === 'later') {
+    if (isPaid) {
+      return (
+        <div className="flex flex-col gap-1">
+          <span className="inline-flex items-center gap-1.5 text-emerald-600 font-semibold text-sm">
+            <BadgeCheck size={15} />
+            Fully Paid
+          </span>
+        </div>
+      );
+    }
+
     return (
-      <span className="inline-flex items-center gap-1.5 text-amber-600 text-sm font-medium">
-        <MapPin size={13} />
-        Pay at venue
-      </span>
+      <div className="flex flex-col gap-1.5">
+        <span className="inline-flex items-center gap-1.5 text-amber-600 text-sm font-medium">
+          <MapPin size={13} />
+          Pay at venue
+        </span>
+        <Button
+          onClick={() => onCheckout(booking)}
+          size="sm"
+          className="h-8 text-sm font-semibold bg-gradient-to-t to-green-800 from-green-600/70 text-white hover:opacity-90 rounded cursor-pointer border-0 shadow-sm"
+        >
+          <CreditCard size={14} className="mr-1" />
+          Pay Now
+        </Button>
+      </div>
     );
   }
 

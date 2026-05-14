@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { TOrder } from '@/types/order.type';
-import { CheckCircle } from 'lucide-react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import {
   Form,
@@ -28,6 +27,10 @@ import ImagePreviewer from '@/components/ui/core/MSWImageUploader/ImagePreviewer
 import { toast } from 'sonner';
 import { useRequestOrderMutation } from '@/redux/features/order/orderApi';
 import { useGetReturnPolicyQuery } from '@/redux/features/returnPolicy/returnPolicyApi';
+import { useRouter } from 'next/navigation';
+import { useAppSelector } from '@/redux/hooks';
+import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import { AlertTriangle, ArrowRight, MessageSquare } from 'lucide-react';
 
 interface CancelModalProps {
   selectedOrder: TOrder | null;
@@ -48,6 +51,8 @@ const ReturnModal = ({
   onOpenChange,
   onConfirm,
 }: CancelModalProps) => {
+  const router = useRouter();
+  const user = useAppSelector(selectCurrentUser);
   const [accept, setAccept] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
@@ -62,6 +67,8 @@ const ReturnModal = ({
   const { data: returnData } = useGetReturnPolicyQuery(
     selectedOrder?.vendor?._id as string,
   );
+
+  const hasPolicy = !!returnData?.data?.content;
 
   const [requestOrder] = useRequestOrderMutation();
 
@@ -105,6 +112,17 @@ const ReturnModal = ({
     }
   };
 
+  const handleMessageVendor = () => {
+    const vendorUserId = (selectedOrder?.vendor?.userId as any)?._id;
+
+    const productId =
+      typeof selectedOrder?.products[0]?.product === 'string'
+        ? selectedOrder?.products[0]?.product
+        : (selectedOrder?.products[0]?.product as any)?._id;
+
+    router.push(`/user/message?userId=${vendorUserId}&productId=${productId}`);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xl rounded-lg">
@@ -113,18 +131,25 @@ const ReturnModal = ({
             Return Policy
           </DialogTitle>
           <DialogDescription asChild>
-            <div
-              className="mt-2 text-base text-gray-500 prose prose-sm max-w-none
-            [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
-            [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
-            [&_li]:my-0.5
-            [&_b]:font-semibold [&_strong]:font-semibold
-            [&_a]:text-blue-500 [&_a]:underline
-            [&_p]:my-1"
-              dangerouslySetInnerHTML={{
-                __html: returnData?.data?.content || '',
-              }}
-            />
+            {!hasPolicy ? (
+              <div className="flex items-start gap-2 text-yellow-600 bg-yellow-50 border border-yellow-200 rounded px-4 py-3">
+                <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
+                <p>This vendor has not set a return policy yet. You may still proceed with your return.</p>
+              </div>
+            ) : (
+              <div
+                className="mt-2 text-base text-gray-500 prose prose-sm max-w-none
+      [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2
+      [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-2
+      [&_li]:my-0.5
+      [&_b]:font-semibold [&_strong]:font-semibold
+      [&_a]:text-blue-500 [&_a]:underline
+      [&_p]:my-1"
+                dangerouslySetInnerHTML={{
+                  __html: returnData?.data?.content || '',
+                }}
+              />
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -182,24 +207,25 @@ const ReturnModal = ({
                 className="cursor-pointer"
               />
               <FormLabel className="text-sm" htmlFor="terms">
-                I agree to the cancellation and return policies.
+                I agree to the return policy.
               </FormLabel>
             </div>
 
             <div className="flex justify-between gap-2">
               <Button
-                type="button"
-                className="w-1/2 border-gray-800 bg-gradient-to-t to-white from-white hover:bg-green-500/80 p-5 cursor-pointer text-base shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 text-black"
-                onClick={() => onOpenChange(false)}
-              >
-                No
-              </Button>
-              <Button
                 disabled={accept === false}
                 type="submit"
-                className="w-1/2 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 p-5 cursor-pointer text-base shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+                className="w-1/2 border-gray-800 bg-gradient-to-t to-green-800 from-green-500/70 hover:bg-green-500/80 p-5 cursor-pointer text-base shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 uppercase"
               >
-                Yes
+                Submit <ArrowRight />
+              </Button>
+              <Button
+                type="button"
+                className="w-1/2 border-gray-800 bg-gradient-to-t to-white from-white hover:bg-green-500/80 p-5 cursor-pointer text-base shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500 text-black uppercase"
+                disabled={!user?.userId}
+                onClick={handleMessageVendor}
+              >
+                Message Provider <MessageSquare />
               </Button>
             </div>
           </form>
