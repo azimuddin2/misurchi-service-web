@@ -68,7 +68,7 @@ const OrdersRequest = () => {
   const [isReturnModalOpen, setReturnModalOpen] = useState(false);
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
-  const { data, isLoading } = useGetOrdersByEmailQuery(email);
+  const { data, isLoading, refetch } = useGetOrdersByEmailQuery(email);
   const orders = data?.data ?? [];
 
   const handleConfirmCancel = () => {
@@ -188,6 +188,7 @@ const OrdersRequest = () => {
             size="sm"
             variant="outline"
             className="border border-blue-400 rounded text-blue-500 hover:text-blue-600 cursor-pointer w-1/2"
+            disabled={order.isReviewed === true}
             onClick={() => {
               setSelectedReviewOrder(order);
               setReviewModalOpen(true);
@@ -358,6 +359,7 @@ const OrdersRequest = () => {
         selectedOrder={selectedReviewOrder}
         isOpen={isReviewModalOpen}
         onOpenChange={setReviewModalOpen}
+        refetch={refetch}
       />
     </div>
   );

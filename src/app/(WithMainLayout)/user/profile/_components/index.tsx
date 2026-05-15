@@ -11,7 +11,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { AppButton } from '@/components/shared/app-button';
 import { PhoneInput } from '@/components/ui/core/phone-input';
 import Link from 'next/link';
@@ -30,6 +29,18 @@ import LocationMap from '@/components/shared/location-map';
 import CoverImageUploader from '@/components/ui/core/CoverImageUploader';
 import CoverImagePreview from '@/components/ui/core/CoverImageUploader/CoverImagePreview';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+export const profileSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  phone: z.string().min(6, 'Phone number is required'),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
+  streetAddress: z.string().optional(),
+});
 
 const UserProfile = () => {
   const router = useRouter();
@@ -46,6 +57,7 @@ const UserProfile = () => {
   const [updateUserProfile] = useUpdateUserProfileMutation();
 
   const form = useForm({
+    resolver: zodResolver(profileSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -96,27 +108,33 @@ const UserProfile = () => {
       },
     };
 
-    console.log('Payload to be sent:', payload);
-
     const formData = new FormData();
     formData.append('data', JSON.stringify(payload));
 
     imageFiles.forEach((file) => formData.append('profile', file));
     coverImageFiles.forEach((file) => formData.append('coverImage', file));
 
-    const toastId = toast.loading('Updating profile...');
     try {
       const res = await updateUserProfile({
         email: email,
         body: formData,
       }).unwrap();
 
-      toast.success(res.message || 'Profile update successfully');
+      await Swal.fire({
+        title: `<span style="font-size: 24px; font-weight: 500;">${res.message || 'Profile Updated Successfully!'}</span>`,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6',
+      });
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update profile');
-    } finally {
-      toast.dismiss(toastId);
+      await Swal.fire({
+        title: 'Update Failed!',
+        text: error?.data?.message || 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+        confirmButtonColor: '#d33',
+      });
     }
   };
 

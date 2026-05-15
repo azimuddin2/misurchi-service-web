@@ -99,7 +99,7 @@ const BookingsRequest = () => {
   const [isRescheduleModalOpen, setRescheduleModalOpen] = useState(false);
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
-  const { data, isLoading } = useGetBookingsByEmailQuery(email);
+  const { data, isLoading, refetch } = useGetBookingsByEmailQuery(email);
   const bookings = data?.data ?? [];
 
   const handleConfirmCancel = () => {
@@ -211,11 +211,12 @@ const BookingsRequest = () => {
         <Button
           size="sm"
           variant="outline"
-          className="border border-blue-500 text-blue-600 rounded"
+          className="border border-blue-500 text-blue-600 rounded cursor-pointer hover:text-blue-700 hover:border-blue-700 hover:bg-white flex items-center"
           onClick={() => {
             setSelectedReviewBooking(booking);
             setReviewModalOpen(true);
           }}
+          disabled={booking.isReviewed === true}
         >
           <Star className="w-4 h-4 mr-1" />
           Review
@@ -407,6 +408,7 @@ const BookingsRequest = () => {
         selectedBooking={selectedReviewBooking}
         isOpen={isReviewModalOpen}
         onOpenChange={setReviewModalOpen}
+        refetch={refetch}
       />
     </div>
   );

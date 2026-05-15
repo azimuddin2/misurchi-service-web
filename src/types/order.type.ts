@@ -55,5 +55,6 @@ export type TOrder = {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
+  isReviewed: boolean;
   __v: number;
 };

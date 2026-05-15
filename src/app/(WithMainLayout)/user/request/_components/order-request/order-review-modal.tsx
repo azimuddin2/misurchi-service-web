@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
-import { ArrowRight, StarIcon } from 'lucide-react';
+import { StarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
@@ -31,6 +31,7 @@ type Props = {
   selectedOrder: TOrder | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  refetch: () => void;
 };
 
 const reviewSchema = z.object({
@@ -47,7 +48,12 @@ const ratingLabels: Record<number, string> = {
   5: 'Excellent',
 };
 
-const OrderReviewModal = ({ selectedOrder, isOpen, onOpenChange }: Props) => {
+const OrderReviewModal = ({
+  selectedOrder,
+  isOpen,
+  onOpenChange,
+  refetch,
+}: Props) => {
   const user = useAppSelector(selectCurrentUser);
   const [rating, setRating] = useState<number>(0);
   const [addReview] = useAddReviewMutation();
@@ -84,12 +90,14 @@ const OrderReviewModal = ({ selectedOrder, isOpen, onOpenChange }: Props) => {
         product: selectedOrder.products[0].product,
         rating,
         review: data.review,
+        orderId: selectedOrder._id,
       } as any).unwrap();
 
       toast.success('Your review has been submitted!');
 
       setTimeout(() => {
         handleClose();
+        refetch();
       }, 500);
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to submit review');
@@ -208,23 +216,16 @@ const OrderReviewModal = ({ selectedOrder, isOpen, onOpenChange }: Props) => {
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 h-12 rounded-sm border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
+                  className="flex-1 h-12 uppercase rounded-sm border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!user?.userId || rating === 0 || isSubmitting}
-                  className="flex-1 h-12 rounded-sm text-sm font-semibold text-white bg-gradient-to-t to-green-800 from-green-500/70 border-b-4 border-r-4 border-gray-900 shadow-sm shadow-gray-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+                  className="flex-1 h-12 uppercase rounded-sm text-sm font-medium text-white bg-gradient-to-t to-green-800 from-green-500/70 border-b-4 border-r-4 border-gray-900 shadow-sm shadow-gray-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
                 >
-                  {isSubmitting ? (
-                    'Submitting...'
-                  ) : (
-                    <>
-                      Submit Review
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
+                  {isSubmitting ? 'Submitting...' : <>Submit Review</>}
                 </button>
               </div>
             </form>

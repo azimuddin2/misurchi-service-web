@@ -68,7 +68,6 @@ const RescheduleModal = ({
           </DialogDescription>
         </DialogHeader>
 
-
         <div className="flex justify-between gap-2">
           <Button
             type="button"

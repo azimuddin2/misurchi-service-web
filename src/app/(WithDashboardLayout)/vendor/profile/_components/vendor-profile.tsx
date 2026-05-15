@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { currencyOptions } from '@/constants/currency';
 import { timezonesOptions } from '@/constants/timezones';
 import { workHourOptions } from '@/constants/workHour';
@@ -43,6 +42,7 @@ import CoverImagePreview from '@/components/ui/core/CoverImageUploader/CoverImag
 import LocationMap from '@/components/shared/location-map';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { vendorProfileSchema } from './profileValidation';
+import Swal from 'sweetalert2';
 
 const VendorProfile = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -132,27 +132,32 @@ const VendorProfile = () => {
       },
     };
 
-    console.log('Payload to be sent:', payload);
-
     const formData = new FormData();
     formData.append('data', JSON.stringify(payload));
 
     imageFiles.forEach((file) => formData.append('profile', file));
     coverImageFiles.forEach((file) => formData.append('coverImage', file));
 
-    const toastId = toast.loading('Updating profile...');
-
     try {
       const res = await updateVendorProfile({
         email: email,
         body: formData,
       }).unwrap();
-      toast.success(res.message || 'Profile update successfully');
+      await Swal.fire({
+        title: `<span style="font-size: 24px; font-weight: 500;">${res.message || 'Profile Updated Successfully!'}</span>`,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6',
+      });
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to add product');
-    } finally {
-      toast.dismiss(toastId);
+      await Swal.fire({
+        title: 'Update Failed!',
+        text: error?.data?.message || 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+        confirmButtonColor: '#d33',
+      });
     }
   };
 

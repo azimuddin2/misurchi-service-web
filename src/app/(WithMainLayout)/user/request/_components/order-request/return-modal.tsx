@@ -134,7 +134,10 @@ const ReturnModal = ({
             {!hasPolicy ? (
               <div className="flex items-start gap-2 text-yellow-600 bg-yellow-50 border border-yellow-200 rounded px-4 py-3">
                 <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
-                <p>This vendor has not set a return policy yet. You may still proceed with your return.</p>
+                <p>
+                  This vendor has not set a return policy yet. You may still
+                  proceed with your return.
+                </p>
               </div>
             ) : (
               <div

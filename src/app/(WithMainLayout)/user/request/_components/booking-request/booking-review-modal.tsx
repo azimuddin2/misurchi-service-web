@@ -31,6 +31,7 @@ type Props = {
   selectedBooking: TBooking | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  refetch: () => void;
 };
 
 const reviewSchema = z.object({
@@ -51,6 +52,7 @@ const BookingReviewModal = ({
   selectedBooking,
   isOpen,
   onOpenChange,
+  refetch,
 }: Props) => {
   const user = useAppSelector(selectCurrentUser);
   const [rating, setRating] = useState<number>(0);
@@ -76,7 +78,7 @@ const BookingReviewModal = ({
 
     const userId = user?.userId;
     const vendorId = selectedBooking.vendor?._id;
-    const serviceId = selectedBooking.service._id; // ✅ THIS MUST BE serviceId, NOT service
+    const serviceId = selectedBooking.service._id;
 
     if (!userId || !vendorId || !serviceId) {
       toast.error('Cannot submit review: missing required data.');
@@ -97,10 +99,12 @@ const BookingReviewModal = ({
         service: serviceId,
         rating,
         review: data.review,
+        bookingId: selectedBooking._id,
       } as any).unwrap();
 
       toast.success('Your review has been submitted!');
       handleClose();
+      refetch();
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to submit review');
     } finally {

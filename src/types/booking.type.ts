@@ -56,7 +56,7 @@ export type TBooking = {
   request?: IBookingRequest;
 
   assignedTo: string | null;
-
+  isReviewed: boolean;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;

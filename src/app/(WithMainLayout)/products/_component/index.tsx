@@ -163,8 +163,8 @@ const ProductDetails = ({ productId }: Props) => {
   };
 
   const handleMessageVendor = () => {
-    const vendorUserId = (product?.vendor?.userId as any)?._id
-      ?? product?.vendor?.userId;
+    const vendorUserId =
+      (product?.vendor?.userId as any)?._id ?? product?.vendor?.userId;
 
     router.push(`/user/message?userId=${vendorUserId}&productId=${productId}`);
   };
@@ -202,10 +202,11 @@ const ProductDetails = ({ productId }: Props) => {
                 <button
                   key={index}
                   type="button"
-                  className={`border-2 rounded-md p-1 transition ${selectedImage === image.url
-                    ? 'border-green-800'
-                    : 'border-gray-300'
-                    }`}
+                  className={`border-2 rounded-md p-1 transition ${
+                    selectedImage === image.url
+                      ? 'border-green-800'
+                      : 'border-gray-300'
+                  }`}
                   onClick={() => setSelectedImage(image.url)}
                 >
                   <Image
@@ -310,10 +311,11 @@ const ProductDetails = ({ productId }: Props) => {
               {/* Quantity pill — only show when available */}
               {status === 'Available' && product?.quantity !== undefined && (
                 <span
-                  className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${isLowStock
-                    ? 'bg-orange-50 text-orange-700 border-orange-200'
-                    : 'bg-gray-50 text-gray-600 border-gray-200'
-                    }`}
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${
+                    isLowStock
+                      ? 'bg-orange-50 text-orange-700 border-orange-200'
+                      : 'bg-gray-50 text-gray-600 border-gray-200'
+                  }`}
                 >
                   {isLowStock && (
                     <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
@@ -403,10 +405,11 @@ const ProductDetails = ({ productId }: Props) => {
                       onClick={() =>
                         setSelectedSize(s === selectedSize ? null : s)
                       }
-                      className={`px-3 py-1 rounded-sm border-1 text-sm font-medium transition-all cursor-pointer ${selectedSize === s
-                        ? 'bg-green-800 text-white border-green-800'
-                        : 'bg-gray-100 border-gray-200 text-gray-700 hover:border-green-600'
-                        } disabled:opacity-40 disabled:cursor-not-allowed`}
+                      className={`px-3 py-1 rounded-sm border-1 text-sm font-medium transition-all cursor-pointer ${
+                        selectedSize === s
+                          ? 'bg-green-800 text-white border-green-800'
+                          : 'bg-gray-100 border-gray-200 text-gray-700 hover:border-green-600'
+                      } disabled:opacity-40 disabled:cursor-not-allowed`}
                     >
                       {s}
                     </button>
@@ -435,10 +438,11 @@ const ProductDetails = ({ productId }: Props) => {
                     onClick={() =>
                       setSelectedColor(color === selectedColor ? null : color)
                     }
-                    className={`flex cursor-pointer items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium  bg-white transition-all ${selectedColor === color
-                      ? 'border-green-700 border-2'
-                      : 'border-gray-300 hover:border-green-600 border-1'
-                      } disabled:opacity-40 disabled:cursor-not-allowed`}
+                    className={`flex cursor-pointer items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium  bg-white transition-all ${
+                      selectedColor === color
+                        ? 'border-green-700 border-2'
+                        : 'border-gray-300 hover:border-green-600 border-1'
+                    } disabled:opacity-40 disabled:cursor-not-allowed`}
                     style={{ color: '#000' }}
                   >
                     <span
@@ -477,10 +481,11 @@ const ProductDetails = ({ productId }: Props) => {
             <Button
               onClick={() => handleAddToCart(product)}
               disabled={!canAddToCart || product?.quantity === 0}
-              className={`w-full flex items-center justify-center gap-2 py-6 rounded-sm text-sm font-semibold uppercase tracking-wide border-b-4 border-r-4 shadow-sm transition-all ${canAddToCart
-                ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white border-green-900 hover:opacity-90 cursor-pointer'
-                : 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
-                }`}
+              className={`w-full flex items-center justify-center gap-2 py-6 rounded-sm text-sm font-semibold uppercase tracking-wide border-b-4 border-r-4 shadow-sm transition-all ${
+                canAddToCart
+                  ? 'bg-gradient-to-t to-green-800 from-green-500/70 text-white border-green-900 hover:opacity-90 cursor-pointer'
+                  : 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+              }`}
             >
               <ShoppingCart className="w-5 h-5" />
               {addToCartLabel}

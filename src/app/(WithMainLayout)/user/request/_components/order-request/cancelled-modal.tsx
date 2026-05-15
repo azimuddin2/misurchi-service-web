@@ -128,7 +128,10 @@ const CancelledModal = ({
             {!hasPolicy ? (
               <div className="flex items-start gap-2 text-yellow-600 bg-yellow-50 border border-yellow-200 rounded px-4 py-3">
                 <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
-                <p>This vendor has not set a cancellation policy yet. You may still proceed with your cancellation.</p>
+                <p>
+                  This vendor has not set a cancellation policy yet. You may
+                  still proceed with your cancellation.
+                </p>
               </div>
             ) : (
               <div
