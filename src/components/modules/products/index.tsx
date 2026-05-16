@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 import FilterSidebar from './filter-sidebar';
 import ProductCard from '@/components/modules/cards/product-card';
@@ -85,9 +85,27 @@ const AllProducts = () => {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search product here..."
+                  placeholder="Search by product name, shop or zip code..."
                   className="w-full px-6 py-3 outline-none text-base"
                 />
+
+                {/* ✅ Clear button */}
+                {search && (
+                  <button
+                    onClick={() => {
+                      setSearch('');
+                      const params = new URLSearchParams(
+                        searchParams.toString(),
+                      );
+                      params.delete('searchTerm');
+                      params.set('page', '1');
+                      router.push(`?${params.toString()}`);
+                    }}
+                    className="bg-red-100 hover:bg-red-200 text-red-500 hover:text-red-600 p-1 rounded-full mr-2 transition cursor-pointer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
 
                 <button
                   onClick={handleSearch}

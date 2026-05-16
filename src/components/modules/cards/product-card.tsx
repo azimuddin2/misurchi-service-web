@@ -72,12 +72,14 @@ const ProductCard = ({ product }: ProductProps) => {
       <div className="my-3">
         <div className="flex justify-between items-center my-2">
           <div className="flex items-center gap-2">
-            <Avatar className="w-10 h-10 border-none">
-              <AvatarImage src={product?.vendor?.image} />
-              <AvatarFallback className="bg-[#093954] text-white text-xl">
-                {product?.vendor?.businessName?.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
+            <Link href={`/providers/${product?.vendor?._id}`}>
+              <Avatar className="w-10 h-10 border-none">
+                <AvatarImage src={product?.vendor?.image} />
+                <AvatarFallback className="bg-[#093954] text-white text-xl">
+                  {product?.vendor?.businessName?.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
             <span className="capitalize">
               {product?.vendor?.businessName?.slice(0, 12)}
             </span>

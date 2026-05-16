@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Verified,
@@ -11,8 +10,9 @@ import {
   Users,
   ShoppingCart,
   Send,
-  Plus,
   XCircle,
+  PackageOpen,
+  LayoutList,
 } from 'lucide-react';
 import bannerImg from '@/assets/images/banner.png';
 import Image from 'next/image';
@@ -26,6 +26,8 @@ import { useGetVendorUserByIdQuery } from '@/redux/features/vendor/vendorApi';
 import FollowButton from '@/components/modules/follow-button';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { useGetVendorFollowersQuery } from '@/redux/features/follow/followApi';
+import { useGetVendorProfileStatsQuery } from '@/redux/features/dashboard/dashboardApi';
 
 type Props = {
   providerId: string;
@@ -39,6 +41,19 @@ const ProviderProfile = ({ providerId }: Props) => {
   const vendorId = vendorUser?._id as string;
   const userId = vendorUser?.userId._id;
 
+  const { data: followersData } = useGetVendorFollowersQuery(vendorId);
+  const followersCount = followersData?.data?.followersCount ?? 0;
+
+  const { data: profileStatsData } = useGetVendorProfileStatsQuery(
+    { id: vendorId },
+    {
+      pollingInterval: 1000,
+    },
+  );
+  const totalProducts = profileStatsData?.data?.totalProducts ?? 0;
+  const totalServices = profileStatsData?.data?.totalServices ?? 0;
+  const totalSales = profileStatsData?.data?.totalSales ?? 0;
+
   const handleMessageVendor = () => {
     router.push(`/user/message?userId=${userId}`);
   };
@@ -50,7 +65,7 @@ const ProviderProfile = ({ providerId }: Props) => {
   return (
     <div>
       {/* User Info */}
-      <div className="min-h-screen py-8 px-3 lg:px-0">
+      <div className="py-8 px-3 lg:px-0">
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <Card className="mb-6 overflow-hidden pt-0">
@@ -86,11 +101,11 @@ const ProviderProfile = ({ providerId }: Props) => {
                   </p>
                 </div>
                 {/* Button */}
-                <div className="mt-4 sm:mt-0 flex items-center gap-2">
+                <div className="mt-4 sm:mt-0 lg:flex items-center gap-2">
                   <Button
                     disabled={!userId}
                     onClick={handleMessageVendor}
-                    className="text-black border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6  cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
+                    className="text-black w-full lg:w-fit border-gray-800 bg-gradient-to-t to-[#fff] from-[#fff] p-6  cursor-pointer text-sm mt-2 shadow-amber-500d shadow-sm rounded-sm border-b-4 border-r-4  shadow-gray-500"
                   >
                     <Send className="w-5 h-5" />
                     <span className="uppercase text-sm font-semibold">
@@ -100,7 +115,7 @@ const ProviderProfile = ({ providerId }: Props) => {
 
                   <FollowButton
                     vendorId={vendorId}
-                    className="text-white border-gray-800 bg-gradient-to-t mt-2 to-green-800 from-green-500/70 hover:bg-green-500/80"
+                    className="text-white border-gray-800 bg-gradient-to-t mt-2 to-green-800 from-green-500/70 hover:bg-green-500/80 w-full lg:w-fit"
                   />
                 </div>
               </div>
@@ -112,7 +127,9 @@ const ProviderProfile = ({ providerId }: Props) => {
               <CardContent className="pt-2">
                 <div className="flex flex-col items-center">
                   <Users className="h-6 w-6 text-gray-500 mb-2" />
-                  <span className="text-2xl font-bold">2.5K</span>
+                  <span className="text-2xl font-bold">
+                    {String(followersCount ?? 0).padStart(2, '0')}
+                  </span>
                   <span className="text-sm text-gray-500">Followers</span>
                 </div>
               </CardContent>
@@ -120,9 +137,22 @@ const ProviderProfile = ({ providerId }: Props) => {
             <Card>
               <CardContent className="pt-2">
                 <div className="flex flex-col items-center">
-                  <Users className="h-6 w-6 text-gray-500 mb-2" />
-                  <span className="text-2xl font-bold">25</span>
-                  <span className="text-sm text-gray-500">Following</span>
+                  <PackageOpen className="h-6 w-6 text-gray-500 mb-2" />
+                  <span className="text-2xl font-bold">
+                    {String(totalProducts ?? 0).padStart(2, '0')}
+                  </span>
+                  <span className="text-sm text-gray-500">Total Product</span>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-2">
+                <div className="flex flex-col items-center">
+                  <LayoutList className="h-6 w-6 text-gray-500 mb-2" />
+                  <span className="text-2xl font-bold">
+                    {String(totalServices ?? 0).padStart(2, '0')}
+                  </span>
+                  <span className="text-sm text-gray-500">Total Service</span>
                 </div>
               </CardContent>
             </Card>
@@ -130,21 +160,18 @@ const ProviderProfile = ({ providerId }: Props) => {
               <CardContent className="pt-2">
                 <div className="flex flex-col items-center">
                   <ShoppingCart className="h-6 w-6 text-gray-500 mb-2" />
-                  <span className="text-2xl font-bold">100+</span>
+                  <span className="text-2xl font-bold">
+                    {totalSales >= 1000
+                      ? '1000+'
+                      : totalSales >= 500
+                        ? '500+'
+                        : totalSales >= 200
+                          ? '200+'
+                          : totalSales >= 100
+                            ? '100+'
+                            : String(totalSales ?? 0).padStart(2, '0')}
+                  </span>
                   <span className="text-sm text-gray-500">Total Sold</span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-2">
-                <div className="flex flex-col items-center">
-                  <Badge
-                    variant="outline"
-                    className="mb-2 bg-cyan-100 text-cyan-800"
-                  >
-                    Aquarist
-                  </Badge>
-                  <span className="text-sm text-gray-500">Specialist</span>
                 </div>
               </CardContent>
             </Card>
@@ -154,14 +181,28 @@ const ProviderProfile = ({ providerId }: Props) => {
             {/* Left Column - About & Contact */}
             <div className="md:col-span-2 space-y-6">
               {/* About Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl font-medium">About</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-500">{vendorUser?.description}</p>
-                </CardContent>
-              </Card>
+              {vendorUser?.description &&
+              vendorUser.description.trim() !== '' ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl font-medium">About</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-500">{vendorUser?.description}</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl font-medium">About</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-400 italic">
+                      This vendor hasn&apos;t added a description yet.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Right Column - Details */}
@@ -225,7 +266,7 @@ const ProviderProfile = ({ providerId }: Props) => {
       </div>
 
       {/* Service & Product */}
-      <div className="my-5">
+      <div className="my-5 mt-0">
         <Tabs defaultValue="products">
           <TabsList
             style={{ background: 'none' }}

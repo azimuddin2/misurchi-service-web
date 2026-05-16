@@ -48,6 +48,15 @@ const dashboardApi = baseApi.injectEndpoints({
       }),
       providesTags: ['Dashboard'],
     }),
+
+    getVendorProfileStats: builder.query<TResponse<any>, { id: string }>({
+      query: ({ id }) => ({
+        url: `/vendors/profile-stats/${id}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Dashboard'],
+    }),
   }),
 });
 
@@ -56,4 +65,5 @@ export const {
   useGetVendorSalesOverviewChartQuery,
   useGetAppointmentsOverviewRateQuery,
   useGetVendorDashboardDataQuery,
+  useGetVendorProfileStatsQuery,
 } = dashboardApi;

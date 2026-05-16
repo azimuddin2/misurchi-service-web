@@ -71,12 +71,14 @@ const ServiceCard = ({ service }: ServiceProps) => {
       <div className="my-3">
         <div className="flex justify-between items-center my-2">
           <div className="flex items-center gap-2">
-            <Avatar className="w-10 h-10 border-none">
-              <AvatarImage src={service?.vendor?.image} />
-              <AvatarFallback className="bg-[#093954] text-white text-2xl">
-                {service?.vendor?.businessName?.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
+            <Link href={`/providers/${service?.vendor?._id}`}>
+              <Avatar className="w-10 h-10 border-none">
+                <AvatarImage src={service?.vendor?.image} />
+                <AvatarFallback className="bg-[#093954] text-white text-2xl">
+                  {service?.vendor?.businessName?.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
             <span className="capitalize">
               {service?.vendor?.businessName?.slice(0, 12)}
             </span>

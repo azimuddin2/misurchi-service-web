@@ -249,9 +249,10 @@ export default function FilterSidebar() {
               <Button
                 onClick={() => router.push(pathname, { scroll: false })}
                 size="sm"
-                className="bg-red-400 hover:bg-red-500 text-white rounded flex items-center gap-1 cursor-pointer"
+                className="bg-red-100 hover:bg-red-200 text-red-500 hover:text-red-600 rounded-sm flex items-center gap-1 cursor-pointer"
               >
-                Clear <CircleX size={20} />
+                <X size={20} />
+                <span>Clear Filter</span>
               </Button>
             )}
             <button className="md:hidden p-2" onClick={() => setIsOpen(false)}>

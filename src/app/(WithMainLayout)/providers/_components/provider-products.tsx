@@ -5,7 +5,7 @@ import Spinner from '@/components/shared/Spinner';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { useGetAllProductsByUserQuery } from '@/redux/features/product/productApi';
 import { TProduct } from '@/types/product.type';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -69,21 +69,42 @@ const ProviderProducts = ({ vendorId }: Props) => {
     <div className="mb-10 container px-3 lg:mx-auto">
       <div className="block lg:flex gap-10 mt-5">
         <div className="w-full lg:mb-0">
-          <div className="lg:w-1/2 mx-auto relative">
-            <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search product here..."
-                className="w-full px-6 py-3 outline-none"
-              />
-              <button
-                onClick={handleSearch}
-                className="bg-sky-950 text-white p-4 rounded-full absolute right-0"
-              >
-                <Search className="h-5 w-5" />
-              </button>
+          <div className="flex items-center w-full lg:w-4/5 mx-auto">
+            <div className="lg:w-3/5 w-full mx-auto relative">
+              <div className="flex items-center bg-white border rounded-full shadow-md overflow-hidden">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search by product name..."
+                  className="w-full px-6 py-3 outline-none text-base"
+                />
+
+                {/* ✅ Clear button */}
+                {search && (
+                  <button
+                    onClick={() => {
+                      setSearch('');
+                      const params = new URLSearchParams(
+                        searchParams.toString(),
+                      );
+                      params.delete('searchTerm');
+                      params.set('page', '1');
+                      router.push(`?${params.toString()}`);
+                    }}
+                    className="bg-red-100 hover:bg-red-200 text-red-500 hover:text-red-600 p-1 rounded-full mr-2 transition cursor-pointer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+
+                <button
+                  onClick={handleSearch}
+                  className="bg-sky-950 hover:bg-sky-900 text-white p-3 rounded-full m-1 transition"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -115,11 +136,11 @@ const ProviderProducts = ({ vendorId }: Props) => {
                         height={160}
                         className="mb-6 opacity-80"
                       />
-                      <p className="text-base font-medium text-gray-500">
+                      <p className="text-base font-medium text-gray-500 capitalize">
                         No product found
                       </p>
                       <p className="text-sm text-gray-400 mt-1">
-                        Try changing your search keywords or filter options.
+                        Try changing your search keywords.
                       </p>
                     </div>
                   )}
@@ -128,7 +149,7 @@ const ProviderProducts = ({ vendorId }: Props) => {
         </div>
       </div>
 
-      <MSWPagination totalPage={meta?.totalPage} />
+      {products.length > 0 && <MSWPagination totalPage={meta?.totalPage} />}
     </div>
   );
 };

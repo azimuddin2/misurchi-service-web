@@ -148,12 +148,14 @@ const ServiceDetails = ({ serviceId }: Props) => {
           {/* Vendor Profile */}
           <div className="mt-12">
             <div className="flex items-center gap-3 mb-5">
-              <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
-                <AvatarImage src={service?.vendor?.image} />
-                <AvatarFallback>
-                  {service?.vendor?.businessName?.slice(0, 1)}
-                </AvatarFallback>
-              </Avatar>
+              <Link href={`/providers/${vendorId}`}>
+                <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
+                  <AvatarImage src={service?.vendor?.image} />
+                  <AvatarFallback>
+                    {service?.vendor?.businessName?.slice(0, 1)}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
               <div>
                 <p className="text-lg">{service?.vendor?.businessName}</p>
                 <p className="flex items-center gap-1">

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, MapPinIcon } from 'lucide-react';
+import { Search, MapPinIcon, X } from 'lucide-react';
 
 import ServiceCard from '@/components/modules/cards/service-card';
 import FilterSidebar from './filter-sidebar';
@@ -121,21 +121,39 @@ const AllServices = () => {
         <div className="w-full lg:mb-0">
           {/* SEARCH + NEARBY */}
           <div className="flex items-center gap-4">
-            {/* SEARCH */}
-            <div className="flex items-center w-3/4">
+            {/* Search bar */}
+            <div className="flex items-center w-full lg:w-4/5 mx-auto">
               <div className="relative w-full">
                 <div className="flex items-center bg-white border rounded-full shadow-md overflow-hidden">
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search service here..."
-                    className="w-full px-6 py-4 outline-none text-sm"
+                    placeholder="Search by service name, shop or zip code..."
+                    className="w-full px-6 py-3 outline-none text-base"
                   />
+
+                  {/* ✅ Clear button */}
+                  {search && (
+                    <button
+                      onClick={() => {
+                        setSearch('');
+                        const params = new URLSearchParams(
+                          searchParams.toString(),
+                        );
+                        params.delete('searchTerm');
+                        params.set('page', '1');
+                        router.push(`?${params.toString()}`);
+                      }}
+                      className="bg-red-100 hover:bg-red-200 text-red-500 hover:text-red-600 p-1 rounded-full mr-2 transition cursor-pointer"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
 
                   <button
                     onClick={handleSearch}
-                    className="bg-sky-950 hover:bg-sky-900 text-white p-4 rounded-full m-1 transition cursor-pointer"
+                    className="bg-sky-950 hover:bg-sky-900 text-white p-4 rounded-full m-1 transition"
                   >
                     <Search className="h-5 w-5" />
                   </button>

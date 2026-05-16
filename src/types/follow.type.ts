@@ -9,5 +9,6 @@ export type TFollow = {
 export type TVendorFollowersResponse = {
   vendorId: string;
   followersCount: number;
+  followingCount: number;
   isFollowing: boolean;
 };

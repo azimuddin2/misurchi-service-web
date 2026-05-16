@@ -25,6 +25,7 @@ import { TReview } from '@/types/review.type';
 import FollowButton from '@/components/modules/follow-button';
 import { useRouter } from 'next/navigation';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
+import Link from 'next/link';
 
 type Props = {
   productId: string;
@@ -224,12 +225,14 @@ const ProductDetails = ({ productId }: Props) => {
           {/* Vendor Profile */}
           <div className="mt-10">
             <div className="flex items-center gap-3 mb-5">
-              <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
-                <AvatarImage src={product?.vendor?.image} />
-                <AvatarFallback>
-                  {product?.vendor?.businessName?.slice(0, 1)}
-                </AvatarFallback>
-              </Avatar>
+              <Link href={`/providers/${vendorId}`}>
+                <Avatar className="cursor-pointer border border-gray-300 h-12 w-12">
+                  <AvatarImage src={product?.vendor?.image} />
+                  <AvatarFallback>
+                    {product?.vendor?.businessName?.slice(0, 1)}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
               <div>
                 <p className="text-lg">{product?.vendor?.businessName}</p>
                 <p className="flex items-center gap-1">
