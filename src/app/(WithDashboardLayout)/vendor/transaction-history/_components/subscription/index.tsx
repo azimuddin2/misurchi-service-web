@@ -125,9 +125,6 @@ const SubscriptionHistory = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mt-5">
-        {/* <h2 className="text-xl font-medium">Subscription History</h2> */}
-      </div>
       {/* Table */}
       <MSWTable columns={columns} data={subPayments} />
 

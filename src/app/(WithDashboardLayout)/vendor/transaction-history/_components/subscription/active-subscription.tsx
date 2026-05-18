@@ -193,11 +193,21 @@ const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
           </li>
           <li className="flex items-center gap-2">
             <Image src={checkIcon} alt="check" width={20} />
-            <span>Add Service Max: {plan?.limits?.serviceMax}</span>
+            <span>
+              Service Max:{' '}
+              {plan.limits.serviceMax === 'unlimited'
+                ? 'Unlimited'
+                : plan.limits.serviceMax}
+            </span>
           </li>
           <li className="flex items-center gap-2">
             <Image src={checkIcon} alt="check" width={20} />
-            <span>Add Product Max: {plan?.limits?.productMax}</span>
+            <span>
+              Product Max:{' '}
+              {plan.limits.productMax === 'unlimited'
+                ? 'Unlimited'
+                : plan.limits.productMax}
+            </span>
           </li>
           <li className="flex items-center gap-2">
             <Image src={checkIcon} alt="check" width={20} />

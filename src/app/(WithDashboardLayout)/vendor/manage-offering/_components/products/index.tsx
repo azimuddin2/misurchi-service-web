@@ -45,6 +45,9 @@ import {
 import Spinner from '@/components/shared/Spinner';
 import Link from 'next/link';
 import { useGetUserProfileQuery } from '@/redux/features/user/userApi';
+import { useGetActiveSubscriptionByVendorQuery } from '@/redux/features/subPayment/subPaymentApi';
+import { TSubPayment } from '@/types/subPayment.type';
+import { TSubscriptionPlan } from '@/types/plan.type';
 
 const statusOptions = [
   { label: 'Available', key: 'Available' },
@@ -103,6 +106,14 @@ const ManageProducts = () => {
 
   const products = data?.data || [];
   const meta = data?.meta || { totalPage: 1 };
+
+  const { data: subscriptionData } =
+    useGetActiveSubscriptionByVendorQuery(vendorId);
+
+  const activeSubscription = subscriptionData?.data as TSubPayment;
+  const plan = activeSubscription?.plan as TSubscriptionPlan;
+
+  console.log('Plan data.......', plan);
 
   const [updateProductStatus] = useUpdateProductStatusMutation();
   const [deleteProduct] = useDeleteProductMutation();

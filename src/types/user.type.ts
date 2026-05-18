@@ -2,6 +2,7 @@ export type TRole = 'vendor' | 'user' | 'admin' | 'team_member';
 
 export type TStatus = 'ongoing' | 'confirmed' | 'blocked';
 export type TSubscribed = 'advance' | 'basic';
+export type TChooseOffer = 'services' | 'products' | 'both';
 
 export interface IUser {
   firstName: string;
@@ -67,6 +68,7 @@ export type TVendorUser = {
   coverImage?: string;
   createdAt: string;
   updatedAt: string;
+  chooseOffer?: TChooseOffer;
   location?: {
     type: string;
     coordinates: number[]; // [lng, lat]

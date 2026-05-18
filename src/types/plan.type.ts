@@ -17,8 +17,8 @@ export type TSubscriptionPlan = {
   };
 
   limits: {
-    serviceMax: number;
-    productMax: number;
+    serviceMax: number | 'unlimited';
+    productMax: number | 'unlimited';
     highlightOfferMax: number;
     transactionFee: number;
   };
