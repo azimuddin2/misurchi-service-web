@@ -222,11 +222,11 @@ export default function Header() {
           </div>
           {!user?.email ? (
             <div className="flex gap-4 items-center">
-              <Link href="/login" className="hover:underline">
+              <Link href="/login" className="hover:underline cursor-pointer">
                 Sign In
               </Link>
               <Link href="/user-role">
-                <Button className="bg-gray-700/50 px-4 py-1 text-sm text-white">
+                <Button className="bg-gray-700/50 px-4 py-1 text-sm text-white cursor-pointer">
                   Sign Up
                 </Button>
               </Link>

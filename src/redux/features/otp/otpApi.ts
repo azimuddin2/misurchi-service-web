@@ -2,6 +2,13 @@ import { baseApi } from '../../api/baseApi';
 
 const otpApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    resendOtp: builder.mutation({
+      query: (email: string) => ({
+        url: '/otp/resend-otp',
+        method: 'POST',
+        body: { email },
+      }),
+    }),
     verifyOtp: builder.mutation({
       query: (otpCode) => ({
         url: '/otp/verify-otp',
@@ -12,4 +19,4 @@ const otpApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useVerifyOtpMutation } = otpApi;
+export const { useVerifyOtpMutation, useResendOtpMutation } = otpApi;
