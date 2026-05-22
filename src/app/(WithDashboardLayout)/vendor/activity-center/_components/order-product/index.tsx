@@ -288,11 +288,10 @@ const ManageOrderProducts = () => {
                     option.key !== status &&
                     handleStatusUpdate(row.original._id, option.key)
                   }
-                  className={`capitalize px-3 py-2 ${
-                    option.key === status
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'hover:bg-gray-100'
-                  }`}
+                  className={`capitalize px-3 py-2 ${option.key === status
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-gray-100'
+                    }`}
                 >
                   {option.label}
                 </DropdownMenuItem>
@@ -332,7 +331,7 @@ const ManageOrderProducts = () => {
               </span>
             )}
 
-            {/* Approve / Reject — pending হলে */}
+            {/* Approve / Reject — pending */}
             {hasRequest && canApprove && isPending && (
               <div className="flex flex-col gap-2">
                 <span className="text-yellow-600 text-sm font-medium flex items-center gap-1">
@@ -528,7 +527,7 @@ const ManageOrderProducts = () => {
 
       {/* Table & Pagination */}
       <MSWTable columns={columns} data={orders || []} />
-      <MSWPagination totalPage={meta?.totalPage} />
+      {orders?.length > 1 && <MSWPagination totalPage={meta?.totalPage} />}
     </div>
   );
 };

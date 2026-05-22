@@ -336,7 +336,7 @@ const CancelRequest = () => {
 
       {/* Table & Pagination */}
       <MSWTable columns={columns} data={bookings || []} />
-      <MSWPagination totalPage={meta?.totalPage} />
+         {bookings?.length > 1 && <MSWPagination totalPage={meta?.totalPage} />}
     </div>
   );
 };

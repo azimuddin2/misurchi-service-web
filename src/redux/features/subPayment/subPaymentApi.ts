@@ -45,10 +45,25 @@ const subPaymentApi = baseApi.injectEndpoints({
       }),
       providesTags: ['SubPayment'],
     }),
+
+    cancelActiveSubscription: builder.mutation<
+      TResponse<{ expiredAt: string; message: string }>,
+      string
+    >({
+      query: (vendorId) => ({
+        url: `/sub-payments/cancel-subscription/${vendorId}`,
+        method: 'PATCH',
+        credentials: 'include',
+      }),
+      invalidatesTags: ['SubPayment'],
+    }),
+
+
   }),
 });
 
 export const {
   useGetSubPaymentByVendorQuery,
   useGetActiveSubscriptionByVendorQuery,
+  useCancelActiveSubscriptionMutation,
 } = subPaymentApi;

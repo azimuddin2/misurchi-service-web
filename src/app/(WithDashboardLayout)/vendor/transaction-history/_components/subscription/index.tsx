@@ -124,7 +124,7 @@ const SubscriptionHistory = () => {
   }
 
   return (
-    <div>
+    <div className='mt-3'>
       {/* Table */}
       <MSWTable columns={columns} data={subPayments} />
 

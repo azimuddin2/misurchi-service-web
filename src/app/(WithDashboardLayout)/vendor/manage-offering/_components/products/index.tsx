@@ -266,7 +266,7 @@ const ManageProducts = () => {
       header: 'Quantity',
       cell: ({ row }) => {
         const quantity = row.original.quantity;
-        const isLow = quantity > 0 && quantity <= 10;
+        const isLow = quantity > 0 && quantity <= 3;
         const isOut = quantity === 0;
 
         return (
