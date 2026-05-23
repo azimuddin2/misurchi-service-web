@@ -111,7 +111,7 @@ const CancellationRequest = () => {
                   className="lg:w-28 lg:h-28 object-cover rounded border"
                 />
                 <div>
-                  <p>{ }</p>
+                  <p>{}</p>
                   <p className="text-base font-medium">{p.name}</p>
                   <p className="text-sm text-gray-500">
                     Quantity: {p.quantity}
@@ -284,10 +284,11 @@ const CancellationRequest = () => {
                   router.push(`/vendor/activity-center/order-cancellation`)
                 }
                 className={`relative w-full cursor-pointer text-base font-medium py-4 rounded px-4 transition-all duration-200 border
-          ${pathname === '/vendor/activity-center/order-cancellation'
-                    ? 'bg-red-100 text-red-600 border-b-2 border-red-500'
-                    : 'text-black bg-white shadow border border-gray-100'
-                  }`}
+          ${
+            pathname === '/vendor/activity-center/order-cancellation'
+              ? 'bg-red-100 text-red-600 border-b-2 border-red-500'
+              : 'text-black bg-white shadow border border-gray-100'
+          }`}
               >
                 Cancellation Request
                 <FolderSymlink />
@@ -300,10 +301,11 @@ const CancellationRequest = () => {
                   router.push(`/vendor/activity-center/order-return`)
                 }
                 className={`relative w-full cursor-pointer text-[#165940] text-base font-medium py-4 rounded px-4 transition-all duration-200
-          ${pathname === '/vendor/activity-center/order-return'
-                    ? 'bg-green-100 text-green-700 border-b-2 border-green-700'
-                    : 'text-black bg-white shadow border border-gray-100'
-                  }`}
+          ${
+            pathname === '/vendor/activity-center/order-return'
+              ? 'bg-green-100 text-green-700 border-b-2 border-green-700'
+              : 'text-black bg-white shadow border border-gray-100'
+          }`}
               >
                 Return Request
                 <FolderSymlink />

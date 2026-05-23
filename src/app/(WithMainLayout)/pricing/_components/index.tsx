@@ -70,13 +70,15 @@ const Pricing = () => {
         err?.data?.message ||
         err?.message ||
         'Something went wrong while processing your subscription.';
-
-      if (msg.toLowerCase().includes('already have an active subscription')) {
+      if (
+        msg.toLowerCase().includes('already have an active subscription') ||
+        msg.toLowerCase().includes('already on a free plan')
+      ) {
         setActiveError(msg);
       } else {
         toast.error(msg);
       }
-    } finally {
+
       setLoadingPlanId(null);
       isRequestInFlight.current = false;
       setIsSubmitting(false);

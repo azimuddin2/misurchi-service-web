@@ -43,6 +43,7 @@ const AddProduct = () => {
   const [imagePreview, setImagePreview] = useState<string[] | []>([]);
   const user = useAppSelector(selectCurrentUser);
   const router = useRouter();
+  const vendorId = user?.vendorId as string;
 
   const form = useForm({
     resolver: zodResolver(addProductSchema),
@@ -55,8 +56,6 @@ const AddProduct = () => {
   } = form;
 
   const { data: productTypeData } = useGetAllProductTypeQuery({});
-
-  const vendorId = user?.vendorId as string;
 
   const [addProduct] = useAddProductMutation();
 

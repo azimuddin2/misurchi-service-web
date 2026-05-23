@@ -113,7 +113,14 @@ const ManageProducts = () => {
   const activeSubscription = subscriptionData?.data as TSubPayment;
   const plan = activeSubscription?.plan as TSubscriptionPlan;
 
-  console.log('Plan data.......', plan);
+  const isFree = plan?.validity === 'free';
+  const productMax = plan?.limits?.productMax;
+  const currentProductCount = meta?.totalPage || products?.length || 0;
+
+  const isProductLimitReached =
+    isFree &&
+    productMax !== 'unlimited' &&
+    currentProductCount >= Number(productMax);
 
   const [updateProductStatus] = useUpdateProductStatusMutation();
   const [deleteProduct] = useDeleteProductMutation();
@@ -419,13 +426,39 @@ const ManageProducts = () => {
           </div>
         </div>
       )}
+      {isProductLimitReached && (
+        <div className="mt-2 flex items-start gap-3 text-red-800 bg-red-50 p-3 rounded border border-red-200 text-sm">
+          <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-600" />
+          <div className="flex flex-col gap-1">
+            <span className="font-medium">Product Limit Reached</span>
+            <span className="text-red-700">
+              You have reached the maximum product limit ({productMax}) allowed
+              under your free plan. To continue adding products, please upgrade
+              to the Advance Plan.
+            </span>
+            <Link
+              href="/pricing"
+              className="mt-1 inline-flex items-center gap-1 font-medium text-red-900 underline underline-offset-2 hover:text-red-700 transition-colors"
+            >
+              Upgrade to Advance Plan
+              <ExternalLink size={13} />
+            </Link>
+          </div>
+        </div>
+      )}
 
-      {/* Add Product Button */}
       <AppButton
-        disabled={!isStripeReady}
+        disabled={!isStripeReady || isProductLimitReached}
         className="w-full text-black border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80"
         content={
-          isStripeReady ? (
+          isProductLimitReached ? (
+            <div className="flex justify-center items-center space-x-1 font-semibold">
+              <PlusCircle size={24} className="text-red-500" />
+              <span className="uppercase text-sm font-semibold text-red-500">
+                Product Limit Reached ({productMax})
+              </span>
+            </div>
+          ) : isStripeReady ? (
             <Link
               href={`/vendor/manage-offering/add-product`}
               className="flex justify-center items-center space-x-1 font-semibold"

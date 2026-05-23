@@ -57,8 +57,6 @@ const subPaymentApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['SubPayment'],
     }),
-
-
   }),
 });
 

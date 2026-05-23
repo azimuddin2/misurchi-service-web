@@ -17,7 +17,7 @@ const subscriptionApi = baseApi.injectEndpoints({
           'Content-Type': 'application/json',
         },
       }),
-      invalidatesTags: ['Subscription'],
+      invalidatesTags: ['SubPayment'],
     }),
   }),
 });

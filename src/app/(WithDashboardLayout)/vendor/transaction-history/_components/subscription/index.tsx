@@ -86,21 +86,21 @@ const SubscriptionHistory = () => {
         );
       },
     },
+
     {
       accessorKey: 'isPaid',
       header: 'Plan Status',
       cell: ({ row }) => {
         const subscription = row.original.subscription as any;
         const now = new Date();
+
         const isExpired = subscription?.expiredAt
           ? new Date(subscription.expiredAt) < now
           : false;
 
-        const status = !row.original.isPaid
-          ? 'pending'
-          : isExpired
-            ? 'expired'
-            : 'active';
+        const status = isExpired
+          ? 'expired'
+          : subscription?.status || 'pending';
 
         return (
           <span
@@ -109,7 +109,9 @@ const SubscriptionHistory = () => {
                 ? 'text-green-600 bg-green-50 px-4 py-1 rounded'
                 : status === 'expired'
                   ? 'text-red-600 bg-red-50 px-2 py-1 rounded'
-                  : 'text-yellow-600 bg-yellow-50 px-2 py-1 rounded'
+                  : status === 'canceled'
+                    ? 'text-orange-500 bg-orange-50 px-2 py-1 rounded'
+                    : 'text-yellow-600 bg-yellow-50 px-2 py-1 rounded'
             }`}
           >
             {status}
@@ -124,7 +126,7 @@ const SubscriptionHistory = () => {
   }
 
   return (
-    <div className='mt-3'>
+    <div className="mt-3">
       {/* Table */}
       <MSWTable columns={columns} data={subPayments} />
 

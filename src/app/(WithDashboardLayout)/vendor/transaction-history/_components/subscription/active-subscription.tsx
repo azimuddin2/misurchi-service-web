@@ -1,7 +1,10 @@
 'use client';
 
 import Spinner from '@/components/shared/Spinner';
-import { useGetActiveSubscriptionByVendorQuery, useCancelActiveSubscriptionMutation } from '@/redux/features/subPayment/subPaymentApi';
+import {
+  useGetActiveSubscriptionByVendorQuery,
+  useCancelActiveSubscriptionMutation,
+} from '@/redux/features/subPayment/subPaymentApi';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import checkIcon from '@/assets/icons/check.png';
@@ -26,8 +29,10 @@ const formatValidity = (validity: string) => {
 };
 
 const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
-  const { data, isLoading, refetch } = useGetActiveSubscriptionByVendorQuery(vendorId);
-  const [cancelSubscription, { isLoading: isCanceling }] = useCancelActiveSubscriptionMutation();
+  const { data, isLoading, refetch } =
+    useGetActiveSubscriptionByVendorQuery(vendorId);
+  const [cancelSubscription, { isLoading: isCanceling }] =
+    useCancelActiveSubscriptionMutation();
   const [showModal, setShowModal] = useState(false);
   const [cancelMessage, setCancelMessage] = useState('');
 
@@ -113,20 +118,20 @@ const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
         <span className="text-green-600 text-sm font-normal">
           {subscription?.startedAt
             ? new Date(subscription.startedAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
             : 'N/A'}
         </span>
         {' → '}
         <span className="text-red-500 text-sm font-normal">
           {subscription?.expiredAt
             ? new Date(subscription.expiredAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })
             : 'N/A'}
         </span>
       </h2>
@@ -148,7 +153,8 @@ const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
                 ${plan?.cost?.toFixed(2)}
               </span>
               <span className="text-xl">
-                {' '}/ {formatValidity(plan?.validity)}
+                {' '}
+                / {formatValidity(plan?.validity)}
               </span>
             </>
           )}
@@ -191,7 +197,9 @@ const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
           </li>
           <li className="flex items-center gap-2">
             <Image
-              src={plan?.features?.grantPermissionAccess ? checkIcon : closeIcon}
+              src={
+                plan?.features?.grantPermissionAccess ? checkIcon : closeIcon
+              }
               alt=""
               width={20}
             />
@@ -241,10 +249,11 @@ const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
           >
             <button
               disabled={!isBasicPlan}
-              className={`w-full px-6 py-3 rounded-sm font-medium text-sm uppercase border-b-4 border-r-4 ${!isBasicPlan
-                ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
-                : 'bg-gradient-to-t to-green-800 from-green-500/70 text-white border-gray-800 hover:opacity-90 cursor-pointer'
-                }`}
+              className={`w-full px-6 py-3 rounded-sm font-medium text-sm uppercase border-b-4 border-r-4 ${
+                !isBasicPlan
+                  ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : 'bg-gradient-to-t to-green-800 from-green-500/70 text-white border-gray-800 hover:opacity-90 cursor-pointer'
+              }`}
             >
               Upgrade
             </button>
@@ -254,12 +263,17 @@ const ActiveSubscription = ({ vendorId }: { vendorId: string }) => {
           <button
             onClick={handleCancel}
             disabled={isBasicPlan || isCanceling || isCanceled}
-            className={`flex-1 px-6 py-3 rounded-sm font-medium text-sm uppercase border-b-4 border-r-4 ${isBasicPlan || isCanceled
-              ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
-              : 'bg-red-500 text-white border-red-800 hover:opacity-90 cursor-pointer'
-              }`}
+            className={`flex-1 px-6 py-3 rounded-sm font-medium text-sm uppercase border-b-4 border-r-4 ${
+              isBasicPlan || isCanceled
+                ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                : 'bg-red-500 text-white border-red-800 hover:opacity-90 cursor-pointer'
+            }`}
           >
-            {isCanceled ? 'Plan Canceled' : isCanceling ? 'Canceling...' : 'Cancel Plan'}
+            {isCanceled
+              ? 'Plan Canceled'
+              : isCanceling
+                ? 'Canceling...'
+                : 'Cancel Plan'}
           </button>
         </div>
       </div>

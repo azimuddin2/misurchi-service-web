@@ -301,10 +301,11 @@ const RescheduleRequest = () => {
                   router.push(`/vendor/activity-center/booking-cancel`)
                 }
                 className={`relative w-full cursor-pointer text-base font-medium py-4 rounded px-4 transition-all duration-200
-          ${pathname === '/vendor/activity-center/booking-cancel'
-                    ? 'bg-red-100 text-red-600 border-b-2 border-red-500'
-                    : 'text-black bg-white shadow border border-gray-100'
-                  }`}
+          ${
+            pathname === '/vendor/activity-center/booking-cancel'
+              ? 'bg-red-100 text-red-600 border-b-2 border-red-500'
+              : 'text-black bg-white shadow border border-gray-100'
+          }`}
               >
                 Cancel Request
                 <FolderSymlink />
@@ -317,10 +318,11 @@ const RescheduleRequest = () => {
                   router.push(`/vendor/activity-center/booking-reschedule`)
                 }
                 className={`relative w-full cursor-pointer text-[#165940] text-base font-medium py-4 rounded px-4 transition-all duration-200
-          ${pathname === '/vendor/activity-center/booking-reschedule'
-                    ? 'bg-green-100 text-green-700 border-b-2 border-green-600'
-                    : 'text-black bg-white shadow border border-gray-100'
-                  }`}
+          ${
+            pathname === '/vendor/activity-center/booking-reschedule'
+              ? 'bg-green-100 text-green-700 border-b-2 border-green-600'
+              : 'text-black bg-white shadow border border-gray-100'
+          }`}
               >
                 Reschedule Request
                 <FolderSymlink />

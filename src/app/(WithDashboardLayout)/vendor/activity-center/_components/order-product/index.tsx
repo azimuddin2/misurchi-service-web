@@ -288,10 +288,11 @@ const ManageOrderProducts = () => {
                     option.key !== status &&
                     handleStatusUpdate(row.original._id, option.key)
                   }
-                  className={`capitalize px-3 py-2 ${option.key === status
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:bg-gray-100'
-                    }`}
+                  className={`capitalize px-3 py-2 ${
+                    option.key === status
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'hover:bg-gray-100'
+                  }`}
                 >
                   {option.label}
                 </DropdownMenuItem>
