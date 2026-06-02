@@ -52,11 +52,11 @@ const serviceSchema = z.object({
     discount: z.string().optional(),
   }),
   status: z.enum([...ServiceStatus] as [string, ...string[]], {
-    required_error: 'Product status is required',
+    required_error: 'Service status is required',
   }),
   description: z
     .string({
-      required_error: 'Product description is required',
+      required_error: 'Service description is required',
     })
     .refine(
       (val) => {
