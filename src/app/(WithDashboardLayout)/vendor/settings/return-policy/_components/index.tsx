@@ -91,8 +91,8 @@ const ReturnPolicyForm = () => {
                   {...field}
                   // value={field.value }
                   name="content"
-                  control={control}
-                  placeholder="Enter cancellation policy here..."
+                  control={control as any}
+                  placeholder="Enter return policy here..."
                   minHeight={500}
                 />
               </FormItem>

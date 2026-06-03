@@ -381,7 +381,7 @@ const AddProduct = () => {
                   {...field}
                   // value={field.value || ''}
                   name="description"
-                  control={control}
+                  control={control as any}
                   placeholder="Enter description here..."
                   minHeight={300}
                 />

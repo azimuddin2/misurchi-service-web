@@ -91,7 +91,7 @@ const CancellationPolicyForm = () => {
                   {...field}
                   // value={field.value }
                   name="content"
-                  control={control}
+                  control={control as any}
                   placeholder="Enter cancellation policy here..."
                   minHeight={500}
                 />
