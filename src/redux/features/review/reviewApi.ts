@@ -16,14 +16,14 @@ const reviewApi = baseApi.injectEndpoints({
         body: reviewData,
         credentials: 'include',
       }),
-      invalidatesTags: ['Review'], // if product stats depend on reviews
+      invalidatesTags: ['Review'],
     }),
 
     getAllReviews: builder.query<
       TResponse<TReview[]>,
       {
-        id: string; // productId or serviceId
-        type: 'product' | 'service'; // specify which type
+        id: string;
+        type: 'product' | 'service';
         page?: number | string;
         limit?: number | string;
         query?: Record<string, string | string[] | undefined>;
