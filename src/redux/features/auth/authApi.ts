@@ -11,11 +11,16 @@ const authApi = baseApi.injectEndpoints({
     }),
 
     vendorSignup: builder.mutation({
-      query: (userInfo) => ({
-        url: '/users/vendor/signup',
-        method: 'POST',
-        body: userInfo,
-      }),
+      query: (userInfo) => {
+        const { refCode, ...body } = userInfo;
+        return {
+          url: refCode
+            ? `/users/vendor/signup?ref=${refCode}`
+            : '/users/vendor/signup',
+          method: 'POST',
+          body,
+        };
+      },
     }),
 
     login: builder.mutation({

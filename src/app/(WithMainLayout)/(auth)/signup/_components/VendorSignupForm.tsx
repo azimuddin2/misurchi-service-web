@@ -60,9 +60,14 @@ const VendorSignupForm = () => {
   const redirect = searchParams.get('redirectPath');
   const router = useRouter();
 
+  const refCode = searchParams.get('ref');
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      const response = await vendorSignup(data).unwrap();
+      const response = await vendorSignup({
+        ...data,
+        refCode: refCode || undefined,
+      }).unwrap();
 
       const accessToken = response?.data?.accessToken;
       if (!accessToken) {

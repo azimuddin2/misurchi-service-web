@@ -16,7 +16,7 @@ import {
   MessageSquareText,
   ShieldCheck,
   FileCheck,
-  Star,
+  Gift,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -89,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         title: 'Refer & Earn',
         url: `/vendor/refer-earn`,
-        icon: Star,
+        icon: Gift,
         disabled: false,
         lockIcon: false,
       },
