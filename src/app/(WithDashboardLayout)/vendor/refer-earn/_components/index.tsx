@@ -24,10 +24,25 @@ const ReferEarn = () => {
     return `${year}-${m}`;
   });
 
-  const { data: linkData, isLoading: isLinkLoading } =
-    useGetReferralLinkQuery(undefined);
+  const { data: linkData, isLoading: isLinkLoading } = useGetReferralLinkQuery(
+    undefined,
+    {
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    },
+  );
+
   const { data: statsData, isLoading: isStatsLoading } =
-    useGetReferralStatsQuery({ month: month || undefined });
+    useGetReferralStatsQuery(
+      { month: month || undefined },
+      {
+        refetchOnMountOrArgChange: true,
+        refetchOnFocus: true,
+        refetchOnReconnect: true,
+        pollingInterval: 30000,
+      },
+    );
   const [emailReferral] = useEmailReferralLinkMutation();
 
   const referralLink = linkData?.data?.referralLink || '';

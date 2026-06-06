@@ -43,7 +43,7 @@ interface AddAssignModalProps {
 
 // ✅ Validation schema
 const assignSchema = z.object({
-  assignedTo: z.string().min(1, 'Please select a member'),
+  assignedToMember: z.string().min(1, 'Please select a member'),
 });
 
 type FormValues = z.infer<typeof assignSchema>;
@@ -67,7 +67,7 @@ const AddAssignModal = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(assignSchema),
     defaultValues: {
-      assignedTo: '',
+      assignedToMember: '',
     },
   });
 
@@ -78,7 +78,7 @@ const AddAssignModal = ({
   // Preload form if needed
   useEffect(() => {
     if (bookingData) {
-      form.reset({ assignedTo: bookingData.assignedTo || '' });
+      form.reset({ assignedToMember: bookingData.assignedToMember?._id || '' });
     }
   }, [bookingData, form]);
 
@@ -86,13 +86,13 @@ const AddAssignModal = ({
     const toastId = toast.loading('Assigning member...');
 
     const modifyData = {
-      assignedTo: data.assignedTo as string,
+      assignedToMember: data.assignedToMember as string,
     };
 
     try {
       const res = await assignToMember({
         id: bookingData?._id as string,
-        assignedTo: modifyData,
+        assignedToMember: modifyData,
       }).unwrap();
       toast.success(res.message || 'Member assigned successfully');
       form.reset();
@@ -136,7 +136,12 @@ const AddAssignModal = ({
               </p>
               <p>
                 <span className="font-medium">Assigned To:</span>{' '}
-                {bookingData?.assignedTo || 'Unassigned'}
+                {bookingData?.assignedToMember?.firstName &&
+                bookingData?.assignedToMember?.lastName
+                  ? bookingData?.assignedToMember?.firstName +
+                    ' ' +
+                    bookingData?.assignedToMember?.lastName
+                  : 'Unassigned'}
               </p>
               <p>
                 <span className="font-medium">Date:</span> {bookingData?.date}
@@ -149,7 +154,7 @@ const AddAssignModal = ({
             {/* Assign To Select */}
             <FormField
               control={form.control}
-              name="assignedTo"
+              name="assignedToMember"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium">
@@ -166,8 +171,8 @@ const AddAssignModal = ({
                     </FormControl>
                     <SelectContent className="max-h-60 overflow-y-auto">
                       {members?.map((member) => (
-                        <SelectItem key={member._id} value={member.firstName}>
-                          {member.firstName}
+                        <SelectItem key={member._id} value={member._id}>
+                          {member.firstName + ' ' + member.lastName}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -194,7 +199,7 @@ const AddAssignModal = ({
                   form.reset();
                   onOpenChange(false);
                 }}
-                className="w-1/2 uppercase flex items-center justify-center text-black p-2 border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80 cursor-pointer text-base mt-2 shadow-sm rounded-sm border-b-4 border-r-4 shadow-gray-500"
+                className="w-1/2 uppercase flex items-center justify-center text-black p-2 border-gray-800 bg-gradient-to-t to-[#FFFFFF] from-[#FFFFFF] hover:bg-green-500/80 cursor-pointer text-base mt-2 shadow-sm rounded-sm border-b-4 border-r-4"
               >
                 <p className="mr-1">Cancel</p>
                 <ArrowRight size={16} />

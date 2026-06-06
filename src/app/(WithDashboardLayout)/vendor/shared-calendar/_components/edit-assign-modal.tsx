@@ -36,7 +36,7 @@ import { useBookingAssignedToMemberMutation } from '@/redux/features/booking/boo
 
 // ✅ Validation schema
 const assignSchema = z.object({
-  assignedTo: z.string().min(1, 'Please select a member'),
+  assignedToMember: z.string().min(1, 'Please select a member'),
 });
 
 type FormValues = z.infer<typeof assignSchema>;
@@ -66,7 +66,7 @@ const EditAssignModal = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(assignSchema),
     defaultValues: {
-      assignedTo: '',
+      assignedToMember: '',
     },
   });
 
@@ -77,7 +77,7 @@ const EditAssignModal = ({
   // preload form with bookingData
   useEffect(() => {
     if (bookingData) {
-      form.reset({ assignedTo: bookingData.assignedTo || '' });
+      form.reset({ assignedToMember: bookingData.assignedToMember?._id || '' });
     }
   }, [bookingData, form]);
 
@@ -85,13 +85,13 @@ const EditAssignModal = ({
     const toastId = toast.loading('Assigning member...');
 
     const modifyData = {
-      assignedTo: data.assignedTo as string,
+      assignedToMember: data.assignedToMember as string,
     };
 
     try {
       const res = await assignToMember({
         id: bookingData?._id as string,
-        assignedTo: modifyData,
+        assignedToMember: modifyData,
       }).unwrap();
       toast.success(res.message || 'Member assigned successfully');
       form.reset();
@@ -137,7 +137,12 @@ const EditAssignModal = ({
               </p>
               <p>
                 <span className="font-medium">Assigned To:</span>{' '}
-                {bookingData?.assignedTo || 'Unassigned'}
+                {bookingData?.assignedToMember?.firstName &&
+                bookingData?.assignedToMember?.lastName
+                  ? bookingData?.assignedToMember?.firstName +
+                    ' ' +
+                    bookingData?.assignedToMember?.lastName
+                  : 'Unassigned'}
               </p>
               <p>
                 <span className="font-medium">Date:</span> {bookingData?.date}
@@ -150,7 +155,7 @@ const EditAssignModal = ({
             {/* Assign To Select */}
             <FormField
               control={form.control}
-              name="assignedTo"
+              name="assignedToMember"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="!text-gray-700 !text-base font-medium">
@@ -164,8 +169,8 @@ const EditAssignModal = ({
                     </FormControl>
                     <SelectContent className="max-h-60 overflow-y-auto">
                       {members?.map((member) => (
-                        <SelectItem key={member._id} value={member.firstName}>
-                          {member.firstName}
+                        <SelectItem key={member._id} value={member._id}>
+                          {member.firstName + ' ' + member.lastName}
                         </SelectItem>
                       ))}
                     </SelectContent>

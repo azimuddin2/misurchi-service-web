@@ -130,12 +130,12 @@ const bookingApi = baseApi.injectEndpoints({
 
     bookingAssignedToMember: builder.mutation<
       TResponse<TBooking>,
-      { id: string; assignedTo: { assignedTo: string } }
+      { id: string; assignedToMember: { assignedToMember: string } }
     >({
-      query: ({ id, assignedTo }) => ({
+      query: ({ id, assignedToMember }) => ({
         url: `/bookings/assign/${id}`,
         method: 'PATCH',
-        body: assignedTo,
+        body: assignedToMember,
         credentials: 'include',
       }),
       invalidatesTags: ['Booking'],

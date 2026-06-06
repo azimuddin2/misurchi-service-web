@@ -1,3 +1,4 @@
+import { TMember } from './member.type';
 import { TService } from './service.type';
 import { TVendorUser } from './user.type';
 
@@ -55,7 +56,7 @@ export type TBooking = {
   // Request field for cancel/reschedule
   request?: IBookingRequest;
 
-  assignedTo: string | null;
+  assignedToMember: TMember | null;
   isReviewed: boolean;
   isDeleted: boolean;
   createdAt: string;
