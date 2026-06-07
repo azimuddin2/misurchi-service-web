@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Search } from 'lucide-react';
+import { FileText, Search } from 'lucide-react';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import { useAppSelector } from '@/redux/hooks';
@@ -15,6 +15,7 @@ import { useGetAllPaymentQuery } from '@/redux/features/payment/paymentApi';
 import { TPayment } from '@/types/payment.type';
 import Spinner from '@/components/shared/Spinner';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const SalesHistory = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -331,8 +332,17 @@ const SalesHistory = () => {
       </div>
 
       {/* Header */}
-      <div className="flex justify-between items-center mt-10 mb-2">
+      <div className="flex justify-between items-center mt-10 mb-3">
         <h2 className="text-xl font-medium">Sales Transaction History</h2>
+        <Link
+          href="/vendor/transaction-history/tax-summary"
+          className="flex items-center text-sm text-[#006400] hover:text-green-700 transition-colors"
+        >
+          <FileText size={18} />
+          <span className="underline decoration-1 underline-offset-2">
+            Tax Summary Report
+          </span>
+        </Link>
       </div>
 
       {/* Table */}

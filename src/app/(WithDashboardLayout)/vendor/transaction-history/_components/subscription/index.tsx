@@ -11,6 +11,8 @@ import { format } from 'date-fns';
 import { MSWTable } from '@/components/ui/core/MSWTable';
 import MSWPagination from '@/components/ui/core/MSWPagination';
 import ActiveSubscription from './active-subscription';
+import { FileText } from 'lucide-react';
+import Link from 'next/link';
 
 const SubscriptionHistory = () => {
   const user = useAppSelector(selectCurrentUser);
@@ -127,6 +129,22 @@ const SubscriptionHistory = () => {
 
   return (
     <div className="mt-3">
+      {/* Header */}
+      <div className="flex justify-between items-center my-3">
+        <h2 className="text-xl font-medium">
+          Subscription Transaction History
+        </h2>
+        <Link
+          href="/vendor/transaction-history/tax-summary"
+          className="flex items-center text-sm text-[#006400] hover:text-green-700 transition-colors"
+        >
+          <FileText size={18} />
+          <span className="underline decoration-1 underline-offset-2">
+            Tax Summary Report
+          </span>
+        </Link>
+      </div>
+
       {/* Table */}
       <MSWTable columns={columns} data={subPayments} />
 

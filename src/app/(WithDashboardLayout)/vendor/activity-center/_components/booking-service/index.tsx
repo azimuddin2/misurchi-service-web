@@ -171,21 +171,30 @@ const ManageBookingServices = () => {
         const service = row.original.service;
         const imageUrl = service?.images?.[0]?.url || '/placeholder.png';
         return (
-          <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-            <Image
-              src={imageUrl}
-              alt={service?.name || 'Service'}
-              width={100}
-              height={100}
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-sm object-cover border"
-            />
+          <div className="flex items-center gap-3 w-full max-w-full">
+            {/* Image Section */}
+            <div className="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-md overflow-hidden border border-gray-100">
+              <Image
+                src={imageUrl || '/fallback-placeholder.png'} // Fallback image handling
+                alt={service?.name || 'Service Image'}
+                fill // fill use korle responsive aspect ratio maintain kora sahaj hoy
+                sizes="(max-w-640px) 64px, 80px"
+                className="object-cover"
+              />
+            </div>
 
-            <div className="min-w-0">
-              <p className="truncate text-sm sm:text-base">
-                {row.original.serviceName}
-              </p>
-              <p className="truncate text-xs text-gray-400">
-                ID: {row.original.serviceId}
+            {/* Content Section */}
+            <div className="flex-1 min-w-0 flex flex-col justify-center py-0.5">
+              <h4
+                className="text-sm sm:text-base font-medium text-gray-800 truncate leading-snug"
+                title={row.original.serviceName}
+              >
+                {row.original.serviceName || 'Unknown Service'}
+              </h4>
+
+              <p className="text-xs text-gray-400 mt-0.5 font-mono select-all truncate">
+                <span className="text-gray-300 font-sans">ID:</span>{' '}
+                {row.original.serviceId || 'N/A'}
               </p>
             </div>
           </div>
