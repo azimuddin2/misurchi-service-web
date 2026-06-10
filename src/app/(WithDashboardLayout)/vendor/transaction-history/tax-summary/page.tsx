@@ -1,4 +1,4 @@
-import TaxSummaryReport from '../_components/sales/tax-summary-report';
+import TaxSummaryReport from './_components';
 
 const TaxSummaryPage = () => {
   return (

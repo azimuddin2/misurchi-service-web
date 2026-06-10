@@ -40,6 +40,7 @@ export type TSalesTaxSummary = {
   platformFees: number;
   netPayouts: number;
   subscriptionFeesPaid: number;
+  planName: string;
   refundIssue: number;
   payoutDatesAndMethods: string;
 };
