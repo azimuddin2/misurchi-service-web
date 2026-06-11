@@ -2,9 +2,9 @@
 
 import { FileText } from 'lucide-react';
 import { format } from 'date-fns';
-import { TSubscriptionTaxSummary } from '@/types/payment.type';
 import { Row } from './row';
 import { handleDownloadPDF, handleExportCSV } from '@/lib/tax-summary-export';
+import { TSubscriptionTaxSummary } from '@/types/taxSummary.type';
 
 const SubscriptionSummaryCard = ({
   summary,
@@ -72,14 +72,14 @@ const SubscriptionSummaryCard = ({
       <div className="flex gap-3 flex-wrap">
         <button
           onClick={() => handleDownloadPDF('subscription', summary)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#003250] text-white text-sm font-medium rounded hover:bg-[#004a78] transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#003250] text-white text-sm font-medium rounded hover:bg-[#004a78] transition-colors cursor-pointer"
         >
           <FileText className="w-4 h-4" />
           Download PDF
         </button>
         <button
           onClick={() => handleExportCSV('subscription', summary)}
-          className="inline-flex items-center gap-2 px-4 py-2 border text-sm font-medium rounded hover:bg-gray-50 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 border text-sm font-medium rounded hover:bg-gray-50 transition-colors cursor-pointer"
         >
           <FileText className="w-4 h-4" />
           Export CSV

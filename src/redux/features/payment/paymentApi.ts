@@ -1,10 +1,6 @@
 import { TResponse } from '@/types';
 import { baseApi } from '../../api/baseApi';
-import {
-  TPayment,
-  TSalesTaxSummary,
-  TSubscriptionTaxSummary,
-} from '@/types/payment.type';
+import { TPayment } from '@/types/payment.type';
 
 interface CheckoutPayload {
   user: string;
@@ -65,38 +61,8 @@ const paymentApi = baseApi.injectEndpoints({
       },
       providesTags: ['Payment'],
     }),
-
-    // ─── Sales Tax Summary ──────────────────────────────────────────────────
-    getSalesTaxSummary: builder.query<
-      TResponse<TSalesTaxSummary[]>,
-      { vendorId: string }
-    >({
-      query: ({ vendorId }) => ({
-        url: `/tax-summary/sales?vendorId=${vendorId}`,
-        method: 'GET',
-        credentials: 'include',
-      }),
-      providesTags: ['Payment'],
-    }),
-
-    // ─── Subscription Tax Summary ───────────────────────────────────────────
-    getSubscriptionTaxSummary: builder.query<
-      TResponse<TSubscriptionTaxSummary[]>,
-      { vendorId: string }
-    >({
-      query: ({ vendorId }) => ({
-        url: `/tax-summary/subscriptions?vendorId=${vendorId}`,
-        method: 'GET',
-        credentials: 'include',
-      }),
-      providesTags: ['Payment'],
-    }),
   }),
 });
 
-export const {
-  useCreateCheckoutSessionMutation,
-  useGetAllPaymentQuery,
-  useGetSalesTaxSummaryQuery,
-  useGetSubscriptionTaxSummaryQuery,
-} = paymentApi;
+export const { useCreateCheckoutSessionMutation, useGetAllPaymentQuery } =
+  paymentApi;

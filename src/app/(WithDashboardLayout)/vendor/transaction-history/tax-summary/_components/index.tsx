@@ -3,20 +3,20 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppSelector } from '@/redux/hooks';
 import { selectCurrentUser } from '@/redux/features/auth/authSlice';
-import {
-  useGetSalesTaxSummaryQuery,
-  useGetSubscriptionTaxSummaryQuery,
-} from '@/redux/features/payment/paymentApi';
-import {
-  TSalesTaxSummary,
-  TSubscriptionTaxSummary,
-} from '@/types/payment.type';
 import Spinner from '@/components/shared/Spinner';
 import EmptyState from './empty-state';
 import SalesSummaryCard from './sales-summary-Card';
 import SubscriptionSummaryCard from './subscription-summary-card';
 import { useGetVendorProfileQuery } from '@/redux/features/vendor/vendorApi';
 import { TVendorUser } from '@/types';
+import {
+  TSalesTaxSummary,
+  TSubscriptionTaxSummary,
+} from '@/types/taxSummary.type';
+import {
+  useGetSalesTaxSummaryQuery,
+  useGetSubscriptionTaxSummaryQuery,
+} from '@/redux/features/taxSummary/taxSummaryApi';
 
 const TaxSummaryReport = () => {
   const user = useAppSelector(selectCurrentUser);

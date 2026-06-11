@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { FileText } from 'lucide-react';
-import { TSalesTaxSummary } from '@/types/payment.type';
 import { Row } from './row';
+import { TSalesTaxSummary } from '@/types/taxSummary.type';
 
 const SalesSummaryCard = ({
   summary,
@@ -46,7 +46,7 @@ const SalesSummaryCard = ({
       />
     </div>
     <Link
-      href={`/dashboard/transaction-history/tax-summary/sales/${summary.year}`}
+      href={`/vendor/transaction-history/tax-summary/sales/${summary.year}`}
       className="inline-flex items-center gap-1 text-blue-600 text-sm hover:underline mt-4"
     >
       <FileText className="w-3.5 h-3.5" />

@@ -1,8 +1,8 @@
-import { format } from 'date-fns';
 import {
   TSalesTaxSummary,
   TSubscriptionTaxSummary,
-} from '@/types/payment.type';
+} from '@/types/taxSummary.type';
+import { format } from 'date-fns';
 
 // ─── CSV Export ───────────────────────────────────────────────────────────────
 
