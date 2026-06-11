@@ -75,6 +75,15 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
+
+    deleteUserAccount: builder.mutation<TResponse<IUser>, void>({
+      query: () => ({
+        url: `/users`,
+        method: 'DELETE',
+        credentials: 'include',
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -84,4 +93,5 @@ export const {
   useGetAllUsersQuery,
   useGetUserByIdQuery,
   useUpdateNotificationSettingsMutation,
+  useDeleteUserAccountMutation,
 } = userApi;
