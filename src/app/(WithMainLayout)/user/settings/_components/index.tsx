@@ -1,3 +1,4 @@
+import AccountDelete from '@/components/modules/settings/account-delete';
 import ChangePassword from '@/components/modules/settings/change-password';
 import LanguageSettings from '@/components/modules/settings/language-settings';
 import Notifications from '@/components/modules/settings/notifications';
@@ -8,6 +9,7 @@ const Settings = () => {
       <ChangePassword />
       <Notifications />
       <LanguageSettings />
+      <AccountDelete />
     </div>
   );
 };

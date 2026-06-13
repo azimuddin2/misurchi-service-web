@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { TResponse } from '../../types';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://10.10.10.73:5000/api/v1',
+  baseUrl: 'http://10.10.28.3:5000/api/v1',
   credentials: 'include',
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.token;
@@ -38,7 +38,7 @@ const baseQueryWithRefreshToken: BaseQueryFn<
 
   if (result.error?.status === 401) {
     const res = await fetch(
-      'http://10.10.10.73:5000/api/v1/auth/refresh-token',
+      'http://10.10.28.3:5000/api/v1/auth/refresh-token',
       {
         method: 'POST',
         credentials: 'include',
